@@ -44,13 +44,23 @@ edges, species, and events — not just their labels — because several entitie
 axes per record: reading-order (for gating) and in-world-date (for spatial
 animation/scrubber).
 
-**D3 — The spatial layer is a commodity; the overlay graph is the whole job.**
-Val's `stars-near.bin` (54,836 stars, all within ~83 pc) and both skybox JPGs
-transfer UNCHANGED — the real sky behind a local-bubble story is identical to
-PHM's. Every physical Bobiverse system (all within ~30 ly) is ALREADY in that
-file as an anonymous point. We are NOT adding stars; we are identifying which
-existing points are named systems and attaching fictional metadata. ~100% of
-original effort goes into the overlay graph + UI.
+**D3 — The spatial layer is BESPOKE (not commodity); the overlay graph is
+still the bulk of the job.** Val's skybox JPGs transfer unchanged, but
+`stars-near.bin` does NOT contain most of the systems we care about. Empirical
+check (`data/system_to_star_index.json`): **15 of 17** Bobiverse systems we
+need — Alpha Centauri, Epsilon Eridani, Epsilon Indi, Eta Cassiopeiae,
+Eta Leporis, Omicron² Eridani, etc. — are **missing** from the file. Cause:
+Gaia DR3 saturates on bright nearby stars; the original bin is a volume
+sample of the faint background, not a catalogue of named hosts.
+
+Resolved this session by appending 19 named-system records to the file
+(indices 53836–53854) via `scripts/append_named_systems.py`, with source
+positions in `data/named_systems.json`. The bin format is unchanged; the
+header count was bumped and records concatenated.
+
+Implication: the spatial layer carries fictional content, so the bin is no
+longer a drop-in inherited asset — re-running the append script is part of
+the build. ~80% of remaining effort still goes to the overlay graph + UI.
 
 **D4 — Hosting: GitHub Pages**, matching Val. Do NOT deploy onto the owner's
 `.coffee`/`.pizza` domains (other services run there; avoid exposure and avoid
@@ -127,10 +137,21 @@ event:            chapter_code, reading_order, in_world_date, date_precision,
   Separate adapter from the body parser; note hyphen-vs-endash drift.
 - **Books 2–5 chapter bodies** — datelines in first lines (POV / date /
   location). Use `parse_bobiverse.py`.
-- **Books 1–5 Cast of Characters + Genealogy appendices** — extends lineage to
-  ~24th generation (Heaven's River), defines POV enum and spoiler tiers, types
-  entities (Bob vs Deltan vs human vs rival replicant). HIGHEST-VALUE
-  remaining grab.
+- **Cast of Characters + Genealogy appendices** — only **Book 2** carries
+  these (`part0085.html` Cast, `part0086.html` Genealogy). Verified by
+  inspecting all 5 epubs:
+
+  | Book | Cast | Genealogy |
+  |---|---|---|
+  | 1 | ❌ | ❌ |
+  | 2 | ✅ | ✅ |
+  | 3 | ❌ | ❌ |
+  | 4 | ❌ (only Glossary of Quinlan Terms) | ❌ |
+  | 5 | ❌ | ❌ |
+
+  Do NOT chase phantom appendices in books 3/4/5. Gen-8+ parentage
+  (Marcus, Herschel, Neil, Mack, Hugh, Lenny, Mud, Conan, etc.) must be
+  mined from B3+ prose directly — see issue #5.
 - **Books 4–5 events** — no fan timeline located for these yet (VERIFY one
   doesn't exist before committing to LLM prose extraction). This is the only
   part that genuinely needs prose scraping.
@@ -178,8 +199,9 @@ Code setup well-suited to this).
 **Directly reusable (in Val's `data/`):**
 - `skybox.jpg`, `skybox-color.jpg` — equirectangular GAIA renders, one per view
   mode (Color/Petrova toggle = texture swap). Transfer unchanged.
-- `stars-near.bin` — see §2. Reuse as-is, or regenerate to re-add faint M
-  dwarfs + flag named systems.
+- `stars-near.bin` — inherited as the base file, but **not drop-in**: we
+  append named-system records that Gaia DR3 dropped (see §D3). Treat the
+  shipped bin as a build artifact, not a vendored asset.
 
 **CHECK LICENSE before copying verbatim.** GitHub Pages projects often ship no
 license (= all rights reserved). Learn from architecture; rebuild if unclear.
@@ -196,19 +218,41 @@ license (= all rights reserved). Learn from architecture; rebuild if unclear.
 
 ## 6. Conflicts register (CRITICAL — a cold session WILL get these wrong)
 
-Full detail in `systems_and_gazetteer.json`. Summary:
+Full detail in `gazetteer.json` and `data/bobs.json._conflicts_resolved` /
+`._unresolved`. Summary:
+
+**Resolved this session:**
 
 1. **Poseidon = Eta Cassiopeiae**, NOT Gliese 877. (GL877 is the *Others'* home
    star, destroyed B3C70.) An earlier guess of GL877 was wrong; do not repeat.
-2. **Bender's destination:** timeline says "Gamma Leporis A"; wiki list says
-   "Eta Leporis". Resolve — Bender is book 4's search target.
-3. **Victor/Viktor:** genealogy spells "Viktor" (born 2165); timeline says
-   "Victor" cloned 2174 alongside a "Pete" missing from the genealogy.
-4. **born vs online dates** disagree for the first cohort (2144 vs 2145) —
+2. **Bender's destination = Eta Leporis** (intended Gamma Leporis A, actually
+   arrived at Eta Leporis). Wiki row 219 (B4-1 C2) is the canonical source.
+   `gazetteer.json` updated.
+3. **Vulcan = Omicron² Eridani** (canonical). `gazetteer.json` updated.
+4. **Victor/Viktor** — canonical is "Victor". Epub grep: B2 7×, B4 2×;
+   "Viktor" appears 0× in prose. `genealogy.json` had the typo;
+   renamed in `bobs.json._conflicts_resolved`.
+5. **Dexter parent = Charles** (genealogy.json preferred over bob_index.json
+   "Riker"). Logged in `bobs.json._conflicts_resolved`.
+6. **Thor parent = Calvin** (genealogy.json preferred over bob_index.json
+   "Bill"). Logged.
+7. **Mulder/Moulder, Jonny/Johnny** — canonical spellings "Mulder" and
+   "Jonny". Logged.
+
+**Still open:**
+
+8. **born vs online dates** disagree for the first cohort (2144 vs 2145) —
    define edge-timestamp semantics before trusting either.
-5. **Genealogy JSON is ~through book 2.** Book 3+ Bobs (Marcus, Herschel, Neil,
-   Icarus, Daedalus, Mack) are missing. Icarus is a book-5 POV — that line
-   persists to the end.
+9. **`jonny-skinner-born-year`** — sheet has `online_year=2070` for both,
+   impossible (pre-Bob's creation 2133). Sheet appears to misread a column.
+   In `bobs.json._unresolved`. Tracked in issue #7.
+10. **`missing-parents-gen8+`** — Marcus, Monty, Herschel, Neil, Mack, Hugh,
+    Lenny, Mud, Conan, ANEC, etc. have no canonical parent from any current
+    source. Must be mined from B3+ prose. Tracked in issue #5.
+11. **Unresolved system placements** — Quin, Jabberwocky, Skippyland, Gamma
+    Leporis. Need prose check. Tracked in issue #3.
+12. **POV / parentage disagreements** — B2C15, B3C39 POV calls; Mack's
+    children (Isaac/Jack/Owen). Tracked in issue #4.
 
 ---
 
@@ -227,11 +271,21 @@ Full detail in `systems_and_gazetteer.json`. Summary:
 
 ## 8. OPEN QUESTIONS (owner has NOT decided — do not assume)
 
-- **Ambition dial.** Three tiers, escalating: (a) static spatial route explorer;
-  (b) spatial map + timeline scrubber that grows the graph over in-world time
-  (the Caldis model — highest-value single device for this material); (c) guided
-  story mode + free explore. Data now supports (c), but the owner has not picked.
-  **Ask before building beyond (a).**
+- **View modes (not exclusive tiers).** The UI exposes three switchable
+  modes over the same underlying graph + spatial data — not three separate
+  apps:
+  - **Explore mode** — free fly-through; all content visible up to the
+    reading-order selector (1–5).
+  - **Timeline mode** — in-world-date scrubber; nodes/edges appear as their
+    date passes (the Caldis device, applied to graph + map together).
+  - **Story mode** — guided tour following a chosen POV (Bob, Riker, Bill,
+    Bender, Icarus…) chapter-by-chapter.
+
+  The data model already supports all three: reading-order for gating (D2),
+  in-world-date on every replication/travel edge for animation, POV +
+  chapter_code on every event for story playback. Build Explore mode's
+  data plumbing first; Timeline and Story are additive overlays on the
+  same graph.
 - **Books 4–5 fan timeline** — does one exist? Determines size of the prose-
   extraction gap. Search before committing to LLM scraping.
 - **Non-spatial rendering convention** — how to draw Sgr A* (off-scale beacon),
@@ -253,5 +307,6 @@ Full detail in `systems_and_gazetteer.json`. Summary:
    chapter code; join to the dateline output (this also validates the parser).
 4. Flatten `genealogy_fan.json` into replication edges; reconcile §6 conflicts.
 5. Search for a books 4–5 timeline; scope the remaining prose-extraction work.
-6. THEN pause for the owner's call on the ambition dial (§8) before scaffolding.
+6. Scaffold Explore mode first (§8) — Timeline and Story mode reuse the
+   same graph + spatial data and can be layered on after Explore is solid.
 ```
