@@ -1,0 +1,41 @@
+Wiki CSV → events.json normalization report
+Source: timelines/bobiverse-wiki-timeline.csv
+Events: 353  Skipped (no chapter code): 3
+
+--- Location type coverage ---
+   197  system
+    43  place_in_system
+    40  virt
+    35  megastructure_internal
+    17  en_route
+    12  unresolved
+     8  off_map_distant
+     1  vehicle
+
+--- Unresolved locations (needs_review=true) ---
+     9  'Jabberwocky'
+     3  'Skippyland'
+
+--- Systems touched (17) ---
+  82 Eridani
+  Alpha Centauri
+  Beta Hydri
+  Delta Eridani
+  Delta Pavonis
+  Epsilon Eridani
+  Epsilon Indi
+  Eta Cassiopeiae
+  Eta Leporis
+  Gamma Pavonis
+  Gliese 54
+  Gliese 877
+  HIP 14101
+  HIP 84051
+  Omicron² Eridani
+  Sol
+  Zeta Tucanae
+
+--- Skipped rows (no Book[-Part]/Chapter) ---
+  Year=2036  Loc='Earth, Sol'  Desc='The United States elects an ultra-conservative fundamentalist Christian presiden'
+  Year=2040  Loc='Earth, Sol'  Desc='As typical of the political system the United States next elects an atheist pres'
+  Year=2041  Loc='Earth, Sol'  Desc='Fundamentalists stage a successful coup creating the new governing body and the '

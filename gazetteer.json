@@ -1,52 +1,152 @@
 {
-  "_about": "Two lookup tables for location normalization. SYSTEMS is the closed enum of 22 canonical Bobiverse star systems. GAZETTEER maps named in-world places to their parent system. Confidence reflects source strength: 'timeline' = stated in the fan timeline, 'cast' = from book-2 Cast appendix, 'unresolved' = needs wiki/prose lookup. Do NOT trust 'unresolved' rows without verification.",
+  "_about": "Lookup tables for location normalization. SYSTEMS is the closed enum of canonical Bobiverse star systems (catalog stars w/ real XYZ in stars-near.bin) plus non_physical (no real star). GAZETTEER maps named in-world places to their parent system. MEGASTRUCTURES are large built/topological structures sited at a system but rendered with a non-spatial convention per handoff D1. Confidence reflects source strength.",
+
+  "_confidence_levels": {
+    "cast": "stated in a book Cast-of-Characters appendix",
+    "timeline": "stated in the B1-3 fan timeline",
+    "wiki": "stated in the wiki timeline CSV (timelines/bobiverse-wiki-timeline.csv)",
+    "wiki+timeline": "agreed by both fan compilations",
+    "cast+timeline": "in cast appendix and fan timeline",
+    "implied": "not explicitly stated; inferred from co-located events",
+    "unresolved": "system unknown; needs prose/wiki lookup. DO NOT TRUST."
+  },
 
   "systems": {
-    "_note": "Only local-bubble stars carry real XYZ in stars-near.bin. Federation Capital is fictional (no real star). Sagittarius A* is the galactic center (~26000 ly) - off-scale, render as directional beacon, NOT an in-scene node.",
+    "_note": "Only local-bubble stars carry real XYZ in stars-near.bin. Non-physical entries either have no real star (Federation Capital is fictional) or are too distant to render in-scene (Sagittarius A* is ~26000 ly — render as directional beacon per handoff D1).",
     "catalog_star": [
       "Sol", "Alpha Centauri", "Epsilon Eridani", "Epsilon Indi",
       "Delta Eridani", "Delta Pavonis", "Gamma Pavonis", "Beta Hydri",
       "Zeta Tucanae", "Kappa Ceti", "Eta Cassiopeiae", "Eta Leporis",
-      "Pi3 Orionis", "82 Eridani", "Omicron\u00b2 Eridani", "Gliese 54",
+      "Pi3 Orionis", "82 Eridani", "Omicron² Eridani", "Gliese 54",
       "Gliese 877", "NN 4285", "HIP 14101", "HIP 84051"
     ],
     "non_physical": ["Federation Capital", "Sagittarius A*"]
   },
 
   "gazetteer": [
-    {"place": "Vulcan",            "system": "Omicron\u00b2 Eridani", "confidence": "cast+timeline", "note": "double planet w/ Romulus; = 40 Eridani"},
-    {"place": "Romulus",           "system": "Omicron\u00b2 Eridani", "confidence": "cast+timeline"},
-    {"place": "Romulous",          "system": "Omicron\u00b2 Eridani", "confidence": "timeline", "note": "timeline misspelling of Romulus"},
-    {"place": "Eden",              "system": "Delta Eridani",         "confidence": "timeline", "note": "Bob leaves Eden when Archimedes dies, B3C69"},
+    {"place": "Earth",             "system": "Sol",                   "confidence": "wiki+timeline"},
+    {"place": "Sol System",        "system": "Sol",                   "confidence": "wiki", "note": "wiki variant of bare 'Sol'"},
+
+    {"place": "Vulcan",            "system": "Omicron² Eridani", "confidence": "cast+timeline", "note": "double planet w/ Romulus; = 40 Eridani"},
+    {"place": "Romulus",           "system": "Omicron² Eridani", "confidence": "cast+timeline"},
+    {"place": "Romulous",          "system": "Omicron² Eridani", "confidence": "timeline", "note": "timeline misspelling of Romulus"},
+    {"place": "Vulcan Post-Life Arcology", "system": "Omicron² Eridani", "confidence": "wiki", "note": "B4-1 C16; usually paired with Virt"},
+
+    {"place": "Eden",              "system": "Delta Eridani",         "confidence": "wiki+timeline", "note": "Bob leaves Eden when Archimedes dies, B3C69"},
     {"place": "Camelot",           "system": "Delta Eridani",         "confidence": "timeline"},
     {"place": "Caerleon",          "system": "Delta Eridani",         "confidence": "timeline", "note": "second Deltan village, B3C1"},
-    {"place": "Ragnarok",          "system": "Epsilon Eridani",       "confidence": "timeline", "note": "Bill's terraforming project, B1C56/B3C55"},
-    {"place": "Poseidon",          "system": "Eta Cassiopeiae",       "confidence": "timeline", "note": "CORRECTION: earlier guessed GL877, that was WRONG. B2C4 confirms Eta Cas."},
-    {"place": "Asgard",            "system": "82 Eridani",            "confidence": "timeline", "note": "outer planet, B3C18"},
+
+    {"place": "Ragnarök",     "system": "Epsilon Eridani",       "confidence": "wiki+timeline", "note": "Bill's terraforming project; wiki uses umlaut, gazetteer originally spelled 'Ragnarok'"},
+    {"place": "Ragnarok",          "system": "Epsilon Eridani",       "confidence": "timeline", "note": "ASCII variant of Ragnarök"},
+
+    {"place": "Poseidon",          "system": "Eta Cassiopeiae",       "confidence": "wiki+timeline", "note": "RESOLVED: earlier guess of GL877 was wrong. B2C4 confirms Eta Cas; wiki rows for B3 (Marcus arc) confirm."},
+
+    {"place": "Asgard",            "system": "82 Eridani",            "confidence": "wiki+timeline", "note": "outer planet, B3C18"},
     {"place": "Takama-ga-hara",    "system": "82 Eridani",            "confidence": "timeline", "note": "inner planet, B3C18"},
-    {"place": "Valhalla",          "system": "82 Eridani",            "confidence": "timeline", "note": "Asgard's moon, B3C18"},
-    {"place": "Odin",              "system": "HIP 14101",             "confidence": "timeline", "note": "gas giant w/ atmospheric life, B3C20/44"},
-    {"place": "Rivendell",         "system": "HIP 14101",             "confidence": "timeline", "note": "floating city on Odin, B3C56"},
-    {"place": "KKP",               "system": null,                    "confidence": "unresolved", "note": "Klown Kar Planet. System not stated in timeline; check wiki."},
-    {"place": "Klown Kar Planet",  "system": null,                    "confidence": "unresolved", "note": "= KKP"},
-    {"place": "Big Top",           "system": null,                    "confidence": "unresolved", "note": "KKP's parent planet, B3C62; same system as KKP"},
-    {"place": "Aszjan",            "system": "Delta Pavonis",         "confidence": "unresolved", "note": "Pav homeworld; B2C77 implies Delta Pavonis but VERIFY (could be separate)"},
-    {"place": "Skippyland",        "system": null,                    "confidence": "unresolved", "note": "Book 5 (B5, Bill, 2336). No external source. Prose-resolve from book 4-5 content."}
+    {"place": "Takamagahara",      "system": "82 Eridani",            "confidence": "wiki", "note": "wiki spelling; renamed from Jotunheim per row 160"},
+    {"place": "Jotunheim",         "system": "82 Eridani",            "confidence": "wiki", "note": "original name for Takamagahara, B3C18"},
+    {"place": "Valhalla",          "system": "82 Eridani",            "confidence": "wiki+timeline", "note": "Asgard's moon, B3C18"},
+
+    {"place": "Odin",              "system": "HIP 14101",             "confidence": "wiki+timeline", "note": "gas giant w/ atmospheric life, B3C20/44"},
+    {"place": "Rivendell",         "system": "HIP 14101",             "confidence": "wiki+timeline", "note": "first floating city on Odin, B3C56"},
+
+    {"place": "Big Top",           "system": "Epsilon Indi",          "confidence": "wiki", "note": "RESOLVED: B2C32 says KKP is satellite of a Jovian at Epsilon Indi; B3C62 names that Jovian as Big Top. So Big Top = Epsilon Indi Jovian."},
+    {"place": "KKP",               "system": "Epsilon Indi",          "confidence": "wiki", "note": "Klown Kar Planet; habitable moon of Big Top (= Epsilon Indi Jovian), B2C32"},
+    {"place": "Klown Kar Planet",  "system": "Epsilon Indi",          "confidence": "wiki", "note": "= KKP"},
+    {"place": "Tantor",            "system": "Epsilon Indi",          "confidence": "wiki", "note": "floating city on Big Top, B3C62"},
+    {"place": "Trantor",           "system": "Epsilon Indi",          "confidence": "wiki", "note": "= Tantor (wiki spelling drift; Foundation reference). B5 Howard/Bridget residence."},
+    {"place": "Trantor City",      "system": "Epsilon Indi",          "confidence": "wiki", "note": "city on Big Top, B4-2 C15 etc"},
+
+    {"place": "Aszjan",            "system": "Delta Pavonis",         "confidence": "wiki", "note": "Pav homeworld; B2C77 confirms Delta Pavonis"},
+    {"place": "New Pav",           "system": "HIP 84051",             "confidence": "wiki", "note": "Pav new homeworld after Aszjan was stripped by Others, B3C45"},
+    {"place": "Newholme",          "system": "Gamma Pavonis",         "confidence": "wiki", "note": "human colony at Gamma Pavonis, B4-2 C7"},
+    {"place": "Newholme Colony",   "system": "Gamma Pavonis",         "confidence": "wiki"},
+
+    {"place": "Quin",              "system": "Eta Leporis",           "confidence": "implied", "note": "original Quinlan homeworld; B4-1 C6 describes a dead planet at HR's system as 'the original home of the megastructure builders'. Same system as Heaven's River. VERIFY against prose."},
+
+    {"place": "Skippyland",        "system": null,                    "confidence": "unresolved", "note": "Skippies' base, B5. Has its own Oort cloud (B5 C67) so likely its own system. Not stated in CSV."},
+    {"place": "Jabberwocky",       "system": null,                    "confidence": "unresolved", "note": "Dragons' homeworld, B5 Howard/Bridget expedition. System not stated in CSV. Off-map candidate."},
+    {"place": "Atlantis",          "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C53/55. Same system as Jabberwocky."},
+    {"place": "Lemuria",           "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C50/57"},
+    {"place": "Planet BSC-142-C",  "system": null,                    "confidence": "unresolved", "note": "Will exploring on Nostromo, B5 C20. 'BSC' likely Bobiverse Star Catalog. Off-map."}
+  ],
+
+  "megastructures": [
+    {"name": "Heaven's River", "system": "Eta Leporis", "type": "topopolis", "confidence": "wiki", "note": "Quinlan megastructure spiral discovered B4-1 C3; sub-locations (Garack's Spine, Three Lagoons, Galen Town, Elbow, Misty Falls, Six Hills, Cedar Rapids, Utopia River, Nirvana River System, Arcadia River System, Transit, Halep's Ending) all render as megastructure-internal nodes."},
+    {"name": "Matryoshka Brain", "system": "Epsilon Eridani", "type": "dyson_variant", "confidence": "wiki", "note": "Hugh's Skippies install at Epsilon Eridani, B4-1 C30. Distinct from Skippyland."},
+    {"name": "Hub Zero", "system": null, "type": "wormhole_hub", "confidence": "wiki", "note": "central wormhole network hub, ~1700 ly from contact system, B5 C5/14/52. Off-map distant; non-spatial render."},
+    {"name": "Federation Capital", "system": "Federation Capital", "type": "alien_capital", "confidence": "wiki", "note": "Pan Galactic Federation capital, B5 C68. Non-spatial."},
+    {"name": "Wormhole Network", "system": null, "type": "wormhole_network", "confidence": "wiki", "note": "network of >300 wormholes B5; render as edge-set, not a node."}
+  ],
+
+  "off_map_systems": [
+    {"name": "Centaurvania",  "confidence": "wiki", "note": "Gunther's home system, destroyed by something. B5 C48. Beyond local bubble."},
+    {"name": "Roanoke",       "confidence": "wiki", "note": "abandoned alien world reached via wormhole, B5 C52/54/56. Beyond local bubble."},
+    {"name": "Alien System",  "confidence": "wiki", "note": "wiki's generic label for the first wormhole-network discovery, B5 C5/8/12. Possibly named in prose."},
+    {"name": "Sagittarius A*","confidence": "wiki", "note": "galactic center, ~26000 ly. Render as directional beacon per D1."}
+  ],
+
+  "vehicles": [
+    {"name": "Bellerophon",   "type": "alien_cargo_ship", "note": "the Others' colony-cargo ship recovered B3, used to evacuate Earth. Crewed by Herschel/Neil."},
+    {"name": "Fargo",         "type": "human_colony_ship","note": "smaller Bellerophon-class built by Will, B4-2 C13. Ever Onward society."},
+    {"name": "Nostromo",      "type": "exploration_ship","note": "Will's exploration ship, B5 C20."},
+    {"name": "Singularity",   "type": "skippy_ship",     "note": "Hugh's ship, hijacked B5 C63."},
+    {"name": "Refuge-1",      "type": "pav_evac_ship",   "note": "Phineas/Ferb evacuated Pav, B2C73."},
+    {"name": "Refuge-2",      "type": "pav_evac_ship"},
+    {"name": "Exodus-1",      "type": "human_colony_ship","note": "first Earth colony ship, B1C54/58."},
+    {"name": "Exodus-2",      "type": "human_colony_ship"},
+    {"name": "Exodus-3",      "type": "human_colony_ship","note": "Sam pilot, to Omicron2 Eri B2C7."},
+    {"name": "Exodus-6",      "type": "human_colony_ship","note": "Rudy/Edwin to KKP B2C46."},
+    {"name": "Exodus-7",      "type": "human_colony_ship","note": "to Vulcan, B2C51."}
+  ],
+
+  "internal_locations": [
+    {"name": "Virt",      "type": "vr", "note": "default VR space; render as non-spatial overlay"},
+    {"name": "BobNet",    "type": "network", "note": "the inter-Bob comms substrate; treat as Virt-equivalent"},
+    {"name": "Bobiverse", "type": "network", "note": "wiki's looser label for in-network scenes"}
   ],
 
   "conflicts": [
-    {"id": "bender-destination", "desc": "Timeline B1C39 says Bender leaves for 'Gamma Leporis A'. Wiki 22-system list has 'Eta Leporis'. One is wrong. MATTERS: Bender is the search target of book 4.", "action": "verify against book 1 prose + wiki"},
-    {"id": "vulcan-system", "desc": "Book-2 Cast says Milo found Vulcan/Romulus at 'Epsilon2 Eridani'. Datelines + timeline say Omicron2 Eridani (=40 Eri). Cast is wrong.", "action": "trust dateline; Omicron2 Eridani is canonical"},
-    {"id": "victor-viktor", "desc": "Genealogy JSON spells 'Viktor', born 2165. Timeline B2C24 says 'Victor' cloned 2174, alongside a 'Pete' absent from the JSON.", "action": "normalize to 'Victor'; add Pete; reconcile date"},
-    {"id": "born-vs-online", "desc": "Genealogy 'born' year vs timeline 'comes online' year disagree for first cohort (2144 vs 2145).", "action": "define edge timestamp semantics before use"},
-    {"id": "genealogy-scope", "desc": "Fan genealogy JSON covers ~through book 2. Book 3 active Bobs (Marcus, Herschel, Neil, Icarus, Daedalus, Mack) missing.", "action": "extend from books 3-5 appendices/prose"}
+    {"id": "bender-destination", "status": "resolved",
+     "desc": "Timeline B1C39 says Bender leaves for 'Gamma Leporis A'. Wiki 22-system list has 'Eta Leporis'.",
+     "resolution": "B4-1 C2 (wiki row 219) says Bob 'begins his search for Bender towards Gamma Leporis A, and after several months finds evidence of a possible megastructure at Eta Leporis and heads towards it'. So Bender INTENDED Gamma Leporis A but ended up at Eta Leporis. Both are correct, at different times."},
+
+    {"id": "vulcan-system", "status": "resolved",
+     "desc": "Book-2 Cast says Milo found Vulcan/Romulus at 'Epsilon2 Eridani'. Datelines + timeline + wiki say Omicron2 Eridani (=40 Eri).",
+     "resolution": "Cast appendix is wrong; trust dateline/timeline/wiki. Omicron2 Eridani is canonical."},
+
+    {"id": "victor-viktor", "status": "partial",
+     "desc": "Genealogy JSON spells 'Viktor', born 2165. Timeline B2C24 and wiki row 77 spell 'Victor', cloned 2174 alongside 'Pete' (absent from JSON).",
+     "action": "normalize to 'Victor'; add Pete to lineage; reconcile date discrepancy"},
+
+    {"id": "born-vs-online", "status": "open",
+     "desc": "Genealogy 'born' year vs timeline/wiki 'comes online' year disagree for first cohort (2144 vs 2145).",
+     "action": "define edge timestamp semantics: replication_edge.timestamp = activation date, not lineage-creation date. Bob is reanimated 2133 but cohort comes online 2144-2145 after launch."},
+
+    {"id": "genealogy-scope", "status": "open",
+     "desc": "Fan genealogy JSON covers ~through book 2. Book 3+ active Bobs (Marcus, Herschel, Neil, Icarus, Daedalus, Mack, Khan, Loki, Hannibal, Hugh, Lenny, Mud, Conan, Will/Riker, etc.) missing.",
+     "action": "extend from books 3-5 appendices and wiki Description mining"},
+
+    {"id": "starfleet-attribution", "status": "open",
+     "desc": "B4-2 wiki rows attribute SCUT/autofactory hacking to Starfleet, then revise (row 280: 'Bill no longer believes that Starfleet did the actual hacking'). Final reveal in B5: Skippies (Mud) were involved.",
+     "action": "event 'attribution' field should reflect what was believed at the time; track revisions separately"},
+
+    {"id": "quin-system", "status": "open",
+     "desc": "Quin is the Quinlan homeworld; B4-1 C6 implies same system as Heaven's River (Eta Leporis) but does not state it explicitly.",
+     "action": "verify against prose; current gazetteer assumes Eta Leporis with confidence=implied"},
+
+    {"id": "jabberwocky-system", "status": "open",
+     "desc": "Jabberwocky (Dragons' homeworld, B5) has no system attached in CSV.",
+     "action": "look up in B5 prose; likely off_map_distant"}
   ],
 
   "species_overlay": {
-    "_note": "Verify all home-system mappings against wiki/prose; several are uncertain from memory.",
-    "Deltans": {"home": "Delta Eridani", "confidence": "high"},
-    "Others":  {"home": "Gliese 877", "confidence": "timeline", "note": "home star destroyed B3C70"},
-    "Pav":     {"home": "Delta Pavonis", "confidence": "medium", "note": "homeworld Aszjan; verify"},
-    "Quinlans":{"home": null, "confidence": "unresolved", "note": "Heaven's River topopolis; book 4; location TBD"}
+    "_note": "Home-system mappings; verify against prose where confidence < high.",
+    "Deltans":    {"home": "Delta Eridani", "confidence": "high"},
+    "Others":     {"home": "Gliese 877",    "confidence": "timeline", "note": "home star destroyed B3C70"},
+    "Pav":        {"home": "Delta Pavonis", "confidence": "wiki",     "note": "homeworld Aszjan, B2C77"},
+    "Quinlans":   {"home": "Eta Leporis",   "confidence": "implied",  "note": "homeworld Quin; relocated to Heaven's River topopolis. See conflicts.quin-system."},
+    "Centaurs":   {"home": "Centaurvania",  "confidence": "wiki",     "note": "off-map; B5"},
+    "Dragons":    {"home": "Jabberwocky",   "confidence": "wiki",     "note": "system unresolved"}
   }
 }
