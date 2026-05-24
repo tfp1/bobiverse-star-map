@@ -1,12 +1,13 @@
 {
   "$schema_version": "1.0.0",
-  "$generated_at": "2026-05-24T21:09:35Z",
+  "$generated_at": "2026-05-24T21:20:51Z",
   "$source_files": [
     "timelines/genealogy.json",
     "data/bob_index.json",
-    "data/edges_replication.json"
+    "data/edges_replication.json",
+    "data/edges_replication_manual.json"
   ],
-  "$bob_count": 70,
+  "$bob_count": 74,
   "_canon_rules_applied": [
     "Moulder\u2192Mulder",
     "Johnny\u2192Jonny",
@@ -2219,6 +2220,32 @@
       }
     },
     {
+      "id": "Mack",
+      "name": "Mack",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": null,
+      "parent_source": "n/a",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Referenced as parent of Isaac/Jack/Owen (B3C18) and as the pilot delivering three colony ships to 82 Eridani (wiki row 160). Mack's own parentage is unknown \u2014 gen-8+ extraction tracked under issue #5. Bootstrapped here so the Isaac/Jack/Owen edges resolve cleanly."
+      ],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {}
+    },
+    {
       "id": "Icarus",
       "name": "Icarus",
       "bob_number": null,
@@ -2271,10 +2298,88 @@
         "parent_id": "edges_replication.json",
         "online_year": "edges_replication.json"
       }
+    },
+    {
+      "id": "Isaac",
+      "name": "Isaac",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": "Mack",
+      "parent_source": "edges_manual",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {
+        "parent_id": "edges_replication_manual.json"
+      }
+    },
+    {
+      "id": "Jack",
+      "name": "Jack",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": "Mack",
+      "parent_source": "edges_manual",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {
+        "parent_id": "edges_replication_manual.json"
+      }
+    },
+    {
+      "id": "Owen",
+      "name": "Owen",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": "Mack",
+      "parent_source": "edges_manual",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {
+        "parent_id": "edges_replication_manual.json"
+      }
     }
   ],
   "_coverage": {
-    "total_bobs": 70,
+    "total_bobs": 74,
     "by_generation": {
       "1": 1,
       "2": 9,
@@ -2294,6 +2399,7 @@
       "genealogy.json": 1,
       "edges_replication.json,genealogy.json": 2,
       "bob_index.json": 21,
+      "edges_replication_manual.json": 4,
       "edges_replication.json": 2
     }
   },

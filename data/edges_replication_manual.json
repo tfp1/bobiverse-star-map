@@ -1,0 +1,58 @@
+{
+  "$schema_version": "1.0.0",
+  "$about": "Manually adjudicated replication edges + stub Bob declarations that the wiki-CSV miner cannot infer alone. `bobs` is a list of {name, note} entries for Bobs known to exist in prose but with parent unknown (typically gen-8+ Bobs whose parentage tracks under issue #5). `edges` matches data/edges_replication.json. Merged by scripts/consolidate_bobs.py after the auto-mined edges. Each entry MUST cite the chapter and the prose evidence.",
+  "bobs": [
+    {
+      "name": "Mack",
+      "first_book": 3,
+      "note": "Referenced as parent of Isaac/Jack/Owen (B3C18) and as the pilot delivering three colony ships to 82 Eridani (wiki row 160). Mack's own parentage is unknown — gen-8+ extraction tracked under issue #5. Bootstrapped here so the Isaac/Jack/Owen edges resolve cleanly."
+    }
+  ],
+  "edges": [
+    {
+      "parent": "Mack",
+      "child": "Isaac",
+      "in_world_date": null,
+      "date_year": null,
+      "chapter_code": "B3.C18",
+      "reading_order": 18,
+      "first_book": 3,
+      "pattern": "manual_prose_adjudication",
+      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
+      "parent_known": true,
+      "child_known": false,
+      "confidence": "high",
+      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones (explicit phrase 'three clones'). Pilots the three colony ships arriving at 82 Eridani per wiki row 160. Adjudicated under issue #4."
+    },
+    {
+      "parent": "Mack",
+      "child": "Jack",
+      "in_world_date": null,
+      "date_year": null,
+      "chapter_code": "B3.C18",
+      "reading_order": 18,
+      "first_book": 3,
+      "pattern": "manual_prose_adjudication",
+      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
+      "parent_known": true,
+      "child_known": false,
+      "confidence": "high",
+      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones. Adjudicated under issue #4."
+    },
+    {
+      "parent": "Mack",
+      "child": "Owen",
+      "in_world_date": null,
+      "date_year": null,
+      "chapter_code": "B3.C18",
+      "reading_order": 18,
+      "first_book": 3,
+      "pattern": "manual_prose_adjudication",
+      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
+      "parent_known": true,
+      "child_known": false,
+      "confidence": "high",
+      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones. Adjudicated under issue #4."
+    }
+  ]
+}

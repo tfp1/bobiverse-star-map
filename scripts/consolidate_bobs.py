@@ -2,11 +2,14 @@
 """
 consolidate_bobs.py
 
-Merge three Bob sources into canonical data/bobs.json:
-  1. timelines/genealogy.json     — nested tree, canonical lineage (~book 2)
-  2. data/bob_index.json          — sheet extract, Bob# / HIC / online-year /
-                                    deceased-year / destinations / annotations
-  3. data/edges_replication.json  — mined parents for late Bobs missing from 1+2
+Merge Bob sources into canonical data/bobs.json:
+  1. timelines/genealogy.json              — nested tree, canonical lineage (~book 2)
+  2. data/bob_index.json                   — sheet extract, Bob# / HIC / online-year /
+                                             deceased-year / destinations / annotations
+  3. data/edges_replication.json           — auto-mined parents for late Bobs
+  4. data/edges_replication_manual.json    — human-adjudicated parents for cases
+                                             the miner cannot infer (e.g. B3C18
+                                             Mack→Isaac/Jack/Owen, issue #4)
 
 Canon renames (per epub grep):
   Moulder → Mulder
@@ -160,6 +163,7 @@ def main():
     genealogy_path = os.path.join(args.repo, "timelines", "genealogy.json")
     index_path = os.path.join(args.repo, "data", "bob_index.json")
     edges_path = os.path.join(args.repo, "data", "edges_replication.json")
+    edges_manual_path = os.path.join(args.repo, "data", "edges_replication_manual.json")
     out_path = args.out or os.path.join(args.repo, "data", "bobs.json")
 
     with open(genealogy_path) as f:
@@ -168,6 +172,10 @@ def main():
         index = json.load(f)
     with open(edges_path) as f:
         edges = json.load(f)
+    edges_manual = {"edges": []}
+    if os.path.exists(edges_manual_path):
+        with open(edges_manual_path) as f:
+            edges_manual = json.load(f)
 
     conflicts = []
 
@@ -347,8 +355,27 @@ def main():
             if canon_alt not in b["alt_names"]:
                 b["alt_names"].append(canon_alt)
 
-    # ---- 3. Layer edges_replication.json (mined parents for late Bobs) ----
-    for e in edges["edges"]:
+    # ---- 3a. Bootstrap stub Bobs from the manual file -----------------
+    # Declared-known Bobs with unknown parentage (e.g. gen-8+ Bobs whose
+    # lineage tracks under a separate issue). Add as minimal nodes so
+    # downstream edges that reference them resolve cleanly.
+    for stub in edges_manual.get("bobs", []):
+        name = canon_name(stub["name"])
+        if name not in bobs:
+            b = new_bob(name, name)
+            add_source(b, "edges_replication_manual.json")
+            if stub.get("note"):
+                b["annotations"].append(stub["note"])
+            bobs[name] = b
+
+    # ---- 3b. Layer edges_replication.json + edges_replication_manual.json ----
+    # Manual edges run AFTER auto-mined so that they take precedence on parent
+    # disagreements — they're human-adjudicated from prose.
+    tagged_edges = (
+        [(e, "edges_replication.json", "edges_mined") for e in edges["edges"]]
+        + [(e, "edges_replication_manual.json", "edges_manual") for e in edges_manual.get("edges", [])]
+    )
+    for e, src_file, parent_src_label in tagged_edges:
         child_raw = e["child"]
         # Some mined children are slash-forms like "Kyle/Jackson"; prefer first
         # token as the canonical, and add the second as alt_name.
@@ -365,17 +392,29 @@ def main():
         if child_name not in bobs:
             b = new_bob(child_name, child_name)
             b["parent_id"] = parent_name
-            b["parent_source"] = "edges_mined"
-            b["provenance"]["parent_id"] = "edges_replication.json"
+            b["parent_source"] = parent_src_label
+            b["provenance"]["parent_id"] = src_file
             # generation = parent + 1 if parent known
             if parent_name in bobs and bobs[parent_name]["generation"] is not None:
                 b["generation"] = bobs[parent_name]["generation"] + 1
-            b["online_year"] = e["date_year"]
-            b["provenance"]["online_year"] = "edges_replication.json"
-            add_source(b, "edges_replication.json")
+            if e.get("date_year") is not None:
+                b["online_year"] = e["date_year"]
+                b["provenance"]["online_year"] = src_file
+            add_source(b, src_file)
             bobs[child_name] = b
         else:
-            add_source(bobs[child_name], "edges_replication.json")
+            add_source(bobs[child_name], src_file)
+            # Manual edges override auto-mined parent on disagreement
+            if parent_src_label == "edges_manual" and bobs[child_name]["parent_id"] != parent_name:
+                prev_parent = bobs[child_name]["parent_id"]
+                conflicts.append({
+                    "bob": child_name,
+                    "issue": f"parent disagreement: prior={prev_parent!r}, manual adjudication={parent_name!r}",
+                    "resolution": f"kept {parent_name!r} (edges_replication_manual.json)",
+                })
+                bobs[child_name]["parent_id"] = parent_name
+                bobs[child_name]["parent_source"] = parent_src_label
+                bobs[child_name]["provenance"]["parent_id"] = src_file
 
         if alt_name:
             if alt_name not in bobs[child_name]["alt_names"]:
@@ -454,6 +493,7 @@ def main():
             "timelines/genealogy.json",
             "data/bob_index.json",
             "data/edges_replication.json",
+            "data/edges_replication_manual.json",
         ],
         "$bob_count": len(bob_list),
         "_canon_rules_applied": [f"{k}→{v}" for k, v in CANON_RENAMES.items()],
