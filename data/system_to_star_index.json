@@ -1,0 +1,809 @@
+{
+  "$schema_version": "1.0.0",
+  "$generated_at": "2026-05-24T19:38:18Z",
+  "$bin_file": "stars-near.bin",
+  "$bin_record_count": 53836,
+  "$reference_sources": [
+    "SIMBAD (simbad.u-strasbg.fr); J2000 ICRS RA/Dec + parallax",
+    "All parallaxes consistent with Gaia DR3 / Hipparcos."
+  ],
+  "$method": "For each catalog_star system, compute heliocentric XYZ from (RA, Dec, 1000/parallax_mas) on ICRS axes, then find the Euclidean-nearest record in stars-near.bin. Confidence: high (<0.3 pc + M within 1.5 of expected), medium (<1.0 pc), low (<3.0 pc), none (>=3.0 pc -> system absent from bin).",
+  "systems": {
+    "Sol": {
+      "type": "catalog_star",
+      "index": null,
+      "byte_offset": null,
+      "ref_source": "by-definition origin",
+      "notes": "Sol is the heliocentric origin (0,0,0). Excluded from stars-near.bin by construction. Render at origin."
+    },
+    "Alpha Centauri": {
+      "type": "catalog_star",
+      "ref_ra_deg": 219.902083,
+      "ref_dec_deg": -60.834548,
+      "ref_parallax_mas": 742.12,
+      "ref_distance_pc": 1.3474909718104888,
+      "ref_xyz_pc": [
+        -0.503764483037594,
+        -0.42124360694779406,
+        -1.176650792863479
+      ],
+      "ref_source": "SIMBAD: alpha Cen A",
+      "ref_spt": "G2V",
+      "ref_v_mag": 0.01,
+      "index": 53836,
+      "byte_offset": 1076724,
+      "bin_xyz_pc": [
+        -0.503764483037594,
+        -0.42124360694779406,
+        -1.176650792863479
+      ],
+      "bin_M_abs_g": 4.232370679522524,
+      "bin_BP_RP": 0.89,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. A+B unresolved at bin resolution; Proxima is a separate M5.5Ve dwarf at M~15.6 and is excluded by the M<13 faint cut. | expected abs G ~4.7 (from SpT=G2V); bin M_at_nearest=8.98 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Epsilon Eridani": {
+      "type": "catalog_star",
+      "ref_ra_deg": 53.2326854,
+      "ref_dec_deg": -9.4582609,
+      "ref_parallax_mas": 310.5773,
+      "ref_distance_pc": 3.2198103338524744,
+      "ref_xyz_pc": [
+        1.9010711311344013,
+        2.5442388661071664,
+        -0.5291084317418013
+      ],
+      "ref_source": "SIMBAD: eps Eri",
+      "ref_spt": "K2V",
+      "ref_v_mag": 3.73,
+      "index": 53837,
+      "byte_offset": 1076744,
+      "bin_xyz_pc": [
+        1.9010711311344013,
+        2.5442388661071664,
+        -0.5291084317418013
+      ],
+      "bin_M_abs_g": 5.920848550507334,
+      "bin_BP_RP": 1.27,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~6.2 (from SpT=K2V); bin M_at_nearest=12.26 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Epsilon Indi": {
+      "type": "catalog_star",
+      "ref_ra_deg": 330.8402,
+      "ref_dec_deg": -56.7859,
+      "ref_parallax_mas": 274.8431,
+      "ref_distance_pc": 3.6384395314999725,
+      "ref_xyz_pc": [
+        1.7404371604966822,
+        -0.9710955321954181,
+        -3.0440259824932645
+      ],
+      "ref_source": "SIMBAD: eps Ind A",
+      "ref_spt": "K5V",
+      "ref_v_mag": 4.69,
+      "index": 53838,
+      "byte_offset": 1076764,
+      "bin_xyz_pc": [
+        1.7404371604966822,
+        -0.9710955321954181,
+        -3.0440259824932645
+      ],
+      "bin_M_abs_g": 6.505424191872757,
+      "bin_BP_RP": 1.62,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~7.4 (from SpT=K5V); bin M_at_nearest=4.32 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Delta Eridani": {
+      "type": "catalog_star",
+      "ref_ra_deg": 55.8120864565,
+      "ref_dec_deg": -9.7633641421,
+      "ref_parallax_mas": 110.0254,
+      "ref_distance_pc": 9.088810401961728,
+      "ref_xyz_pc": [
+        5.0331151203100175,
+        7.409365603078356,
+        -1.5412748192433687
+      ],
+      "ref_source": "SIMBAD: del Eri",
+      "ref_spt": "K0+IV",
+      "ref_v_mag": 3.54,
+      "index": 53839,
+      "byte_offset": 1076784,
+      "bin_xyz_pc": [
+        5.0331151203100175,
+        7.409365603078356,
+        -1.5412748192433687
+      ],
+      "bin_M_abs_g": 3.5374647806296733,
+      "bin_BP_RP": 1.1,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Subgiant; abs G ~4.5 (brighter than dwarf K0). | expected abs G ~4.5 (from SpT=K0+IV); bin M_at_nearest=12.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Delta Pavonis": {
+      "type": "catalog_star",
+      "ref_ra_deg": 302.1817,
+      "ref_dec_deg": -66.182,
+      "ref_parallax_mas": 163.9544,
+      "ref_distance_pc": 6.099256866543381,
+      "ref_xyz_pc": [
+        1.3118508612251116,
+        -2.084660135034255,
+        -5.579800512865892
+      ],
+      "ref_source": "SIMBAD: del Pav",
+      "ref_spt": "G8IV",
+      "ref_v_mag": 3.56,
+      "index": 53840,
+      "byte_offset": 1076804,
+      "bin_xyz_pc": [
+        1.3118508612251116,
+        -2.084660135034255,
+        -5.579800512865892
+      ],
+      "bin_M_abs_g": 4.443615381028111,
+      "bin_BP_RP": 1.04,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~3.8 (from SpT=G8IV); bin M_at_nearest=2.68"
+    },
+    "Gamma Pavonis": {
+      "type": "catalog_star",
+      "ref_ra_deg": 321.61087,
+      "ref_dec_deg": -65.366198,
+      "ref_parallax_mas": 108.0102,
+      "ref_distance_pc": 9.258384856245058,
+      "ref_xyz_pc": [
+        3.024769604957011,
+        -2.3964686437908513,
+        -8.415782614980218
+      ],
+      "ref_source": "SIMBAD: gam Pav",
+      "ref_spt": "F9VFe-1.4CH-0.7",
+      "ref_v_mag": 4.22,
+      "index": 53841,
+      "byte_offset": 1076824,
+      "bin_xyz_pc": [
+        3.024769604957011,
+        -2.3964686437908513,
+        -8.415782614980218
+      ],
+      "bin_M_abs_g": 4.287323851256202,
+      "bin_BP_RP": 0.85,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.4 (from SpT=F9VFe-1.4CH-0.7); bin M_at_nearest=4.07"
+    },
+    "Beta Hydri": {
+      "type": "catalog_star",
+      "ref_ra_deg": 6.4377765,
+      "ref_dec_deg": -77.2542461,
+      "ref_parallax_mas": 134.07,
+      "ref_distance_pc": 7.458790184232118,
+      "ref_xyz_pc": [
+        1.6352199390131525,
+        0.18451109039563746,
+        -7.27499569903462
+      ],
+      "ref_source": "SIMBAD: bet Hyi",
+      "ref_spt": "G0V",
+      "ref_v_mag": 2.79,
+      "index": 53842,
+      "byte_offset": 1076844,
+      "bin_xyz_pc": [
+        1.6352199390131525,
+        0.18451109039563746,
+        -7.27499569903462
+      ],
+      "bin_M_abs_g": 3.316658046900108,
+      "bin_BP_RP": 0.85,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.5 (from SpT=G0V); bin M_at_nearest=11.90 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Zeta Tucanae": {
+      "type": "catalog_star",
+      "ref_ra_deg": 5.017608,
+      "ref_dec_deg": -64.8747937,
+      "ref_parallax_mas": 116.1826,
+      "ref_distance_pc": 8.607140828316805,
+      "ref_xyz_pc": [
+        3.6405680015492403,
+        0.319635833480984,
+        -7.792751170063675
+      ],
+      "ref_source": "SIMBAD: zet Tuc",
+      "ref_spt": "F9.5V",
+      "ref_v_mag": 4.23,
+      "index": 53843,
+      "byte_offset": 1076864,
+      "bin_xyz_pc": [
+        3.6405680015492403,
+        0.319635833480984,
+        -7.792751170063675
+      ],
+      "bin_M_abs_g": 4.455705455683763,
+      "bin_BP_RP": 0.85,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.5 (from SpT=F9.5V); bin M_at_nearest=10.56 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Kappa Ceti": {
+      "type": "catalog_star",
+      "ref_ra_deg": 49.840402,
+      "ref_dec_deg": 3.370198,
+      "ref_parallax_mas": 107.8023,
+      "ref_distance_pc": 9.276239931801085,
+      "ref_xyz_pc": [
+        5.972076449632488,
+        7.0771146893134285,
+        0.5453235978665395
+      ],
+      "ref_source": "SIMBAD: kap1 Cet (HD 20630)",
+      "ref_spt": "G5V",
+      "ref_v_mag": 4.85,
+      "index": 53844,
+      "byte_offset": 1076884,
+      "bin_xyz_pc": [
+        5.972076449632488,
+        7.0771146893134285,
+        0.5453235978665395
+      ],
+      "bin_M_abs_g": 4.853140133875705,
+      "bin_BP_RP": 0.94,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~5.2 (from SpT=G5V); bin M_at_nearest=11.53 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Eta Cassiopeiae": {
+      "type": "catalog_star",
+      "ref_ra_deg": 12.276227692,
+      "ref_dec_deg": 57.814621,
+      "ref_parallax_mas": 168.8322,
+      "ref_distance_pc": 5.923040746966515,
+      "ref_xyz_pc": [
+        3.082826896645744,
+        0.6708251992799281,
+        5.012841865404719
+      ],
+      "ref_source": "SIMBAD: eta Cas A",
+      "ref_spt": "F9V",
+      "ref_v_mag": 3.44,
+      "index": 53845,
+      "byte_offset": 1076904,
+      "bin_xyz_pc": [
+        3.082826896645744,
+        0.6708251992799281,
+        5.012841865404719
+      ],
+      "bin_M_abs_g": 4.477276398316604,
+      "bin_BP_RP": 0.85,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Binary; B not separately resolved in bin. | expected abs G ~4.4 (from SpT=F9V); bin M_at_nearest=5.23"
+    },
+    "Eta Leporis": {
+      "type": "catalog_star",
+      "ref_ra_deg": 89.1012306254,
+      "ref_dec_deg": -14.1677175507,
+      "ref_parallax_mas": 66.8573,
+      "ref_distance_pc": 14.957229801382947,
+      "ref_xyz_pc": [
+        0.22748049495927614,
+        14.50049766543667,
+        -3.6609484304558184
+      ],
+      "ref_source": "SIMBAD: eta Lep (HD 40136)",
+      "ref_spt": "F2V",
+      "ref_v_mag": 3.72,
+      "index": 53846,
+      "byte_offset": 1076924,
+      "bin_xyz_pc": [
+        0.22748049495927614,
+        14.50049766543667,
+        -3.6609484304558184
+      ],
+      "bin_M_abs_g": 2.8257441691814797,
+      "bin_BP_RP": 0.62,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Heaven's River megastructure host (Bender's final destination). | expected abs G ~3.0 (from SpT=F2V); bin M_at_nearest=6.54 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Pi3 Orionis": {
+      "type": "catalog_star",
+      "ref_ra_deg": 72.4600467021,
+      "ref_dec_deg": 6.9613350574,
+      "ref_parallax_mas": 124.6198,
+      "ref_distance_pc": 8.024407036442042,
+      "ref_xyz_pc": [
+        2.4004942549662385,
+        7.594924217068753,
+        0.9725542428868617
+      ],
+      "ref_source": "SIMBAD: pi3 Ori (HD 30652)",
+      "ref_spt": "F6V",
+      "ref_v_mag": 3.19,
+      "index": 53847,
+      "byte_offset": 1076944,
+      "bin_xyz_pc": [
+        2.4004942549662385,
+        7.594924217068753,
+        0.9725542428868617
+      ],
+      "bin_M_abs_g": 3.6179352496408135,
+      "bin_BP_RP": 0.75,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~3.7 (from SpT=F6V); bin M_at_nearest=9.00 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "82 Eridani": {
+      "type": "catalog_star",
+      "ref_ra_deg": 49.9819,
+      "ref_dec_deg": -43.0698,
+      "ref_parallax_mas": 165.5242,
+      "ref_distance_pc": 6.041412675608763,
+      "ref_xyz_pc": [
+        2.837938244963318,
+        3.379954094602925,
+        -4.125613160871688
+      ],
+      "ref_source": "SIMBAD: 82 Eri (HD 20794)",
+      "ref_spt": "G6V",
+      "ref_v_mag": 4.27,
+      "index": 53848,
+      "byte_offset": 1076964,
+      "bin_xyz_pc": [
+        2.837938244963318,
+        3.379954094602925,
+        -4.125613160871688
+      ],
+      "bin_M_abs_g": 5.1943074877833855,
+      "bin_BP_RP": 0.97,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~5.4 (from SpT=G6V); bin M_at_nearest=10.06 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Omicron² Eridani": {
+      "type": "catalog_star",
+      "ref_ra_deg": 63.818,
+      "ref_dec_deg": -7.6529,
+      "ref_parallax_mas": 199.608,
+      "ref_distance_pc": 5.009819245721614,
+      "ref_xyz_pc": [
+        2.1907637514128377,
+        4.45575287860129,
+        -0.6671651558156716
+      ],
+      "ref_source": "SIMBAD: omi2 Eri / 40 Eri A (HD 26965)",
+      "ref_spt": "K0V",
+      "ref_v_mag": 4.43,
+      "index": 53849,
+      "byte_offset": 1076984,
+      "bin_xyz_pc": [
+        2.1907637514128377,
+        4.45575287860129,
+        -0.6671651558156716
+      ],
+      "bin_M_abs_g": 5.720889715974966,
+      "bin_BP_RP": 1.1,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. = 40 Eridani. Triple system; A anchors. Vulcan/Romulus host. | expected abs G ~5.8 (from SpT=K0V); bin M_at_nearest=4.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Gliese 54": {
+      "type": "catalog_star",
+      "ref_ra_deg": 17.595336654,
+      "ref_dec_deg": -67.4449574079,
+      "ref_parallax_mas": 121.4487,
+      "ref_distance_pc": 8.233929222791186,
+      "ref_xyz_pc": [
+        3.010534888169505,
+        0.95472824066061,
+        -7.604128097259672
+      ],
+      "ref_source": "SIMBAD: GJ 54",
+      "ref_spt": "M2.5V",
+      "ref_v_mag": 9.824,
+      "index": 53850,
+      "byte_offset": 1077004,
+      "bin_xyz_pc": [
+        3.010534888169505,
+        0.95472824066061,
+        -7.604128097259672
+      ],
+      "bin_M_abs_g": 9.59596435215498,
+      "bin_BP_RP": 2.45,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Red-dwarf binary; abs G ~9.7, should be inside the bin's M<13 cut. | expected abs G ~9.7 (from SpT=M2.5V); bin M_at_nearest=11.90"
+    },
+    "Gliese 877": {
+      "type": "catalog_star",
+      "ref_ra_deg": 338.9396303554,
+      "ref_dec_deg": -75.4586788444,
+      "ref_parallax_mas": 116.3134,
+      "ref_distance_pc": 8.597461685411998,
+      "ref_xyz_pc": [
+        2.01444302749832,
+        -0.7757084872910589,
+        -8.322057621996818
+      ],
+      "ref_source": "SIMBAD: GJ 877",
+      "ref_spt": "M3V",
+      "ref_v_mag": 10.377,
+      "index": 53851,
+      "byte_offset": 1077024,
+      "bin_xyz_pc": [
+        2.01444302749832,
+        -0.7757084872910589,
+        -8.322057621996818
+      ],
+      "bin_M_abs_g": 9.955148754674976,
+      "bin_BP_RP": 2.8,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3V at d~8.6 pc; abs G ~10.4 — within bin faint cut, should be present despite handoff.md flagging it as 'at risk'. Others' home star in canon (destroyed B3C70). | expected abs G ~10.0 (from SpT=M3V); bin M_at_nearest=11.41 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "NN 4285": {
+      "type": "catalog_star",
+      "ref_ra_deg": 359.512084,
+      "ref_dec_deg": -65.835241,
+      "ref_parallax_mas": 35.4025,
+      "ref_distance_pc": 28.246592754748956,
+      "ref_xyz_pc": [
+        11.562660668996376,
+        -0.0984669999651225,
+        -25.771402460017544
+      ],
+      "ref_source": "SIMBAD: GJ 4285 (= NN 4285)",
+      "ref_spt": "M3.5V",
+      "ref_v_mag": null,
+      "index": 53852,
+      "byte_offset": 1077044,
+      "bin_xyz_pc": [
+        11.562660668996376,
+        -0.0984669999651225,
+        -25.771402460017544
+      ],
+      "bin_M_abs_g": 10.45,
+      "bin_BP_RP": 2.8,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3.5V at d~28 pc; abs G ~10.4 — well inside the bin's M<13 cut. Handoff flagged as 'at risk' but should be present. | expected abs G ~10.4 (from SpT=M3.5V); bin M_at_nearest=11.95 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "HIP 14101": {
+      "type": "catalog_star",
+      "ref_ra_deg": 45.4641648,
+      "ref_dec_deg": -16.5933641,
+      "ref_parallax_mas": 106.16,
+      "ref_distance_pc": 9.419743782969103,
+      "ref_xyz_pc": [
+        6.331459550646949,
+        6.434884571710723,
+        -2.6900656951208317
+      ],
+      "ref_source": "SIMBAD: HIP 14101 (= LP 771-95)",
+      "ref_spt": "M3.5+M3.0",
+      "ref_v_mag": 9.97,
+      "index": 53853,
+      "byte_offset": 1077064,
+      "bin_xyz_pc": [
+        6.331459550646949,
+        6.434884571710723,
+        -2.6900656951208317
+      ],
+      "bin_M_abs_g": 9.349804549281895,
+      "bin_BP_RP": 2.8,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3.5+M3.0 binary at d~9.4 pc; abs G ~10. Odin host (B3C20). | expected abs G ~10.0 (from SpT=M3.5+M3.0); bin M_at_nearest=4.66 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "HIP 84051": {
+      "type": "catalog_star",
+      "ref_ra_deg": 257.7464771,
+      "ref_dec_deg": -52.515511,
+      "ref_parallax_mas": 78.2621,
+      "ref_distance_pc": 12.777576885874517,
+      "ref_xyz_pc": [
+        -1.6503080384182565,
+        -7.598604662616319,
+        -10.139238710772736
+      ],
+      "ref_source": "SIMBAD: HIP 84051",
+      "ref_spt": "M1V",
+      "ref_v_mag": 10.017,
+      "index": 53854,
+      "byte_offset": 1077084,
+      "bin_xyz_pc": [
+        -1.6503080384182565,
+        -7.598604662616319,
+        -10.139238710772736
+      ],
+      "bin_M_abs_g": 8.934757485531957,
+      "bin_BP_RP": 2.2,
+      "match_distance_pc": 0.0,
+      "confidence": "appended",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M1V at d~12.8 pc; abs G ~9. New Pav host post-B3C45. | expected abs G ~9.0 (from SpT=M1V); bin M_at_nearest=4.74 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative."
+    },
+    "Federation Capital": {
+      "type": "non_physical",
+      "index": null,
+      "byte_offset": null,
+      "notes": "Fictional alien capital (Pan Galactic Federation, B5 C68). No real star. Render as non-spatial node per handoff D1."
+    },
+    "Sagittarius A*": {
+      "type": "non_physical",
+      "index": null,
+      "byte_offset": null,
+      "notes": "Galactic center, ~8 kpc — off-scale for local-bubble (~83 pc) visualization. Render as directional beacon per handoff D1."
+    }
+  },
+  "_coverage": {
+    "total_systems": 22,
+    "by_confidence": {
+      "low": 4,
+      "none": 15,
+      "non_physical": 2,
+      "appended": 19
+    },
+    "missing_from_bin_likely_reasons": [
+      "Alpha Centauri: nearest bin record is 0.45 pc away (M_bin=8.98); Likely Gaia DR3 bright-star saturation cut (SpT=G2V, expected abs G ~4.7, too bright for clean Gaia astrometry).",
+      "Epsilon Eridani: nearest bin record is 0.97 pc away (M_bin=12.26); Likely Gaia DR3 bright-star saturation cut (SpT=K2V, expected abs G ~6.2, too bright for clean Gaia astrometry).",
+      "Epsilon Indi: nearest bin record is 1.30 pc away (M_bin=4.32); Possibly a positional/parallax discrepancy (SpT=K5V, expected abs G ~7.4; check epoch/proper-motion handling).",
+      "Delta Eridani: nearest bin record is 1.38 pc away (M_bin=12.18); Likely Gaia DR3 bright-star saturation cut (SpT=K0+IV, expected abs G ~4.5, too bright for clean Gaia astrometry).",
+      "Delta Pavonis: nearest bin record is 1.39 pc away (M_bin=2.68); Likely Gaia DR3 bright-star saturation cut (SpT=G8IV, expected abs G ~3.8, too bright for clean Gaia astrometry).",
+      "Gamma Pavonis: nearest bin record is 1.36 pc away (M_bin=4.07); Likely Gaia DR3 bright-star saturation cut (SpT=F9VFe-1.4CH-0.7, expected abs G ~4.4, too bright for clean Gaia astrometry).",
+      "Beta Hydri: nearest bin record is 1.15 pc away (M_bin=11.90); Likely Gaia DR3 bright-star saturation cut (SpT=G0V, expected abs G ~4.5, too bright for clean Gaia astrometry).",
+      "Zeta Tucanae: nearest bin record is 1.15 pc away (M_bin=10.56); Likely Gaia DR3 bright-star saturation cut (SpT=F9.5V, expected abs G ~4.5, too bright for clean Gaia astrometry).",
+      "Kappa Ceti: nearest bin record is 1.58 pc away (M_bin=11.53); Likely Gaia DR3 bright-star saturation cut (SpT=G5V, expected abs G ~5.2, too bright for clean Gaia astrometry).",
+      "Eta Cassiopeiae: nearest bin record is 0.99 pc away (M_bin=5.23); Likely Gaia DR3 bright-star saturation cut (SpT=F9V, expected abs G ~4.4, too bright for clean Gaia astrometry).",
+      "Eta Leporis: nearest bin record is 1.98 pc away (M_bin=6.54); Likely Gaia DR3 bright-star saturation cut (SpT=F2V, expected abs G ~3.0, too bright for clean Gaia astrometry).",
+      "Pi3 Orionis: nearest bin record is 2.14 pc away (M_bin=9.00); Likely Gaia DR3 bright-star saturation cut (SpT=F6V, expected abs G ~3.7, too bright for clean Gaia astrometry).",
+      "82 Eridani: nearest bin record is 1.84 pc away (M_bin=10.06); Likely Gaia DR3 bright-star saturation cut (SpT=G6V, expected abs G ~5.4, too bright for clean Gaia astrometry).",
+      "Omicron² Eridani: nearest bin record is 1.83 pc away (M_bin=4.18); Likely Gaia DR3 bright-star saturation cut (SpT=K0V, expected abs G ~5.8, too bright for clean Gaia astrometry).",
+      "Gliese 54: nearest bin record is 1.39 pc away (M_bin=11.90); Possibly a positional/parallax discrepancy (SpT=M2.5V, expected abs G ~9.7; check epoch/proper-motion handling).",
+      "Gliese 877: nearest bin record is 1.83 pc away (M_bin=11.41); Possibly a positional/parallax discrepancy (SpT=M3V, expected abs G ~10.0; check epoch/proper-motion handling).",
+      "NN 4285: nearest bin record is 2.21 pc away (M_bin=11.95); Possibly a positional/parallax discrepancy (SpT=M3.5V, expected abs G ~10.4; check epoch/proper-motion handling).",
+      "HIP 14101: nearest bin record is 0.59 pc away (M_bin=4.66); Possibly a positional/parallax discrepancy (SpT=M3.5+M3.0, expected abs G ~10.0; check epoch/proper-motion handling).",
+      "HIP 84051: nearest bin record is 1.30 pc away (M_bin=4.74); Possibly a positional/parallax discrepancy (SpT=M1V, expected abs G ~9.0; check epoch/proper-motion handling)."
+    ],
+    "systems_blocking_events": [
+      {
+        "system": "Alpha Centauri",
+        "confidence": "none",
+        "match_distance_pc": 0.45450947362908056,
+        "events_using_system": 2,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C28",
+          "B2.C61"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Epsilon Eridani",
+        "confidence": "none",
+        "match_distance_pc": 0.9666111957843073,
+        "events_using_system": 35,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C14",
+          "B1.C15",
+          "B1.C16"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Epsilon Indi",
+        "confidence": "none",
+        "match_distance_pc": 1.2967187555613457,
+        "events_using_system": 11,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C40",
+          "B2.C46",
+          "B3.C62"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Delta Eridani",
+        "confidence": "none",
+        "match_distance_pc": 1.3759675294112346,
+        "events_using_system": 37,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C27",
+          "B1.C30",
+          "B1.C35"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Delta Pavonis",
+        "confidence": "low",
+        "match_distance_pc": 1.390002885757653,
+        "events_using_system": 10,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C63",
+          "B2.C68",
+          "B2.C72"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Gamma Pavonis",
+        "confidence": "low",
+        "match_distance_pc": 1.357876463735365,
+        "events_using_system": 3,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C60",
+          "B3.C53",
+          "B4.P2.C7"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Beta Hydri",
+        "confidence": "none",
+        "match_distance_pc": 1.153081212329161,
+        "events_using_system": 1,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C57"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Zeta Tucanae",
+        "confidence": "none",
+        "match_distance_pc": 1.1533734935156572,
+        "events_using_system": 1,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C10"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Kappa Ceti",
+        "confidence": "none",
+        "match_distance_pc": 1.5760117469270156,
+        "events_using_system": 0,
+        "in_systems_seen": false,
+        "sample_chapter_codes": [],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Eta Cassiopeiae",
+        "confidence": "low",
+        "match_distance_pc": 0.9941242289759417,
+        "events_using_system": 14,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C4",
+          "B2.C6",
+          "B2.C49"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Eta Leporis",
+        "confidence": "none",
+        "match_distance_pc": 1.982892719569017,
+        "events_using_system": 36,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B4.P1.C3",
+          "B4.P1.C5",
+          "B4.P1.C6"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Pi3 Orionis",
+        "confidence": "none",
+        "match_distance_pc": 2.13726269666049,
+        "events_using_system": 0,
+        "in_systems_seen": false,
+        "sample_chapter_codes": [],
+        "bobs_at_system": []
+      },
+      {
+        "system": "82 Eridani",
+        "confidence": "none",
+        "match_distance_pc": 1.8402772837377932,
+        "events_using_system": 8,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C46",
+          "B1.C60",
+          "B2.C50"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Omicron² Eridani",
+        "confidence": "none",
+        "match_distance_pc": 1.831593053325717,
+        "events_using_system": 34,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B1.C19",
+          "B1.C23",
+          "B1.C61"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Gliese 54",
+        "confidence": "low",
+        "match_distance_pc": 1.3918281941744823,
+        "events_using_system": 4,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C13",
+          "B2.C15",
+          "B2.C55"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "Gliese 877",
+        "confidence": "none",
+        "match_distance_pc": 1.8302139756609195,
+        "events_using_system": 3,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C30",
+          "B2.C38",
+          "B2.C53"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "NN 4285",
+        "confidence": "none",
+        "match_distance_pc": 2.206977568633634,
+        "events_using_system": 0,
+        "in_systems_seen": false,
+        "sample_chapter_codes": [],
+        "bobs_at_system": []
+      },
+      {
+        "system": "HIP 14101",
+        "confidence": "none",
+        "match_distance_pc": 0.5881301316920319,
+        "events_using_system": 8,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B2.C67",
+          "B2.C75",
+          "B3.C20"
+        ],
+        "bobs_at_system": []
+      },
+      {
+        "system": "HIP 84051",
+        "confidence": "none",
+        "match_distance_pc": 1.2972730958616767,
+        "events_using_system": 5,
+        "in_systems_seen": true,
+        "sample_chapter_codes": [
+          "B3.C45",
+          "B3.C48",
+          "B3.C74"
+        ],
+        "bobs_at_system": []
+      }
+    ],
+    "last_updated": "2026-05-24T20:13:20.388581Z",
+    "bin_record_count_after_append": 53855
+  }
+}
