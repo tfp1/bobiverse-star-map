@@ -1,0 +1,32 @@
+Edge mining coverage report
+Generated: 2026-05-24T15:19:35.113975Z
+Source events: 353
+
+REPLICATION edges: 40
+  confidence=high: 40
+  by pattern:
+    R1_clone_self: 9
+    R3a_bare_qty_pov: 9
+    R6_cohort: 8
+    R5_inline_clones_of: 7
+    R7_possessive_clone: 2
+    R3c_bare_creates_known: 2
+    R3b_created_paren_pov: 2
+    R2_parent_creates: 1
+  new Bobs discovered (4): Daedalus, Icarus, Kyle/Jackson, Ned/Hector
+
+TRAVEL edges: 23
+  confidence=high: 23
+  by verb:
+    arrives_at: 14
+    heads_to: 5
+    returns_to: 3
+    leaves_for: 1
+  by destination_type:
+    system: 22
+    place_in_system: 1
+
+Unresolved travel destinations (raw → count):
+  (none)
+
+Low-confidence travel edges (sample, first 30):

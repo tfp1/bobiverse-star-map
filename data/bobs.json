@@ -1,0 +1,2298 @@
+{
+  "$schema_version": "1.0.0",
+  "$generated_at": "2026-05-24T19:30:11Z",
+  "$source_files": [
+    "timelines/genealogy.json",
+    "data/bob_index.json",
+    "data/edges_replication.json"
+  ],
+  "$bob_count": 70,
+  "_canon_rules_applied": [
+    "Moulder\u2192Mulder",
+    "Johnny\u2192Jonny",
+    "Viktor\u2192Victor"
+  ],
+  "_conflicts_resolved": [
+    {
+      "bob": "Victor",
+      "issue": "genealogy.json spelling 'Viktor' renamed to canonical 'Victor'",
+      "resolution": "renamed"
+    },
+    {
+      "bob": "Dexter",
+      "issue": "parent disagreement: genealogy.json='Charles', bob_index.json='Riker'",
+      "resolution": "kept 'Charles' (genealogy.json preferred)"
+    },
+    {
+      "bob": "Mulder",
+      "issue": "bob_index.json spelling 'Moulder' renamed to canonical 'Mulder'",
+      "resolution": "renamed"
+    },
+    {
+      "bob": "Jonny",
+      "issue": "bob_index.json spelling 'Johnny' renamed to canonical 'Jonny'",
+      "resolution": "renamed"
+    },
+    {
+      "bob": "Thor",
+      "issue": "parent disagreement: genealogy.json='Calvin', bob_index.json='Bill'",
+      "resolution": "kept 'Calvin' (genealogy.json preferred)"
+    }
+  ],
+  "bobs": [
+    {
+      "id": "Bob",
+      "name": "Bob",
+      "bob_number": 1,
+      "version": null,
+      "generation": 1,
+      "parent_id": null,
+      "parent_source": "n/a",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2133,
+      "online_year": 2133,
+      "replication_edge_year": 2133,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [
+        "Epsilon Eridani",
+        "Delta Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "Sol-1",
+        "year_in_block=2144",
+        "year_in_block=2165",
+        "year_in_block=2263"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bill",
+      "name": "Bill",
+      "bob_number": 3,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2144,
+      "online_year": null,
+      "replication_edge_year": 2144,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": "HIC-16537-2",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Garfield",
+      "name": "Garfield",
+      "bob_number": 7,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2145,
+      "online_year": 2145,
+      "replication_edge_year": 2145,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2150"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Calvin",
+      "name": "Calvin",
+      "bob_number": 9,
+      "version": "v3",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2150,
+      "online_year": 2150,
+      "replication_edge_year": 2150,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bart",
+      "name": "Bart",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Calvin",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2165,
+      "online_year": null,
+      "replication_edge_year": 2165,
+      "deceased_year": null,
+      "origin_system": "Alpha Centauri",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Thor",
+      "name": "Thor",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Calvin",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2165,
+      "online_year": null,
+      "replication_edge_year": 2165,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json"
+      }
+    },
+    {
+      "id": "Goku",
+      "name": "Goku",
+      "bob_number": 10,
+      "version": "v3",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2150,
+      "online_year": null,
+      "replication_edge_year": 2150,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2185"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Linus",
+      "name": "Linus",
+      "bob_number": 8,
+      "version": "v3",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2150,
+      "online_year": 2150,
+      "replication_edge_year": 2150,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Mulder",
+      "name": "Mulder",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [
+        "Moulder"
+      ],
+      "created_year": 2170,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Jonny",
+      "name": "Jonny",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Mulder",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [
+        "Johnny"
+      ],
+      "created_year": 2171,
+      "online_year": 2070,
+      "replication_edge_year": 2070,
+      "deceased_year": null,
+      "origin_system": "Eta Cassiopeiae",
+      "destinations": [],
+      "hic_code": "HIC-3821-2",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Skinner",
+      "name": "Skinner",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Mulder",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2070,
+      "replication_edge_year": 2070,
+      "deceased_year": null,
+      "origin_system": "Eta Cassiopeiae",
+      "destinations": [],
+      "hic_code": "HIC-3821-1",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Oliver",
+      "name": "Oliver",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2205,
+      "replication_edge_year": 2205,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "Alpha Centauri"
+      ],
+      "hic_code": "HIC-71683-14",
+      "annotations": [
+        "Sent over SCUT"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Khan",
+      "name": "Khan",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Loki",
+      "name": "Loki",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Khan",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": null,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": "Khan",
+      "sources": [
+        "genealogy.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json"
+      }
+    },
+    {
+      "id": "Elmer",
+      "name": "Elmer",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Hannibal",
+      "name": "Hannibal",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Tom",
+      "name": "Tom",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Barney",
+      "name": "Barney",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Fred",
+      "name": "Fred",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Kyle",
+      "name": "Kyle",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [
+        "Jackson"
+      ],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Ned",
+      "name": "Ned",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "genealogy.json",
+      "alt_names": [
+        "Hecktor",
+        "Hector"
+      ],
+      "spelling_aliases": [],
+      "created_year": 2171,
+      "online_year": 2185,
+      "replication_edge_year": 2185,
+      "deceased_year": 2185,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Mario",
+      "name": "Mario",
+      "bob_number": 5,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2144,
+      "online_year": null,
+      "replication_edge_year": 2144,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "Beta Hydri"
+      ],
+      "hic_code": "HIC-16537-4",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bashful",
+      "name": "Bashful",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2180,
+      "replication_edge_year": 2180,
+      "deceased_year": 2187,
+      "origin_system": "Gliese 54",
+      "destinations": [
+        "Gliese 877"
+      ],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Dopey",
+      "name": "Dopey",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2180,
+      "replication_edge_year": 2180,
+      "deceased_year": null,
+      "origin_system": "Gliese 54",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Sleepy",
+      "name": "Sleepy",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2180,
+      "replication_edge_year": 2180,
+      "deceased_year": null,
+      "origin_system": "Gliese 54",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Hungry",
+      "name": "Hungry",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2180,
+      "replication_edge_year": 2180,
+      "deceased_year": null,
+      "origin_system": "Gliese 54",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2188"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Hal",
+      "name": "Hal",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2188,
+      "replication_edge_year": 2188,
+      "deceased_year": -1,
+      "origin_system": "Gliese 877",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Bashful Backup"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Claude",
+      "name": "Claude",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": null,
+      "replication_edge_year": 2158,
+      "deceased_year": null,
+      "origin_system": "Gamma Pavonis",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "15 v5 built 2208"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Jacques",
+      "name": "Jacques",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Mario",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2188,
+      "replication_edge_year": 2188,
+      "deceased_year": null,
+      "origin_system": "Delta Pavonis",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "20 v5 built 2208"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Phineas",
+      "name": "Phineas",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Jacques",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": null,
+      "replication_edge_year": 2170,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json"
+      }
+    },
+    {
+      "id": "Ferb",
+      "name": "Ferb",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Jacques",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": null,
+      "replication_edge_year": 2170,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json"
+      }
+    },
+    {
+      "id": "Riker",
+      "name": "Riker",
+      "bob_number": 2,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2144,
+      "online_year": 2145,
+      "replication_edge_year": 2145,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "Sol"
+      ],
+      "hic_code": "HIC-16537-1",
+      "annotations": [
+        "2201 14 Exodus",
+        "Ships in service"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Homer",
+      "name": "Homer",
+      "bob_number": 6,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2145,
+      "online_year": 2145,
+      "replication_edge_year": 2145,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2158"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Ralph",
+      "name": "Ralph",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2166,
+      "online_year": null,
+      "replication_edge_year": 2166,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2171"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Charles",
+      "name": "Charles",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2158,
+      "replication_edge_year": 2158,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Howard",
+      "name": "Howard",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Charles",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Dexter",
+      "name": "Dexter",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Charles",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Rudy",
+      "name": "Rudy",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Edwin",
+      "name": "Edwin",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Exodus 6"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Arthur",
+      "name": "Arthur",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2158,
+      "online_year": null,
+      "replication_edge_year": 2158,
+      "deceased_year": 2166,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bert",
+      "name": "Bert",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Exodus 1"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Ernie",
+      "name": "Ernie",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2170,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Exodux 2"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Milo",
+      "name": "Milo",
+      "bob_number": 4,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2144,
+      "online_year": null,
+      "replication_edge_year": 2144,
+      "deceased_year": 2174,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "Omicron\u00b2 Eridani",
+        "82 Eridani"
+      ],
+      "hic_code": "HIC-16537-3",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "bob_number": "bob_index.json",
+        "deceased_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Marvin",
+      "name": "Marvin",
+      "bob_number": null,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2165,
+      "online_year": 2165,
+      "replication_edge_year": 2165,
+      "deceased_year": null,
+      "origin_system": "Delta Eridani",
+      "destinations": [],
+      "hic_code": "HIC-17378-1",
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json",
+        "hic_code": "bob_index.json"
+      }
+    },
+    {
+      "id": "Luke",
+      "name": "Luke",
+      "bob_number": null,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2165,
+      "online_year": 2165,
+      "replication_edge_year": 2165,
+      "deceased_year": null,
+      "origin_system": "Delta Eridani",
+      "destinations": [
+        "Kappa Ceti"
+      ],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bender",
+      "name": "Bender",
+      "bob_number": null,
+      "version": "v2",
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": 2165,
+      "online_year": 2165,
+      "replication_edge_year": 2165,
+      "deceased_year": null,
+      "origin_system": "Delta Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Gamma Leporis A",
+        "year_in_block=2174"
+      ],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json",
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Victor",
+      "name": "Victor",
+      "bob_number": null,
+      "version": null,
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "genealogy.json",
+      "alt_names": [],
+      "spelling_aliases": [
+        "Viktor"
+      ],
+      "created_year": 2165,
+      "online_year": 2174,
+      "replication_edge_year": 2174,
+      "deceased_year": null,
+      "origin_system": "Delta Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "genealogy.json",
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "genealogy.json",
+        "created_year": "genealogy.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Sam",
+      "name": "Sam",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "Exodus 3"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "unnamed_row42",
+      "name": "???",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "bob_index.json",
+      "alt_names": [
+        "Exodus"
+      ],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "unnamed cohort placeholder"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json"
+      }
+    },
+    {
+      "id": "Marcus",
+      "name": "Marcus",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Monty",
+      "name": "Monty",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "bob_index.json",
+      "alt_names": [
+        "Exodus"
+      ],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "unnamed_row68",
+      "name": "???",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Riker",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2171,
+      "replication_edge_year": 2171,
+      "deceased_year": null,
+      "origin_system": "Sol",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "unnamed cohort placeholder",
+        "Exodus 7"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json"
+      }
+    },
+    {
+      "id": "Bruce",
+      "name": "Bruce",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Calvin",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "Loki_v4",
+      "name": "Loki",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "Khan backup",
+        "2nd Expedition"
+      ],
+      "restored_from": "Khan",
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Elmer_v4",
+      "name": "Elmer",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "From Backup",
+        "2nd Expedition"
+      ],
+      "restored_from": "Elmer",
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Jeffery_v4",
+      "name": "Jeffery",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Milton_v4",
+      "name": "Milton",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Zeke_v4",
+      "name": "Zeke",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Vern_v4",
+      "name": "Vern",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Surly_v4",
+      "name": "Surly",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Hank_v4",
+      "name": "Hank",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "unnamed_row198",
+      "name": "9?",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "unnamed cohort placeholder",
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "unnamed_row204",
+      "name": "10?",
+      "bob_number": null,
+      "version": "v4",
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Epsilon Eridani",
+      "destinations": [
+        "82 Eridani"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "unnamed cohort placeholder",
+        "2nd Expedition"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "Wally",
+      "name": "Wally",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "year_in_block=2205"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "Ben",
+      "name": "Ben",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Jacques",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": "Delta Pavonis",
+      "destinations": [
+        "Delta Pavonis"
+      ],
+      "hic_code": null,
+      "annotations": [
+        "Refugee One",
+        "Refugee Two"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Andrew",
+      "name": "Andrew",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Claude",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "75 v5 Ships Deployed",
+        "Delta Pavonis Defense"
+      ],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "Tony",
+      "name": "Tony",
+      "bob_number": null,
+      "version": null,
+      "generation": 4,
+      "parent_id": "Claude",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json"
+      }
+    },
+    {
+      "id": "Pete",
+      "name": "Pete",
+      "bob_number": null,
+      "version": null,
+      "generation": 2,
+      "parent_id": "Bob",
+      "parent_source": "bob_index.json",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2174,
+      "replication_edge_year": 2174,
+      "deceased_year": null,
+      "origin_system": "Delta Eridani",
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "bob_index.json"
+      ],
+      "provenance": {
+        "generation": "bob_index.json",
+        "parent_id": "bob_index.json",
+        "online_year": "bob_index.json",
+        "origin_system": "bob_index.json"
+      }
+    },
+    {
+      "id": "Icarus",
+      "name": "Icarus",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "edges_mined",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2223,
+      "replication_edge_year": 2223,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "edges_replication.json",
+        "online_year": "edges_replication.json"
+      }
+    },
+    {
+      "id": "Daedalus",
+      "name": "Daedalus",
+      "bob_number": null,
+      "version": null,
+      "generation": 3,
+      "parent_id": "Bill",
+      "parent_source": "edges_mined",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": 2223,
+      "replication_edge_year": 2223,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [],
+      "restored_from": null,
+      "sources": [
+        "edges_replication.json"
+      ],
+      "provenance": {
+        "parent_id": "edges_replication.json",
+        "online_year": "edges_replication.json"
+      }
+    }
+  ],
+  "_coverage": {
+    "total_bobs": 70,
+    "by_generation": {
+      "1": 1,
+      "2": 9,
+      "3": 47,
+      "4": 13
+    },
+    "with_bob_number": 10,
+    "with_created_year": 47,
+    "with_online_year": 43,
+    "with_deceased_year": 11,
+    "with_hic_code": 8,
+    "with_origin_system": 60,
+    "with_destinations": 18,
+    "by_source_set": {
+      "bob_index.json,genealogy.json": 8,
+      "bob_index.json,edges_replication.json,genealogy.json": 36,
+      "genealogy.json": 1,
+      "edges_replication.json,genealogy.json": 2,
+      "bob_index.json": 21,
+      "edges_replication.json": 2
+    }
+  },
+  "_unresolved": [
+    {
+      "bob": "Jonny",
+      "issue": "implausible online_year=2070 (before 2100); likely sheet column-misread"
+    },
+    {
+      "bob": "Skinner",
+      "issue": "implausible online_year=2070 (before 2100); likely sheet column-misread"
+    }
+  ]
+}
