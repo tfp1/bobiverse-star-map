@@ -1,0 +1,52 @@
+{
+  "_about": "Two lookup tables for location normalization. SYSTEMS is the closed enum of 22 canonical Bobiverse star systems. GAZETTEER maps named in-world places to their parent system. Confidence reflects source strength: 'timeline' = stated in the fan timeline, 'cast' = from book-2 Cast appendix, 'unresolved' = needs wiki/prose lookup. Do NOT trust 'unresolved' rows without verification.",
+
+  "systems": {
+    "_note": "Only local-bubble stars carry real XYZ in stars-near.bin. Federation Capital is fictional (no real star). Sagittarius A* is the galactic center (~26000 ly) - off-scale, render as directional beacon, NOT an in-scene node.",
+    "catalog_star": [
+      "Sol", "Alpha Centauri", "Epsilon Eridani", "Epsilon Indi",
+      "Delta Eridani", "Delta Pavonis", "Gamma Pavonis", "Beta Hydri",
+      "Zeta Tucanae", "Kappa Ceti", "Eta Cassiopeiae", "Eta Leporis",
+      "Pi3 Orionis", "82 Eridani", "Omicron\u00b2 Eridani", "Gliese 54",
+      "Gliese 877", "NN 4285", "HIP 14101", "HIP 84051"
+    ],
+    "non_physical": ["Federation Capital", "Sagittarius A*"]
+  },
+
+  "gazetteer": [
+    {"place": "Vulcan",            "system": "Omicron\u00b2 Eridani", "confidence": "cast+timeline", "note": "double planet w/ Romulus; = 40 Eridani"},
+    {"place": "Romulus",           "system": "Omicron\u00b2 Eridani", "confidence": "cast+timeline"},
+    {"place": "Romulous",          "system": "Omicron\u00b2 Eridani", "confidence": "timeline", "note": "timeline misspelling of Romulus"},
+    {"place": "Eden",              "system": "Delta Eridani",         "confidence": "timeline", "note": "Bob leaves Eden when Archimedes dies, B3C69"},
+    {"place": "Camelot",           "system": "Delta Eridani",         "confidence": "timeline"},
+    {"place": "Caerleon",          "system": "Delta Eridani",         "confidence": "timeline", "note": "second Deltan village, B3C1"},
+    {"place": "Ragnarok",          "system": "Epsilon Eridani",       "confidence": "timeline", "note": "Bill's terraforming project, B1C56/B3C55"},
+    {"place": "Poseidon",          "system": "Eta Cassiopeiae",       "confidence": "timeline", "note": "CORRECTION: earlier guessed GL877, that was WRONG. B2C4 confirms Eta Cas."},
+    {"place": "Asgard",            "system": "82 Eridani",            "confidence": "timeline", "note": "outer planet, B3C18"},
+    {"place": "Takama-ga-hara",    "system": "82 Eridani",            "confidence": "timeline", "note": "inner planet, B3C18"},
+    {"place": "Valhalla",          "system": "82 Eridani",            "confidence": "timeline", "note": "Asgard's moon, B3C18"},
+    {"place": "Odin",              "system": "HIP 14101",             "confidence": "timeline", "note": "gas giant w/ atmospheric life, B3C20/44"},
+    {"place": "Rivendell",         "system": "HIP 14101",             "confidence": "timeline", "note": "floating city on Odin, B3C56"},
+    {"place": "KKP",               "system": null,                    "confidence": "unresolved", "note": "Klown Kar Planet. System not stated in timeline; check wiki."},
+    {"place": "Klown Kar Planet",  "system": null,                    "confidence": "unresolved", "note": "= KKP"},
+    {"place": "Big Top",           "system": null,                    "confidence": "unresolved", "note": "KKP's parent planet, B3C62; same system as KKP"},
+    {"place": "Aszjan",            "system": "Delta Pavonis",         "confidence": "unresolved", "note": "Pav homeworld; B2C77 implies Delta Pavonis but VERIFY (could be separate)"},
+    {"place": "Skippyland",        "system": null,                    "confidence": "unresolved", "note": "Book 5 (B5, Bill, 2336). No external source. Prose-resolve from book 4-5 content."}
+  ],
+
+  "conflicts": [
+    {"id": "bender-destination", "desc": "Timeline B1C39 says Bender leaves for 'Gamma Leporis A'. Wiki 22-system list has 'Eta Leporis'. One is wrong. MATTERS: Bender is the search target of book 4.", "action": "verify against book 1 prose + wiki"},
+    {"id": "vulcan-system", "desc": "Book-2 Cast says Milo found Vulcan/Romulus at 'Epsilon2 Eridani'. Datelines + timeline say Omicron2 Eridani (=40 Eri). Cast is wrong.", "action": "trust dateline; Omicron2 Eridani is canonical"},
+    {"id": "victor-viktor", "desc": "Genealogy JSON spells 'Viktor', born 2165. Timeline B2C24 says 'Victor' cloned 2174, alongside a 'Pete' absent from the JSON.", "action": "normalize to 'Victor'; add Pete; reconcile date"},
+    {"id": "born-vs-online", "desc": "Genealogy 'born' year vs timeline 'comes online' year disagree for first cohort (2144 vs 2145).", "action": "define edge timestamp semantics before use"},
+    {"id": "genealogy-scope", "desc": "Fan genealogy JSON covers ~through book 2. Book 3 active Bobs (Marcus, Herschel, Neil, Icarus, Daedalus, Mack) missing.", "action": "extend from books 3-5 appendices/prose"}
+  ],
+
+  "species_overlay": {
+    "_note": "Verify all home-system mappings against wiki/prose; several are uncertain from memory.",
+    "Deltans": {"home": "Delta Eridani", "confidence": "high"},
+    "Others":  {"home": "Gliese 877", "confidence": "timeline", "note": "home star destroyed B3C70"},
+    "Pav":     {"home": "Delta Pavonis", "confidence": "medium", "note": "homeworld Aszjan; verify"},
+    "Quinlans":{"home": null, "confidence": "unresolved", "note": "Heaven's River topopolis; book 4; location TBD"}
+  }
+}
