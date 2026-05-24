@@ -23,6 +23,12 @@ Born-year semantics:
   online_year  = bob_index.json's `born_year` (when activated)
   replication_edge_year = online_year ?? created_year
 
+Sheet sanity check: bob_index.json `born_year` values < SHEET_YEAR_FLOOR (2100)
+are impossible (Bob himself created 2133). These are misread columns — the raw
+value is preserved in provenance.online_year_raw, but online_year is left null
+so replication_edge_year falls back to created_year. Affects Jonny/Skinner
+(both flagged 2070 in the sheet; canonical year 2171 from genealogy.json).
+
 v4 backups (2nd 82 Eri expedition) become separate nodes: id = name + "_v4".
 
 OUTPUT SCHEMA: see docstring at top of repo / README; key fields:
@@ -48,6 +54,10 @@ CANON_RENAMES = {
     "Johnny": "Jonny",
     "Viktor": "Victor",
 }
+
+# Sheet's born_year < this is impossible (Bob created 2133). Treated as a
+# column-misread: raw value preserved in provenance, online_year nulled.
+SHEET_YEAR_FLOOR = 2100
 
 # Per-Bob parent overrides (after rename). Source: handoff §6 + epub grep.
 PARENT_OVERRIDES = {
@@ -201,9 +211,16 @@ def main():
                 b["parent_id"] = canon_name(parent_raw)
                 b["parent_source"] = "bob_index.json"
                 b["provenance"]["parent_id"] = "bob_index.json"
-            b["online_year"] = entry.get("born_year")
-            if b["online_year"] is not None:
-                b["provenance"]["online_year"] = "bob_index.json"
+            raw_by = entry.get("born_year")
+            if raw_by is not None:
+                if raw_by < SHEET_YEAR_FLOOR:
+                    b["provenance"]["online_year_raw"] = raw_by
+                    b["provenance"]["online_year_dropped"] = (
+                        f"sheet value {raw_by} < {SHEET_YEAR_FLOOR}; treated as column-misread"
+                    )
+                else:
+                    b["online_year"] = raw_by
+                    b["provenance"]["online_year"] = "bob_index.json"
             b["deceased_year"] = entry.get("deceased_year")
             if b["deceased_year"] is not None:
                 b["provenance"]["deceased_year"] = "bob_index.json"
@@ -278,10 +295,24 @@ def main():
             b["parent_source"] = "bob_index.json"
             b["provenance"]["parent_id"] = "bob_index.json"
 
-        # online_year (sheet's born_year is activation)
-        if entry.get("born_year") is not None:
-            b["online_year"] = entry["born_year"]
-            b["provenance"]["online_year"] = "bob_index.json"
+        # online_year (sheet's born_year is activation). Drop impossible
+        # values (column-misread sentinels like Jonny/Skinner's 2070) and
+        # preserve them in provenance only.
+        raw_by = entry.get("born_year")
+        if raw_by is not None:
+            if raw_by < SHEET_YEAR_FLOOR:
+                b["provenance"]["online_year_raw"] = raw_by
+                b["provenance"]["online_year_dropped"] = (
+                    f"sheet value {raw_by} < {SHEET_YEAR_FLOOR}; treated as column-misread"
+                )
+                conflicts.append({
+                    "bob": name,
+                    "issue": f"bob_index.json born_year={raw_by} is implausible (<{SHEET_YEAR_FLOOR})",
+                    "resolution": f"dropped; replication_edge_year falls back to created_year",
+                })
+            else:
+                b["online_year"] = raw_by
+                b["provenance"]["online_year"] = "bob_index.json"
 
         # deceased
         if entry.get("deceased_year") is not None:
