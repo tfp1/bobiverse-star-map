@@ -1,20 +1,22 @@
 {
   "$schema_version": "1.0.0",
-  "$generated_at": "2026-05-24T15:19:35.113975Z",
+  "$generated_at": "2026-05-24T21:14:57.610547Z",
   "$source_events": "data/events.json",
-  "$edge_count": 23,
+  "$edge_count": 24,
   "$confidence_breakdown": {
-    "high": 23
+    "high": 23,
+    "medium": 1
   },
   "$verb_breakdown": {
     "arrives_at": 14,
-    "heads_to": 5,
+    "heads_to": 6,
     "returns_to": 3,
     "leaves_for": 1
   },
   "$destination_type_breakdown": {
     "system": 22,
-    "place_in_system": 1
+    "place_in_system": 1,
+    "off_map": 1
   },
   "edges": [
     {
@@ -237,6 +239,23 @@
       "bob_known": true,
       "confidence": "high",
       "note": null
+    },
+    {
+      "bob": "Bender",
+      "verb": "heads_to",
+      "destination_raw": "Gamma Leporis A",
+      "destination_system": null,
+      "destination_type": "off_map",
+      "in_world_date": "2165-10",
+      "date_year": 2165,
+      "chapter_code": "B1.C39",
+      "reading_order": 39,
+      "first_book": 1,
+      "pattern": "T1_heads",
+      "source_text": "Bender heads to Gamma Leporis A",
+      "bob_known": true,
+      "confidence": "medium",
+      "note": "off-map 'Gamma Leporis A'"
     },
     {
       "bob": "Linus",

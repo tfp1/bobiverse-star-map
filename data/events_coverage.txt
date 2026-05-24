@@ -7,14 +7,12 @@ Events: 353  Skipped (no chapter code): 3
     43  place_in_system
     40  virt
     35  megastructure_internal
+    20  off_map_distant
     17  en_route
-    12  unresolved
-     8  off_map_distant
      1  vehicle
 
 --- Unresolved locations (needs_review=true) ---
-     9  'Jabberwocky'
-     3  'Skippyland'
+  (none)
 
 --- Systems touched (17) ---
   82 Eridani

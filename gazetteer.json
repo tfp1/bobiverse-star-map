@@ -62,12 +62,10 @@
     {"place": "Newholme",          "system": "Gamma Pavonis",         "confidence": "wiki", "note": "human colony at Gamma Pavonis, B4-2 C7"},
     {"place": "Newholme Colony",   "system": "Gamma Pavonis",         "confidence": "wiki"},
 
-    {"place": "Quin",              "system": "Eta Leporis",           "confidence": "implied", "note": "original Quinlan homeworld; B4-1 C6 describes a dead planet at HR's system as 'the original home of the megastructure builders'. Same system as Heaven's River. VERIFY against prose."},
+    {"place": "Quin",              "system": "Eta Leporis",           "confidence": "implied", "note": "original Quinlan homeworld. Prose does NOT name the star — verified via grep of all 5 epubs (the glossary entry reads only 'Home planet of the Quinlans'). Eta Leporis attribution is inferred from co-location with Heaven's River (the Quinlan megastructure is at HR's system, and Quin is described as a dead planet there)."},
 
-    {"place": "Skippyland",        "system": null,                    "confidence": "unresolved", "note": "Skippies' base, B5. Has its own Oort cloud (B5 C67) so likely its own system. Not stated in CSV."},
-    {"place": "Jabberwocky",       "system": null,                    "confidence": "unresolved", "note": "Dragons' homeworld, B5 Howard/Bridget expedition. System not stated in CSV. Off-map candidate."},
-    {"place": "Atlantis",          "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C53/55. Same system as Jabberwocky."},
-    {"place": "Lemuria",           "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C50/57"},
+    {"place": "Atlantis",          "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C53/55. Jabberwocky itself is off_map_distant (see off_map_systems)."},
+    {"place": "Lemuria",           "system": null,                    "confidence": "unresolved", "note": "continent on Jabberwocky, B5 C50/57. Jabberwocky itself is off_map_distant."},
     {"place": "Planet BSC-142-C",  "system": null,                    "confidence": "unresolved", "note": "Will exploring on Nostromo, B5 C20. 'BSC' likely Bobiverse Star Catalog. Off-map."}
   ],
 
@@ -83,6 +81,9 @@
     {"name": "Centaurvania",  "confidence": "wiki", "note": "Gunther's home system, destroyed by something. B5 C48. Beyond local bubble."},
     {"name": "Roanoke",       "confidence": "wiki", "note": "abandoned alien world reached via wormhole, B5 C52/54/56. Beyond local bubble."},
     {"name": "Alien System",  "confidence": "wiki", "note": "wiki's generic label for the first wormhole-network discovery, B5 C5/8/12. Possibly named in prose."},
+    {"name": "Jabberwocky",   "confidence": "prose", "note": "Dragons' homeworld, B5 Howard/Bridget expedition (~13 prose mentions). No catalog star ever named — verified via epub grep. Treated as off_map_distant. Continents Atlantis and Lemuria sit on this world."},
+    {"name": "Skippyland",    "confidence": "prose", "note": "Skippies' base, B5 (~3 events). No host star named in prose; has its own Oort cloud per B5 C67, so it is a separate system from Epsilon Eridani (which hosts Hugh's Matryoshka Brain). Treated as off_map_distant."},
+    {"name": "Gamma Leporis A","confidence": "prose","note": "Bender's INTENDED destination (B1C2): 'an F6V star, a bit bigger and brighter than Sol… more than 16 light years away'. Bender actually arrived at Eta Leporis instead — see conflicts.bender-destination. No events occur at Gamma Leporis; entry exists so the miner can resolve the intended-destination travel edge."},
     {"name": "Sagittarius A*","confidence": "wiki", "note": "galactic center, ~26000 ly. Render as directional beacon per D1."}
   ],
 
@@ -131,13 +132,21 @@
      "desc": "B4-2 wiki rows attribute SCUT/autofactory hacking to Starfleet, then revise (row 280: 'Bill no longer believes that Starfleet did the actual hacking'). Final reveal in B5: Skippies (Mud) were involved.",
      "action": "event 'attribution' field should reflect what was believed at the time; track revisions separately"},
 
-    {"id": "quin-system", "status": "open",
+    {"id": "quin-system", "status": "resolved-as-implied",
      "desc": "Quin is the Quinlan homeworld; B4-1 C6 implies same system as Heaven's River (Eta Leporis) but does not state it explicitly.",
-     "action": "verify against prose; current gazetteer assumes Eta Leporis with confidence=implied"},
+     "resolution": "Verified via prose grep of all 5 epubs: no catalog star is ever named for Quin. Glossary entry reads only 'Home planet of the Quinlans'. Keeping Eta Leporis attribution with confidence=implied — the megastructure-builder identity makes the inference safe enough for the map, but flagged so future readers know this is an inference, not a prose-quoted fact."},
 
-    {"id": "jabberwocky-system", "status": "open",
+    {"id": "jabberwocky-system", "status": "resolved",
      "desc": "Jabberwocky (Dragons' homeworld, B5) has no system attached in CSV.",
-     "action": "look up in B5 prose; likely off_map_distant"}
+     "resolution": "Verified via B5 prose grep: no host star is ever named. Moved from places (where it was system=null/unresolved) into off_map_systems. Events resolve as off_map_distant."},
+
+    {"id": "skippyland-system", "status": "resolved",
+     "desc": "Skippyland (Skippies' base, B5) has no system attached in CSV; has its own Oort cloud per B5 C67 so it is a separate system from Epsilon Eridani.",
+     "resolution": "Verified via B5 prose grep: no host star is ever named. Moved into off_map_systems. Events resolve as off_map_distant."},
+
+    {"id": "gamma-leporis-reference", "status": "resolved",
+     "desc": "Bender's intended destination (B1C39) is Gamma Leporis A — a real star ~16 ly away. No events occur there (Bender ends up at Eta Leporis), but the intended-destination travel edge was being dropped by the miner because Gamma Leporis A had no gazetteer entry.",
+     "resolution": "Added to off_map_systems as a reference entry. Coexists with the resolved bender-destination conflict (Bender intended Gamma Leporis A, arrived Eta Leporis)."}
   ],
 
   "species_overlay": {
