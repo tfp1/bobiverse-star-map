@@ -5,59 +5,39 @@
     {
       "name": "Mack",
       "first_book": 3,
-      "note": "Referenced as parent of Isaac/Jack/Owen (B3C18) and as the pilot delivering three colony ships to 82 Eridani (wiki row 160). Mack's own parentage is unknown — gen-8+ extraction tracked under issue #5. Bootstrapped here so the Isaac/Jack/Owen edges resolve cleanly."
+      "note": "B3 C18 chapter (Mack POV): fleet commander arriving at 82 Eridani with three colony ships piloted by Isaac, Jack, and Owen. The earlier #4 reading that 'three clones popped in' implied Mack-as-parent has been overturned by #8 — Mack treats Isaac/Jack/Owen as peers in his VR, and his surprise at their shared variation argues against him being their progenitor. Mack's own parentage remains unattributed in prose. Gen-8+ extraction was tracked under issue #5; this stub remains for the bob to exist in the graph."
     },
     {
       "name": "Will",
       "first_book": 3,
       "note": "Active Bob from B3 onward (e.g. Sol-system manager; by B4 retired to Valhalla). Own parentage not stated in prose; absent from genealogy.json (which covers ~through B2) and from google-sheet-genealogy.csv. Bootstrapped so the Will→Conan edge (B4 P1 C7) resolves cleanly. Gen-8+ extraction tracked under issue #5."
+    },
+    {
+      "name": "Jack",
+      "first_book": 3,
+      "note": "B3 C18: pilots one of three colony ships under Mack's fleet arriving at 82 Eridani, alongside Isaac and Owen. The B3 C18 prose 'Isaac, Jack, and Owen popped in. … the same variation in three clones at the same time' establishes they are clones (of some shared parent), not specifically Mack's. With B3 C21 explicitly attributing Isaac to Bart, Jack/Owen are *plausibly* Bart's clones by cohort inference — but no direct prose attribution. Demoted to parent unknown under #8 per strict-prose-only rule."
+    },
+    {
+      "name": "Owen",
+      "first_book": 3,
+      "note": "B3 C18: pilots one of three colony ships under Mack's fleet arriving at 82 Eridani, alongside Isaac and Jack. Same provenance as Jack — clone of unknown parent, plausibly Bart's by cohort with Isaac but not explicitly attributed in prose. Demoted to parent unknown under #8 per strict-prose-only rule."
     }
   ],
   "edges": [
     {
-      "parent": "Mack",
+      "parent": "Bart",
       "child": "Isaac",
       "in_world_date": null,
       "date_year": null,
-      "chapter_code": "B3.C18",
-      "reading_order": 18,
+      "chapter_code": "B3.C21",
+      "reading_order": 21,
       "first_book": 3,
       "pattern": "manual_prose_adjudication",
-      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
+      "source_text": "This particular replicant, Isaac, was one of Bart's early clones, senior even to Oliver.",
       "parent_known": true,
       "child_known": false,
       "confidence": "high",
-      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones (explicit phrase 'three clones'). Pilots the three colony ships arriving at 82 Eridani per wiki row 160. Adjudicated under issue #4."
-    },
-    {
-      "parent": "Mack",
-      "child": "Jack",
-      "in_world_date": null,
-      "date_year": null,
-      "chapter_code": "B3.C18",
-      "reading_order": 18,
-      "first_book": 3,
-      "pattern": "manual_prose_adjudication",
-      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
-      "parent_known": true,
-      "child_known": false,
-      "confidence": "high",
-      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones. Adjudicated under issue #4."
-    },
-    {
-      "parent": "Mack",
-      "child": "Owen",
-      "in_world_date": null,
-      "date_year": null,
-      "chapter_code": "B3.C18",
-      "reading_order": 18,
-      "first_book": 3,
-      "pattern": "manual_prose_adjudication",
-      "source_text": "Isaac, Jack, and Owen popped in. … Original Bob had always been a bit button-down, so it was surprising to see the same variation in three clones at the same time.",
-      "parent_known": true,
-      "child_known": false,
-      "confidence": "high",
-      "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones. Adjudicated under issue #4."
+      "note": "B3 C21 explicit attribution. Overturns #4's earlier Isaac←Mack reading (which inferred parentage from Mack's fleet command in B3 C18). Adjudicated under issue #8."
     },
     {
       "parent": "Will",

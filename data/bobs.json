@@ -1,6 +1,6 @@
 {
   "$schema_version": "1.0.0",
-  "$generated_at": "2026-05-25T14:44:22Z",
+  "$generated_at": "2026-05-25T16:11:42Z",
   "$source_files": [
     "timelines/genealogy.json",
     "data/bob_index.json",
@@ -2237,7 +2237,7 @@
       "destinations": [],
       "hic_code": null,
       "annotations": [
-        "Referenced as parent of Isaac/Jack/Owen (B3C18) and as the pilot delivering three colony ships to 82 Eridani (wiki row 160). Mack's own parentage is unknown \u2014 gen-8+ extraction tracked under issue #5. Bootstrapped here so the Isaac/Jack/Owen edges resolve cleanly."
+        "B3 C18 chapter (Mack POV): fleet commander arriving at 82 Eridani with three colony ships piloted by Isaac, Jack, and Owen. The earlier #4 reading that 'three clones popped in' implied Mack-as-parent has been overturned by #8 \u2014 Mack treats Isaac/Jack/Owen as peers in his VR, and his surprise at their shared variation argues against him being their progenitor. Mack's own parentage remains unattributed in prose. Gen-8+ extraction was tracked under issue #5; this stub remains for the bob to exist in the graph."
       ],
       "restored_from": null,
       "sources": [
@@ -2264,6 +2264,58 @@
       "hic_code": null,
       "annotations": [
         "Active Bob from B3 onward (e.g. Sol-system manager; by B4 retired to Valhalla). Own parentage not stated in prose; absent from genealogy.json (which covers ~through B2) and from google-sheet-genealogy.csv. Bootstrapped so the Will\u2192Conan edge (B4 P1 C7) resolves cleanly. Gen-8+ extraction tracked under issue #5."
+      ],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {}
+    },
+    {
+      "id": "Jack",
+      "name": "Jack",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": null,
+      "parent_source": "n/a",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "B3 C18: pilots one of three colony ships under Mack's fleet arriving at 82 Eridani, alongside Isaac and Owen. The B3 C18 prose 'Isaac, Jack, and Owen popped in. \u2026 the same variation in three clones at the same time' establishes they are clones (of some shared parent), not specifically Mack's. With B3 C21 explicitly attributing Isaac to Bart, Jack/Owen are *plausibly* Bart's clones by cohort inference \u2014 but no direct prose attribution. Demoted to parent unknown under #8 per strict-prose-only rule."
+      ],
+      "restored_from": null,
+      "sources": [
+        "edges_replication_manual.json"
+      ],
+      "provenance": {}
+    },
+    {
+      "id": "Owen",
+      "name": "Owen",
+      "bob_number": null,
+      "version": null,
+      "generation": null,
+      "parent_id": null,
+      "parent_source": "n/a",
+      "alt_names": [],
+      "spelling_aliases": [],
+      "created_year": null,
+      "online_year": null,
+      "replication_edge_year": null,
+      "deceased_year": null,
+      "origin_system": null,
+      "destinations": [],
+      "hic_code": null,
+      "annotations": [
+        "B3 C18: pilots one of three colony ships under Mack's fleet arriving at 82 Eridani, alongside Isaac and Jack. Same provenance as Jack \u2014 clone of unknown parent, plausibly Bart's by cohort with Isaac but not explicitly attributed in prose. Demoted to parent unknown under #8 per strict-prose-only rule."
       ],
       "restored_from": null,
       "sources": [
@@ -2330,60 +2382,8 @@
       "name": "Isaac",
       "bob_number": null,
       "version": null,
-      "generation": null,
-      "parent_id": "Mack",
-      "parent_source": "edges_manual",
-      "alt_names": [],
-      "spelling_aliases": [],
-      "created_year": null,
-      "online_year": null,
-      "replication_edge_year": null,
-      "deceased_year": null,
-      "origin_system": null,
-      "destinations": [],
-      "hic_code": null,
-      "annotations": [],
-      "restored_from": null,
-      "sources": [
-        "edges_replication_manual.json"
-      ],
-      "provenance": {
-        "parent_id": "edges_replication_manual.json"
-      }
-    },
-    {
-      "id": "Jack",
-      "name": "Jack",
-      "bob_number": null,
-      "version": null,
-      "generation": null,
-      "parent_id": "Mack",
-      "parent_source": "edges_manual",
-      "alt_names": [],
-      "spelling_aliases": [],
-      "created_year": null,
-      "online_year": null,
-      "replication_edge_year": null,
-      "deceased_year": null,
-      "origin_system": null,
-      "destinations": [],
-      "hic_code": null,
-      "annotations": [],
-      "restored_from": null,
-      "sources": [
-        "edges_replication_manual.json"
-      ],
-      "provenance": {
-        "parent_id": "edges_replication_manual.json"
-      }
-    },
-    {
-      "id": "Owen",
-      "name": "Owen",
-      "bob_number": null,
-      "version": null,
-      "generation": null,
-      "parent_id": "Mack",
+      "generation": 5,
+      "parent_id": "Bart",
       "parent_source": "edges_manual",
       "alt_names": [],
       "spelling_aliases": [],
@@ -2436,7 +2436,8 @@
       "1": 1,
       "2": 9,
       "3": 47,
-      "4": 13
+      "4": 13,
+      "5": 1
     },
     "with_bob_number": 10,
     "with_created_year": 47,
