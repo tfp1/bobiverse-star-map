@@ -174,6 +174,43 @@ missing fields, and front matter (front matter has no date line → skipped).
 **Events (books 1–3):** parse `timeline_fan_b1-3.txt`, don't re-scrape prose.
 The timeline already encodes travel edges in its event text.
 
+**Replication & travel edges:** `scripts/mine_edges.py` extracts directed
+edges from `data/events.json` event descriptions. Current coverage: 40
+replication + 48 travel edges, all high/medium confidence, no unresolved
+destinations. Pattern families (full docstrings in the script):
+
+- **Replication R1–R7** — clone-self (`R1`), explicit-parent (`R2`), bare-
+  POV (`R3a/b/c`), parenthetical-of (`R4/R5`), cohort (`R6`: "Khan and N
+  other Bill clones (...)"), and possessive (`R7`).
+- **Travel T1–T9** — heads/arrives/leaves/returns/sets-off/in-transit/
+  passive-sent-to. Subject and verb may be separated by `together`/`all`/
+  `both` ("Calvin and Goku together head to X", "Howard, Bert, and Ernie
+  all arrive at Y").
+- **`T_COHORT_*`** — mirrors of R6_cohort for the same cohort subject form
+  with travel verbs ("Khan and seven other Bill clones (...) arrive at
+  82 Eridani" emits 8 edges).
+- **Hidden-subject `T*H_*_hidden`** — fires when no NAME_TOK precedes the
+  verb; back-tracks within the sentence to recover elided subjects
+  ("Marvin decides to leave and heads out to Pi3 Orionis"), with multi-
+  subject coordination grouping that follows `,`/`and` markers leftward
+  ("Bert and Ernie ... return to Earth" → both). Skips parenthesized
+  names, genitives (`of Bill`/`by Bob`), cohort-parents (`other Bill
+  clones`), and tokens that fall inside a gazetteer dest-regex match
+  (so "Eridani"/"Vulcan" are not mistaken for Bob names).
+
+Coverage report at `data/edges_coverage.txt`; new Bobs surface in
+`$new_bobs_discovered` (replication) and as `bob_known: false` rows
+(travel — e.g. Hugh, discovered via "Bill and Hugh ... return to
+Skippyland").
+
+**Known mining limitations** (tractable, not blockers): the hidden-
+subject back-track stops at the first non-coordinated unknown
+NAME_TOK to the left of the verb. So "Milo finishes... with a high-
+level AMI per the request of Bill (...), then heads out to 82
+Eridani" loses Milo — `AMI` is unknown, isn't part of a coordinated
+list with Milo, and isn't filtered as a stopword. Recovering this
+needs a longer-distance heuristic or grammatical parsing.
+
 **Location resolution:** normalize against the closed 22-system enum, THEN the
 gazetteer (place→system), THEN fall through to open categories (en_route,
 off_map_distant, megastructure, internal, unknown). Unresolved named places
