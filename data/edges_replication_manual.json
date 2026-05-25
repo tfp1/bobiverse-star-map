@@ -6,6 +6,11 @@
       "name": "Mack",
       "first_book": 3,
       "note": "Referenced as parent of Isaac/Jack/Owen (B3C18) and as the pilot delivering three colony ships to 82 Eridani (wiki row 160). Mack's own parentage is unknown — gen-8+ extraction tracked under issue #5. Bootstrapped here so the Isaac/Jack/Owen edges resolve cleanly."
+    },
+    {
+      "name": "Will",
+      "first_book": 3,
+      "note": "Active Bob from B3 onward (e.g. Sol-system manager; by B4 retired to Valhalla). Own parentage not stated in prose; absent from genealogy.json (which covers ~through B2) and from google-sheet-genealogy.csv. Bootstrapped so the Will→Conan edge (B4 P1 C7) resolves cleanly. Gen-8+ extraction tracked under issue #5."
     }
   ],
   "edges": [
@@ -53,6 +58,21 @@
       "child_known": false,
       "confidence": "high",
       "note": "B3C18 prose confirms Isaac/Jack/Owen are Mack's clones. Adjudicated under issue #4."
+    },
+    {
+      "parent": "Will",
+      "child": "Conan",
+      "in_world_date": null,
+      "date_year": null,
+      "chapter_code": "B4.P1.C7",
+      "reading_order": 221,
+      "first_book": 4,
+      "pattern": "manual_prose_adjudication",
+      "source_text": "\"What can I do for you, O great ancestor?\" Conan said. \"Are you one of mine?\" I replied, and he nodded.",
+      "parent_known": true,
+      "child_known": false,
+      "confidence": "high",
+      "note": "B4 P1 C7 (Will POV) explicit: Will asks Conan 'Are you one of mine?' — Conan nods. Adjudicated under issue #5."
     }
   ]
 }
