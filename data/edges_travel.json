@@ -1,22 +1,22 @@
 {
   "$schema_version": "1.0.0",
-  "$generated_at": "2026-05-25T13:28:54.919770Z",
+  "$generated_at": "2026-05-25T14:02:41.054003Z",
   "$source_events": "data/events.json",
-  "$edge_count": 41,
+  "$edge_count": 48,
   "$confidence_breakdown": {
-    "high": 38,
-    "medium": 3
+    "high": 43,
+    "medium": 5
   },
   "$verb_breakdown": {
-    "arrives_at": 25,
-    "heads_to": 9,
-    "returns_to": 6,
+    "arrives_at": 28,
+    "heads_to": 10,
+    "returns_to": 9,
     "leaves_for": 1
   },
   "$destination_type_breakdown": {
-    "system": 35,
-    "place_in_system": 5,
-    "off_map": 1
+    "system": 38,
+    "place_in_system": 7,
+    "off_map": 3
   },
   "edges": [
     {
@@ -173,10 +173,10 @@
       "note": null
     },
     {
-      "bob": "Linus",
+      "bob": "Calvin",
       "verb": "heads_to",
-      "destination_raw": "Epsilon Indi",
-      "destination_system": "Epsilon Indi",
+      "destination_raw": "Alpha Centauri",
+      "destination_system": "Alpha Centauri",
       "destination_type": "system",
       "in_world_date": "2150-09",
       "date_year": 2150,
@@ -184,7 +184,7 @@
       "reading_order": 22,
       "first_book": 1,
       "pattern": "T1_heads",
-      "source_text": "Linus heads to Epsilon Indi",
+      "source_text": "Calvin and Goku together head to Alpha Centauri",
       "bob_known": true,
       "confidence": "high",
       "note": null
@@ -200,8 +200,25 @@
       "chapter_code": "B1.C22",
       "reading_order": 22,
       "first_book": 1,
-      "pattern": "T1H_heads_hidden",
-      "source_text": "head to Alpha Centauri",
+      "pattern": "T1_heads",
+      "source_text": "Calvin and Goku together head to Alpha Centauri",
+      "bob_known": true,
+      "confidence": "high",
+      "note": null
+    },
+    {
+      "bob": "Linus",
+      "verb": "heads_to",
+      "destination_raw": "Epsilon Indi",
+      "destination_system": "Epsilon Indi",
+      "destination_type": "system",
+      "in_world_date": "2150-09",
+      "date_year": 2150,
+      "chapter_code": "B1.C22",
+      "reading_order": 22,
+      "first_book": 1,
+      "pattern": "T1_heads",
+      "source_text": "Linus heads to Epsilon Indi",
       "bob_known": true,
       "confidence": "high",
       "note": null
@@ -462,6 +479,40 @@
       "note": null
     },
     {
+      "bob": "Howard",
+      "verb": "arrives_at",
+      "destination_raw": "Omicron² Eridani",
+      "destination_system": "Omicron² Eridani",
+      "destination_type": "system",
+      "in_world_date": "2188-09",
+      "date_year": 2188,
+      "chapter_code": "B1.C61",
+      "reading_order": 61,
+      "first_book": 1,
+      "pattern": "T2_arrives",
+      "source_text": "Howard, Bert, and Ernie all arrive at Omicron² Eridani",
+      "bob_known": true,
+      "confidence": "high",
+      "note": null
+    },
+    {
+      "bob": "Bert",
+      "verb": "arrives_at",
+      "destination_raw": "Omicron² Eridani",
+      "destination_system": "Omicron² Eridani",
+      "destination_type": "system",
+      "in_world_date": "2188-09",
+      "date_year": 2188,
+      "chapter_code": "B1.C61",
+      "reading_order": 61,
+      "first_book": 1,
+      "pattern": "T2_arrives",
+      "source_text": "Howard, Bert, and Ernie all arrive at Omicron² Eridani",
+      "bob_known": true,
+      "confidence": "high",
+      "note": null
+    },
+    {
       "bob": "Ernie",
       "verb": "arrives_at",
       "destination_raw": "Omicron² Eridani",
@@ -472,8 +523,8 @@
       "chapter_code": "B1.C61",
       "reading_order": 61,
       "first_book": 1,
-      "pattern": "T2H_arrives_hidden",
-      "source_text": "arrive at Omicron² Eridani",
+      "pattern": "T2_arrives",
+      "source_text": "Howard, Bert, and Ernie all arrive at Omicron² Eridani",
       "bob_known": true,
       "confidence": "high",
       "note": null
@@ -494,6 +545,23 @@
       "bob_known": true,
       "confidence": "high",
       "note": null
+    },
+    {
+      "bob": "Bert",
+      "verb": "returns_to",
+      "destination_raw": "Earth",
+      "destination_system": "Sol",
+      "destination_type": "place_in_system",
+      "in_world_date": "2188-12",
+      "date_year": 2188,
+      "chapter_code": "B2.C5",
+      "reading_order": 66,
+      "first_book": 2,
+      "pattern": "T4H_returns_hidden",
+      "source_text": "return to Earth",
+      "bob_known": true,
+      "confidence": "high",
+      "note": "alias 'Earth' → 'Sol'"
     },
     {
       "bob": "Ernie",
@@ -596,6 +664,23 @@
       "bob_known": true,
       "confidence": "high",
       "note": "alias 'GL 877' → 'Gliese 877'"
+    },
+    {
+      "bob": "Rudy",
+      "verb": "arrives_at",
+      "destination_raw": "KKP",
+      "destination_system": "Epsilon Indi",
+      "destination_type": "place_in_system",
+      "in_world_date": "2190-02",
+      "date_year": 2190,
+      "chapter_code": "B2.C46",
+      "reading_order": 107,
+      "first_book": 2,
+      "pattern": "T2H_arrives_hidden",
+      "source_text": "arrive at KKP",
+      "bob_known": true,
+      "confidence": "high",
+      "note": "alias 'KKP' → 'Epsilon Indi'"
     },
     {
       "bob": "Edwin",
@@ -715,6 +800,40 @@
       "bob_known": true,
       "confidence": "high",
       "note": null
+    },
+    {
+      "bob": "Bill",
+      "verb": "returns_to",
+      "destination_raw": "Skippyland",
+      "destination_system": null,
+      "destination_type": "off_map",
+      "in_world_date": "2345-01",
+      "date_year": 2345,
+      "chapter_code": "B5.C63",
+      "reading_order": 344,
+      "first_book": 5,
+      "pattern": "T4H_returns_hidden",
+      "source_text": "return to Skippyland",
+      "bob_known": true,
+      "confidence": "medium",
+      "note": "off-map 'Skippyland'"
+    },
+    {
+      "bob": "Hugh",
+      "verb": "returns_to",
+      "destination_raw": "Skippyland",
+      "destination_system": null,
+      "destination_type": "off_map",
+      "in_world_date": "2345-01",
+      "date_year": 2345,
+      "chapter_code": "B5.C63",
+      "reading_order": 344,
+      "first_book": 5,
+      "pattern": "T4H_returns_hidden",
+      "source_text": "return to Skippyland",
+      "bob_known": false,
+      "confidence": "medium",
+      "note": "off-map 'Skippyland'"
     }
   ]
 }

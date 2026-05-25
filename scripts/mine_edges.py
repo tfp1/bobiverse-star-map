@@ -398,17 +398,18 @@ def build_cohort_travel_patterns(dest_re):
     Emits one edge per name in [first] + rest_list."""
     D = dest_re.pattern
     COHORT_SUBJ = rf"({NAME_TOK})\s+and\s+\w+\s+other\s+{NAME_TOK}\s+clones?\s*\(({NAME_LIST})\)"
+    ADV = r"(?:(?:together|all|both)\s+)?"
     return [
         ("arrives_at", "T_COHORT_arrives",
-         re.compile(rf"\b{COHORT_SUBJ}\s+arrives?\s+(?:at|in)\s+({D})")),
+         re.compile(rf"\b{COHORT_SUBJ}\s+{ADV}arrives?\s+(?:at|in)\s+({D})")),
         ("heads_to", "T_COHORT_heads",
-         re.compile(rf"\b{COHORT_SUBJ}\s+heads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
+         re.compile(rf"\b{COHORT_SUBJ}\s+{ADV}heads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
         ("leaves_for", "T_COHORT_leaves",
-         re.compile(rf"\b{COHORT_SUBJ}\s+leaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
+         re.compile(rf"\b{COHORT_SUBJ}\s+{ADV}leaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
         ("returns_to", "T_COHORT_returns",
-         re.compile(rf"\b{COHORT_SUBJ}\s+returns?\s+(?:back\s+)?to\s+({D})")),
+         re.compile(rf"\b{COHORT_SUBJ}\s+{ADV}returns?\s+(?:back\s+)?to\s+({D})")),
         ("leaves_for", "T_COHORT_sets_off",
-         re.compile(rf"\b{COHORT_SUBJ}\s+sets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
+         re.compile(rf"\b{COHORT_SUBJ}\s+{ADV}sets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
     ]
 
 
@@ -468,69 +469,98 @@ def _paren_spans(text):
     return spans
 
 
-def _backtrack_subject(desc, sentence_start, verb_start, known_names):
-    """Find the subject of a subjectless travel verb by scanning the sentence
-    prefix for NAME_TOK candidates.
+_COORDINATION_RE = re.compile(r"^,?\s*(?:and\s+)?$")
 
-    Rule: take the *most recent* candidate (excluding stopwords, pronouns, and
-    names inside parentheses). Emit only if that most-recent candidate is a
-    known Bob. Don't fall back to an earlier known Bob — if the most recent
-    is unknown, the real subject is probably the unknown one, and attributing
-    travel to an earlier mention causes false positives (e.g. "Mulder greets
-    Marcus and Monty as they arrive at X" → must not emit Mulder → X).
+
+def _backtrack_subjects(desc, sentence_start, verb_start, known_names, dest_re):
+    """Find the subject(s) of a subjectless travel verb by scanning the
+    sentence prefix for NAME_TOK candidates.
+
+    Returns a list of subject names (possibly multiple, for coordinated forms
+    like "Bert and Ernie", "Rudy and Edwin", "Howard, Bert, and Ernie").
+
+    Algorithm:
+      1. Collect NAME_TOK candidates from the prefix, skipping stopwords,
+         pronouns, parenthesized names, genitives ("of Bill"/"by Bob"), and
+         cohort-parents ("other Bill clones").
+      2. Starting from the rightmost candidate, walk leftward as long as
+         consecutive candidates are separated only by coordination markers
+         (",", " and ", ", and "). This builds the subject group.
+      3. Emit the group only if at least one member is a known Bob. This
+         avoids false positives like "Mulder greets Marcus and Monty as
+         they arrive at X" (group [Marcus, Monty], neither known → drop)
+         while still capturing "Bill and Hugh ... return to Skippyland"
+         (group [Bill, Hugh], Bill known → emit both, Hugh as new Bob).
     """
     prefix = desc[sentence_start:verb_start]
     paren_spans = _paren_spans(prefix)
-    candidates = []
+    # Spans inside the prefix that match the gazetteer dest regex — these are
+    # system / place names ("Delta Eridani", "Alpha Centauri B"); their tokens
+    # are not Bob names even when they look like NAME_TOK.
+    dest_spans = [(m.start(), m.end()) for m in dest_re.finditer(prefix)]
+    candidates = []  # list of (tok, start, end)
     for m in _NAME_TOK_FINDER.finditer(prefix):
         tok = m.group(0)
         if tok in NON_BOB_NAMES or tok in PRONOUNS:
             continue
         if any(s <= m.start() < e for s, e in paren_spans):
             continue
-        # Genitive/agent: "request of Bill", "produced by Bob" — not the subject.
+        if any(s <= m.start() < e for s, e in dest_spans):
+            continue
         prev_word = re.search(r"(\w+)\s*$", prefix[:m.start()])
         if prev_word and prev_word.group(1).lower() in ("of", "by", "other"):
             continue
-        # Cohort parent: "other Bill clones" — Bill is the parent type, not subject.
-        # (Also catches the bare "Bill clones" descriptor.)
         after = prefix[m.end():m.end() + 10]
         if re.match(r"\s+clones?\b", after):
             continue
-        candidates.append(tok)
+        candidates.append((tok, m.start(), m.end()))
     if not candidates:
-        return None
-    last = candidates[-1]
-    return last if last in known_names else None
+        return []
+
+    # Walk leftward from the rightmost, picking up coordinated peers.
+    group_idx = [len(candidates) - 1]
+    for i in range(len(candidates) - 1, 0, -1):
+        sep = prefix[candidates[i - 1][2]:candidates[i][1]]
+        if _COORDINATION_RE.match(sep):
+            group_idx.insert(0, i - 1)
+        else:
+            break
+    group = [candidates[i][0] for i in group_idx]
+    if not any(name in known_names for name in group):
+        return []
+    return group
 
 
 def build_travel_patterns(dest_re):
     """Build the travel-verb patterns parametrized by the curated dest regex.
     Destination is captured precisely from the gazetteer-derived alternation."""
     D = dest_re.pattern  # already a non-capturing group with optional suffix
+    # Optional adverb between subject and verb: "Calvin and Goku together head…",
+    # "Howard, Bert, and Ernie all arrive…"
+    ADV = r"(?:(?:together|all|both)\s+)?"
     return [
         # T1: heads (out|back|over|off|on)? (to|for|toward) <dest>
         ("heads_to", "T1_heads",
-         re.compile(rf"\b({NAME_LIST})\s+heads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}heads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
         # T2: arrives (at|in|with) <dest>
         ("arrives_at", "T2_arrives",
-         re.compile(rf"\b({NAME_LIST})\s+arrives?\s+(?:at|in|with\s+\d+\s+colony\s+ships?\s+at)\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}arrives?\s+(?:at|in|with\s+\d+\s+colony\s+ships?\s+at)\s+({D})")),
         # T3: leaves (heading)? (for|to|back to) <dest>
         ("leaves_for", "T3_leaves",
-         re.compile(rf"\b({NAME_LIST})\s+leaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}leaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
         # T4: returns to <dest>
         ("returns_to", "T4_returns",
-         re.compile(rf"\b({NAME_LIST})\s+returns?\s+(?:back\s+)?to\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}returns?\s+(?:back\s+)?to\s+({D})")),
         # T5: in transit / on route / on the way to <dest>
         ("in_transit_to", "T5_transit",
          re.compile(rf"\b({NAME_LIST})\s+(?:is|are)\s+(?:on\s+(?:the\s+)?route\s+to|in\s+transit\s+(?:to|toward[s]?))\s+({D})")),
         # T6: heads back to <dest>
         ("returns_to", "T6_heads_back",
-         re.compile(rf"\b({NAME_LIST})\s+heads?\s+back\s+to\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}heads?\s+back\s+to\s+({D})")),
         # T7: hightails it (out|away)? — exit verb; no dest. Skip for now.
         # T8: sets off (for|to) <dest>
         ("leaves_for", "T8_sets_off",
-         re.compile(rf"\b({NAME_LIST})\s+sets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
+         re.compile(rf"\b({NAME_LIST})\s+{ADV}sets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
         # T9: passive "sent to <dest>" — emit with bob=<NameList>, verb=leaves_for
         ("leaves_for", "T9_sent_to",
          re.compile(rf"\b({NAME_LIST})\s+(?:was|is|were|are)\s+sent\s+to\s+({D})")),
@@ -605,18 +635,20 @@ def extract_travel(ev, known_names, gaz, travel_patterns, aliases,
                 _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
                       pattern_id, m.group(0).strip())
 
-    # Hidden-subject patterns — back-track to find a known Bob in the sentence.
+    # Hidden-subject patterns — back-track to find coordinated subject group.
     # Standard/cohort passes already populated `seen`, so dedupe is automatic.
     for verb, pattern_id, regex in (hidden_patterns or []):
         for m in regex.finditer(desc):
-            sent_start, sent_end = _sentence_for_position(desc, m.start())
-            bob = _backtrack_subject(desc, sent_start, m.start(), known_names)
-            if not bob:
+            sent_start, _ = _sentence_for_position(desc, m.start())
+            subjects = _backtrack_subjects(desc, sent_start, m.start(),
+                                           known_names, gaz["dest_re"])
+            if not subjects:
                 continue
             dest_raw = m.group(1).strip()
             dest_type, dest_sys, note = resolve_destination(dest_raw, gaz, aliases)
-            _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
-                  pattern_id, m.group(0).strip())
+            for bob in subjects:
+                _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
+                      pattern_id, m.group(0).strip())
 
     return out
 
@@ -644,6 +676,8 @@ def main():
     gaz = load_gazetteer(args.gazetteer)
     aliases = _build_aliases(gaz)
     dest_re = build_dest_regex(gaz)
+    gaz["dest_re"] = dest_re  # for hidden-subject back-track to ignore tokens
+                              # that lie inside system/place names
     travel_patterns = build_travel_patterns(dest_re)
     cohort_patterns = build_cohort_travel_patterns(dest_re)
     hidden_patterns = build_hidden_subject_patterns(dest_re)
