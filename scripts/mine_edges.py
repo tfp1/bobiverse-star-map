@@ -183,6 +183,15 @@ NON_BOB_NAMES = {
     "Earth", "Sol", "Eden", "Camelot", "Caerleon",
     "Manny", "Mannies", "Mulder",  # Mulder is a Bob but special-cased elsewhere
     "Bashful", "Dopey", "Sleepy", "Hungry",  # these ARE Bobs; keep them; remove below
+    # Sentence-opening adverbs that match NAME_TOK but aren't names
+    "Afterwards", "Then", "Meanwhile", "Eventually", "Initially",
+    "Suddenly", "Later", "Subsequently", "Finally", "However",
+    # Greek-letter star-name prefixes (no Bob is named after one)
+    "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta",
+    "Iota", "Kappa", "Lambda", "Omicron", "Sigma", "Tau", "Upsilon",
+    "Phi", "Chi", "Psi", "Omega",
+    # Star catalog designators ("GL 877", "HR 8832", etc.)
+    "GL", "HR", "HIP", "HD",
 }
 # Re-add real Bobs that got caught in the filter
 NON_BOB_NAMES -= {"Mulder", "Bashful", "Dopey", "Sleepy", "Hungry"}
@@ -383,6 +392,118 @@ def extract_replication(ev, known_names):
 
 # ─────────────────────────── travel extractors ────────────────────────
 
+def build_cohort_travel_patterns(dest_re):
+    """Cohort travel patterns — mirror R6_cohort but for travel verbs.
+    Captures: group(1)=first_name, group(2)=rest_list, group(3)=dest.
+    Emits one edge per name in [first] + rest_list."""
+    D = dest_re.pattern
+    COHORT_SUBJ = rf"({NAME_TOK})\s+and\s+\w+\s+other\s+{NAME_TOK}\s+clones?\s*\(({NAME_LIST})\)"
+    return [
+        ("arrives_at", "T_COHORT_arrives",
+         re.compile(rf"\b{COHORT_SUBJ}\s+arrives?\s+(?:at|in)\s+({D})")),
+        ("heads_to", "T_COHORT_heads",
+         re.compile(rf"\b{COHORT_SUBJ}\s+heads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
+        ("leaves_for", "T_COHORT_leaves",
+         re.compile(rf"\b{COHORT_SUBJ}\s+leaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
+        ("returns_to", "T_COHORT_returns",
+         re.compile(rf"\b{COHORT_SUBJ}\s+returns?\s+(?:back\s+)?to\s+({D})")),
+        ("leaves_for", "T_COHORT_sets_off",
+         re.compile(rf"\b{COHORT_SUBJ}\s+sets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
+    ]
+
+
+def build_hidden_subject_patterns(dest_re):
+    """Subjectless travel patterns — verb + destination only, no leading NAME_LIST.
+    Subject is back-tracked from the enclosing sentence (most recent known Bob).
+    Captures: group(1)=dest."""
+    D = dest_re.pattern
+    return [
+        ("heads_to", "T1H_heads_hidden",
+         re.compile(rf"\bheads?\s+(?:out\s+|back\s+|over\s+|off\s+|on\s+)?(?:to|toward[s]?|for)\s+({D})")),
+        ("arrives_at", "T2H_arrives_hidden",
+         re.compile(rf"\barrives?\s+(?:at|in)\s+({D})")),
+        ("leaves_for", "T3H_leaves_hidden",
+         re.compile(rf"\bleaves?\s+(?:heading\s+)?(?:to|toward[s]?|for|back\s+to)\s+({D})")),
+        ("returns_to", "T4H_returns_hidden",
+         re.compile(rf"\breturns?\s+(?:back\s+)?to\s+({D})")),
+        ("leaves_for", "T8H_sets_off_hidden",
+         re.compile(rf"\bsets?\s+(?:off|out)\s+(?:for|to|toward[s]?)\s+({D})")),
+    ]
+
+
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
+_NAME_TOK_FINDER = re.compile(NAME_TOK)
+
+
+def _sentence_for_position(desc, pos):
+    """Return (start, end) of the sentence in desc containing character index pos."""
+    # Sentence boundaries: . ! ? followed by whitespace + capital
+    start = 0
+    for m in _SENTENCE_SPLIT.finditer(desc):
+        if m.end() > pos:
+            break
+        start = m.end()
+    # End is next sentence boundary (or end of string)
+    end = len(desc)
+    for m in _SENTENCE_SPLIT.finditer(desc, pos):
+        end = m.start()
+        break
+    return start, end
+
+
+def _paren_spans(text):
+    """Return list of (start, end) character spans that lie inside parentheses."""
+    spans = []
+    depth = 0
+    open_at = None
+    for i, ch in enumerate(text):
+        if ch == "(":
+            if depth == 0:
+                open_at = i
+            depth += 1
+        elif ch == ")" and depth > 0:
+            depth -= 1
+            if depth == 0:
+                spans.append((open_at, i))
+    return spans
+
+
+def _backtrack_subject(desc, sentence_start, verb_start, known_names):
+    """Find the subject of a subjectless travel verb by scanning the sentence
+    prefix for NAME_TOK candidates.
+
+    Rule: take the *most recent* candidate (excluding stopwords, pronouns, and
+    names inside parentheses). Emit only if that most-recent candidate is a
+    known Bob. Don't fall back to an earlier known Bob — if the most recent
+    is unknown, the real subject is probably the unknown one, and attributing
+    travel to an earlier mention causes false positives (e.g. "Mulder greets
+    Marcus and Monty as they arrive at X" → must not emit Mulder → X).
+    """
+    prefix = desc[sentence_start:verb_start]
+    paren_spans = _paren_spans(prefix)
+    candidates = []
+    for m in _NAME_TOK_FINDER.finditer(prefix):
+        tok = m.group(0)
+        if tok in NON_BOB_NAMES or tok in PRONOUNS:
+            continue
+        if any(s <= m.start() < e for s, e in paren_spans):
+            continue
+        # Genitive/agent: "request of Bill", "produced by Bob" — not the subject.
+        prev_word = re.search(r"(\w+)\s*$", prefix[:m.start()])
+        if prev_word and prev_word.group(1).lower() in ("of", "by", "other"):
+            continue
+        # Cohort parent: "other Bill clones" — Bill is the parent type, not subject.
+        # (Also catches the bare "Bill clones" descriptor.)
+        after = prefix[m.end():m.end() + 10]
+        if re.match(r"\s+clones?\b", after):
+            continue
+        candidates.append(tok)
+    if not candidates:
+        return None
+    last = candidates[-1]
+    return last if last in known_names else None
+
+
 def build_travel_patterns(dest_re):
     """Build the travel-verb patterns parametrized by the curated dest regex.
     Destination is captured precisely from the gazetteer-derived alternation."""
@@ -416,52 +537,87 @@ def build_travel_patterns(dest_re):
     ]
 
 
-def extract_travel(ev, known_names, gaz, travel_patterns, aliases):
+def extract_travel(ev, known_names, gaz, travel_patterns, aliases,
+                   cohort_patterns=None, hidden_patterns=None):
     desc = ev["description"]
     out = []
     seen = set()
 
+    def _conf(dest_type, bob_known):
+        if dest_type in ("system", "place_in_system", "megastructure") and bob_known:
+            return "high"
+        if dest_type in ("system", "place_in_system", "megastructure", "off_map"):
+            return "medium"
+        if bob_known:
+            return "medium"
+        return "low"
+
+    def _emit(bob, verb, dest_raw, dest_type, dest_sys, note, pattern_id, source_text):
+        key = (bob, verb, dest_raw)
+        if key in seen:
+            return
+        seen.add(key)
+        bob_known = bob in known_names
+        out.append({
+            "bob": bob,
+            "verb": verb,
+            "destination_raw": dest_raw,
+            "destination_system": dest_sys,
+            "destination_type": dest_type,
+            "in_world_date": ev["in_world_date"],
+            "date_year": ev["date_year"],
+            "chapter_code": ev["chapter_code"],
+            "reading_order": ev["reading_order"],
+            "first_book": ev["first_book"],
+            "pattern": pattern_id,
+            "source_text": source_text,
+            "bob_known": bob_known,
+            "confidence": _conf(dest_type, bob_known),
+            "note": note,
+        })
+
+    # Standard subject-prefixed patterns
     for verb, pattern_id, regex in travel_patterns:
         for m in regex.finditer(desc):
             subj_str = m.group(1)
             dest_raw = m.group(2).strip()
-            # Multi-subject: "Calvin and Goku" → 2 edges
             subjects = split_names(subj_str)
             subjects = [s for s in subjects if s not in NON_BOB_NAMES]
             if not subjects:
                 continue
             dest_type, dest_sys, note = resolve_destination(dest_raw, gaz, aliases)
             for bob in subjects:
-                key = (bob, verb, dest_raw)
-                if key in seen:
-                    continue
-                seen.add(key)
-                bob_known = bob in known_names
-                if dest_type in ("system", "place_in_system", "megastructure") and bob_known:
-                    conf = "high"
-                elif dest_type in ("system", "place_in_system", "megastructure", "off_map"):
-                    conf = "medium"
-                elif bob_known:
-                    conf = "medium"
-                else:
-                    conf = "low"
-                out.append({
-                    "bob": bob,
-                    "verb": verb,
-                    "destination_raw": dest_raw,
-                    "destination_system": dest_sys,
-                    "destination_type": dest_type,
-                    "in_world_date": ev["in_world_date"],
-                    "date_year": ev["date_year"],
-                    "chapter_code": ev["chapter_code"],
-                    "reading_order": ev["reading_order"],
-                    "first_book": ev["first_book"],
-                    "pattern": pattern_id,
-                    "source_text": m.group(0).strip(),
-                    "bob_known": bob_known,
-                    "confidence": conf,
-                    "note": note,
-                })
+                _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
+                      pattern_id, m.group(0).strip())
+
+    # Cohort patterns — "Khan and seven other Bill clones (Hannibal, Tom, ...) arrive at X"
+    for verb, pattern_id, regex in (cohort_patterns or []):
+        for m in regex.finditer(desc):
+            first = m.group(1)
+            rest_str = m.group(2)
+            dest_raw = m.group(3).strip()
+            subjects = [first] if first not in NON_BOB_NAMES else []
+            subjects += [s for s in split_names(rest_str) if s not in NON_BOB_NAMES]
+            if not subjects:
+                continue
+            dest_type, dest_sys, note = resolve_destination(dest_raw, gaz, aliases)
+            for bob in subjects:
+                _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
+                      pattern_id, m.group(0).strip())
+
+    # Hidden-subject patterns — back-track to find a known Bob in the sentence.
+    # Standard/cohort passes already populated `seen`, so dedupe is automatic.
+    for verb, pattern_id, regex in (hidden_patterns or []):
+        for m in regex.finditer(desc):
+            sent_start, sent_end = _sentence_for_position(desc, m.start())
+            bob = _backtrack_subject(desc, sent_start, m.start(), known_names)
+            if not bob:
+                continue
+            dest_raw = m.group(1).strip()
+            dest_type, dest_sys, note = resolve_destination(dest_raw, gaz, aliases)
+            _emit(bob, verb, dest_raw, dest_type, dest_sys, note,
+                  pattern_id, m.group(0).strip())
+
     return out
 
 
@@ -489,12 +645,18 @@ def main():
     aliases = _build_aliases(gaz)
     dest_re = build_dest_regex(gaz)
     travel_patterns = build_travel_patterns(dest_re)
+    cohort_patterns = build_cohort_travel_patterns(dest_re)
+    hidden_patterns = build_hidden_subject_patterns(dest_re)
 
     rep_edges = []
     trv_edges = []
     for ev in events:
         rep_edges.extend(extract_replication(ev, known_names))
-        trv_edges.extend(extract_travel(ev, known_names, gaz, travel_patterns, aliases))
+        trv_edges.extend(extract_travel(
+            ev, known_names, gaz, travel_patterns, aliases,
+            cohort_patterns=cohort_patterns,
+            hidden_patterns=hidden_patterns,
+        ))
 
     # New names discovered = children in replication not in known_names
     new_bobs = sorted({e["child"] for e in rep_edges if not e["child_known"]})
