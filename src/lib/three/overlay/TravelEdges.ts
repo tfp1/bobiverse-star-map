@@ -3,6 +3,7 @@ import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import type { Overlay } from '$lib/data/overlay';
+import type { TierView } from '$lib/data/derive';
 
 /**
  * Travel edges: per-Bob, the chronologically-ordered chain of system
@@ -21,14 +22,53 @@ export interface TravelEdgesResult {
 	stats: { drawn: number };
 }
 
+/**
+ * Recompute per-Bob itineraries restricted to travel edges with
+ * `first_book <= view.tier`. Mirrors overlay.buildItineraries but
+ * adds the tier gate; the unfiltered version remains cached on the
+ * overlay for the no-tier path.
+ */
+function buildItinerariesAtTier(overlay: Overlay, view: TierView): string[][] {
+	const byBobId = new Map<string, typeof overlay.travel>();
+	for (const t of overlay.travel) {
+		if (!t.bob_known) continue;
+		if (t.destination_type === 'off_map') continue;
+		if (!overlay.systems.has(t.destination_system)) continue;
+		if (t.first_book == null || t.first_book > view.tier) continue;
+		const primary = overlay.bobByName(t.bob);
+		if (!primary) continue;
+		if (!view.bobVisible(primary.name)) continue;
+		const list = byBobId.get(primary.id) ?? [];
+		list.push(t);
+		byBobId.set(primary.id, list);
+	}
+	const out: string[][] = [];
+	for (const bob of overlay.bobs) {
+		if (!view.bobVisible(bob.name)) continue;
+		const travels = byBobId.get(bob.id);
+		if (!travels) continue;
+		const seq: string[] = [];
+		if (overlay.systems.has(bob.origin_system)) seq.push(bob.origin_system);
+		travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
+		for (const t of travels) {
+			if (seq[seq.length - 1] !== t.destination_system) seq.push(t.destination_system);
+		}
+		if (seq.length > 1) out.push(seq);
+	}
+	return out;
+}
+
 export function makeTravelEdges(
 	overlay: Overlay,
-	resolution: THREE.Vector2
+	resolution: THREE.Vector2,
+	view?: TierView
 ): TravelEdgesResult {
 	const positions: number[] = [];
 	let drawn = 0;
 
-	for (const seq of overlay.bobItinerary.values()) {
+	const sequences: string[][] = view ? buildItinerariesAtTier(overlay, view) : [...overlay.bobItinerary.values()];
+
+	for (const seq of sequences) {
 		for (let i = 0; i + 1 < seq.length; i++) {
 			const a = overlay.systems.get(seq[i]);
 			const b = overlay.systems.get(seq[i + 1]);

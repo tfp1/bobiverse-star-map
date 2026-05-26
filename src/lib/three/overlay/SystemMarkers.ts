@@ -6,6 +6,9 @@ import type { SpatialSystem } from '$lib/data/types';
  * One marker (small sphere + HTML label) per Bobiverse-relevant system.
  * Returns the Three.js group, the marker meshes (for raycasting), and
  * a dispose path so the scene teardown can clean everything up.
+ *
+ * `visible` (when provided) filters systems by name — used by the
+ * spoiler selector to hide systems whose content is all gated out.
  */
 export interface SystemMarkersResult {
 	group: THREE.Group;
@@ -13,7 +16,10 @@ export interface SystemMarkersResult {
 	dispose: () => void;
 }
 
-export function makeSystemMarkers(systems: Iterable<SpatialSystem>): SystemMarkersResult {
+export function makeSystemMarkers(
+	systems: Iterable<SpatialSystem>,
+	visible?: Set<string>
+): SystemMarkersResult {
 	const group = new THREE.Group();
 	const sphereGeom = new THREE.SphereGeometry(0.12, 16, 12);
 	const sphereMat = new THREE.MeshBasicMaterial({
@@ -25,6 +31,7 @@ export function makeSystemMarkers(systems: Iterable<SpatialSystem>): SystemMarke
 	const meshes: THREE.Mesh[] = [];
 
 	for (const s of systems) {
+		if (visible && !visible.has(s.name)) continue;
 		const sphere = new THREE.Mesh(sphereGeom, sphereMat);
 		sphere.position.set(s.xyz[0], s.xyz[1], s.xyz[2]);
 		sphere.userData = { kind: 'system', systemName: s.name };
