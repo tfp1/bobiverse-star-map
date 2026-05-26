@@ -1,9 +1,9 @@
 {
-  "_provenance": "Fan-made Bob genealogy, supplied via Pastebin qwfY3PMU. Birth-year data cites kurt-anderson.com/main/uploads/2017/04/Bob-by-construction.pdf. UNVERIFIED. Covers through ~book 2; book 3 active Bobs (Marcus, Herschel, Neil, Icarus, Daedalus, Mack) are NOT present. 'born' year disagrees with timeline 'online' year for first cohort (2144 vs 2145) - resolve semantics before using as edge timestamp. Note spelling 'Viktor' here = 'Victor' elsewhere; 'Pete' (B2C24) is missing entirely.",
+  "_provenance": "Fan-made Bob genealogy, supplied via Pastebin qwfY3PMU. Birth-year data cites kurt-anderson.com/main/uploads/2017/04/Bob-by-construction.pdf. UNVERIFIED. Covers through ~book 2; book 3 active Bobs (Marcus, Herschel, Neil, Icarus, Daedalus, Mack) are NOT present. Note spelling 'Viktor' here = 'Victor' elsewhere; 'Pete' (B2C24) is missing entirely. Gen-1 cohort (Bill/Mario/Riker/Milo) born years corrected 2144→2145 per B1.C17 dateline (July 2145); the fan-source 2144 was a one-year error.",
   "name": "Bob",
   "born": 2133,
   "clones": [
-    {"name": "Bill", "born": 2144, "clones": [
+    {"name": "Bill", "born": 2145, "clones": [
       {"name": "Garfield", "born": 2145, "clones": {}},
       {"name": "Calvin", "born": 2150, "clones": [
         {"name": "Bart", "born": 2165, "clones": {}},
@@ -27,7 +27,7 @@
       {"name": "Kyle", "born": 2171, "clones": {}},
       {"name": "Ned", "born": 2171, "clones": {}}
     ]},
-    {"name": "Mario", "born": 2144, "clones": [
+    {"name": "Mario", "born": 2145, "clones": [
       {"name": "Bashful", "born": 2158, "clones": {}},
       {"name": "Dopey", "born": 2158, "clones": {}},
       {"name": "Sleepy", "born": 2158, "clones": {}},
@@ -39,7 +39,7 @@
         {"name": "Ferb", "born": 2170, "clones": {}}
       ]}
     ]},
-    {"name": "Riker", "born": 2144, "clones": [
+    {"name": "Riker", "born": 2145, "clones": [
       {"name": "Homer", "born": 2145, "clones": {}},
       {"name": "Ralph", "born": 2166, "clones": {}},
       {"name": "Charles", "born": 2158, "clones": [
@@ -52,7 +52,7 @@
       {"name": "Bert", "born": 2170, "clones": {}},
       {"name": "Ernie", "born": 2170, "clones": {}}
     ]},
-    {"name": "Milo", "born": 2144, "clones": []},
+    {"name": "Milo", "born": 2145, "clones": []},
     {"name": "Marvin", "born": 2165, "clones": []},
     {"name": "Luke", "born": 2165, "clones": []},
     {"name": "Bender", "born": 2165, "clones": []},

@@ -276,20 +276,28 @@ Full detail in `gazetteer.json` and `data/bobs.json._conflicts_resolved` /
 7. **Mulder/Moulder, Jonny/Johnny** — canonical spellings "Mulder" and
    "Jonny". Logged.
 
+**Also resolved (later sessions):**
+
+8. **gen-1 born year = 2145** (not 2144). B1.C17 dateline (July 2145) is
+   canonical; the fan source had a one-year error. `genealogy.json` corrected
+   for Bill/Mario/Riker/Milo.
+9. **`jonny-skinner-born-year`** — closed via #7. Consolidator now drops
+   sheet `online_year < 2100` and falls back to `created_year`.
+10. **Gen-8+ parentage** — closed via #5 (partial-by-design). Only
+    Conan ← Will (B4 P1 C7) had explicit prose attribution; Herschel, Neil,
+    Mack, Hugh, Lenny, Mud are genuinely unattributed in the books.
+11. **System placements** — closed via #3. Quin/Jabberwocky/Skippyland/Gamma
+    Leporis all resolved or bucketed as `off_map_systems`.
+12. **POV / parentage disagreements** — closed via #4 (POVs) and **#8**
+    (Isaac ← Bart per B3 C21 prose, overturning #4's Isaac ← Mack reading;
+    Jack/Owen demoted to parent-unknown stubs).
+
 **Still open:**
 
-8. **born vs online dates** disagree for the first cohort (2144 vs 2145) —
-   define edge-timestamp semantics before trusting either.
-9. **`jonny-skinner-born-year`** — sheet has `online_year=2070` for both,
-   impossible (pre-Bob's creation 2133). Sheet appears to misread a column.
-   In `bobs.json._unresolved`. Tracked in issue #7.
-10. **`missing-parents-gen8+`** — Marcus, Monty, Herschel, Neil, Mack, Hugh,
-    Lenny, Mud, Conan, ANEC, etc. have no canonical parent from any current
-    source. Must be mined from B3+ prose. Tracked in issue #5.
-11. **Unresolved system placements** — Quin, Jabberwocky, Skippyland, Gamma
-    Leporis. Need prose check. Tracked in issue #3.
-12. **POV / parentage disagreements** — B2C15, B3C39 POV calls; Mack's
-    children (Isaac/Jack/Owen). Tracked in issue #4.
+None tracked. Possible future work: Hugh/Lenny/Mud stubs in `bobs.json` (currently
+only in `events.json`); "Fake Hugh" as a distinct entity from Hugh (Fake Hugh ←
+Mud per B5 wiki text); re-examine Oliver/Jack/Owen if stronger prose surfaces
+on the Bart-clone-cohort theory.
 
 ---
 
