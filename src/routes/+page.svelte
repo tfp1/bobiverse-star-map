@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
-	import { mountScene, type SceneHandle } from '$lib/three/Scene';
+	import { mountScene, type SceneHandle, type SceneStats } from '$lib/three/Scene';
 
 	let container: HTMLDivElement;
 	let error = $state<string | null>(null);
+	let stats = $state<SceneStats | null>(null);
 
 	onMount(() => {
 		let handle: SceneHandle | undefined;
@@ -15,6 +16,7 @@
 					h.dispose();
 				} else {
 					handle = h;
+					stats = h.stats;
 				}
 			})
 			.catch((e: unknown) => {
@@ -36,7 +38,15 @@
 	<div class="hud">
 		<h1>Bobiverse Star Map</h1>
 		<p>WASD to fly · drag mouse to look · R/F up/down · Q/E roll</p>
-		<p class="small">v0 · spatial scaffold · overlay graph coming next</p>
+		{#if stats}
+			<p class="small">
+				{stats.systems} systems ·
+				<span class="rep">{stats.replicationEdges} replication</span> ·
+				<span class="trv">{stats.travelEdges} travel</span> edges
+			</p>
+		{:else if !error}
+			<p class="small">loading…</p>
+		{/if}
 	</div>
 </div>
 
@@ -74,8 +84,14 @@
 		opacity: 0.8;
 	}
 	.hud .small {
-		opacity: 0.5;
+		opacity: 0.7;
 		font-size: 0.7rem;
+	}
+	.hud .rep {
+		color: #9b7cff;
+	}
+	.hud .trv {
+		color: #ffb15c;
 	}
 	.error {
 		position: absolute;
@@ -84,5 +100,18 @@
 		place-items: center;
 		color: #ff8080;
 		padding: 1rem;
+	}
+	:global(.system-label) {
+		color: #cfe4ff;
+		font-size: 11px;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		letter-spacing: 0.02em;
+		padding: 1px 6px;
+		background: rgba(0, 8, 24, 0.55);
+		border: 1px solid rgba(111, 195, 255, 0.35);
+		border-radius: 3px;
+		transform: translate(10px, -50%);
+		white-space: nowrap;
+		text-shadow: 0 0 4px #000;
 	}
 </style>

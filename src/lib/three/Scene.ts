@@ -1,10 +1,22 @@
 import * as THREE from 'three';
 import { FlyControls } from 'three/addons/controls/FlyControls.js';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { loadStarsBin } from '$lib/stars/loadStarsBin';
+import { getOverlay } from '$lib/data/overlay';
 import { makeStarPoints } from './StarPoints';
+import { makeSystemMarkers } from './overlay/SystemMarkers';
+import { makeReplicationEdges } from './overlay/ReplicationEdges';
+import { makeTravelEdges } from './overlay/TravelEdges';
 
 export interface SceneHandle {
 	dispose: () => void;
+	stats: SceneStats;
+}
+
+export interface SceneStats {
+	systems: number;
+	replicationEdges: number;
+	travelEdges: number;
 }
 
 export interface SceneOptions {
@@ -21,6 +33,14 @@ export async function mountScene(
 	renderer.setClearColor(0x000005, 1.0);
 	container.appendChild(renderer.domElement);
 
+	const labelRenderer = new CSS2DRenderer();
+	labelRenderer.setSize(container.clientWidth, container.clientHeight);
+	labelRenderer.domElement.style.position = 'absolute';
+	labelRenderer.domElement.style.top = '0';
+	labelRenderer.domElement.style.left = '0';
+	labelRenderer.domElement.style.pointerEvents = 'none';
+	container.appendChild(labelRenderer.domElement);
+
 	const scene = new THREE.Scene();
 	const camera = new THREE.PerspectiveCamera(
 		60,
@@ -36,15 +56,22 @@ export async function mountScene(
 	controls.dragToLook = true;
 	controls.autoForward = false;
 
-	let field;
-	try {
-		field = await loadStarsBin(opts.starsBinUrl);
-	} catch (err) {
+	const cleanupPartial = () => {
 		controls.dispose();
 		renderer.dispose();
 		if (renderer.domElement.parentNode === container) {
 			container.removeChild(renderer.domElement);
 		}
+		if (labelRenderer.domElement.parentNode === container) {
+			container.removeChild(labelRenderer.domElement);
+		}
+	};
+
+	let field;
+	try {
+		field = await loadStarsBin(opts.starsBinUrl);
+	} catch (err) {
+		cleanupPartial();
 		throw err;
 	}
 	const stars = makeStarPoints(field);
@@ -57,12 +84,27 @@ export async function mountScene(
 	);
 	scene.add(sol);
 
+	const overlay = getOverlay();
+	const systemMarkers = makeSystemMarkers(overlay.systems.values());
+	scene.add(systemMarkers.group);
+	const repEdges = makeReplicationEdges(overlay);
+	scene.add(repEdges.object);
+	const travelEdges = makeTravelEdges(overlay);
+	scene.add(travelEdges.object);
+
+	const stats: SceneStats = {
+		systems: overlay.systems.size,
+		replicationEdges: repEdges.stats.drawn,
+		travelEdges: travelEdges.stats.drawn
+	};
+
 	const clock = new THREE.Clock();
 	let raf = 0;
 	const tick = () => {
 		const dt = clock.getDelta();
 		controls.update(dt);
 		renderer.render(scene, camera);
+		labelRenderer.render(scene, camera);
 		raf = requestAnimationFrame(tick);
 	};
 	raf = requestAnimationFrame(tick);
@@ -71,6 +113,7 @@ export async function mountScene(
 		const w = container.clientWidth;
 		const h = container.clientHeight;
 		renderer.setSize(w, h);
+		labelRenderer.setSize(w, h);
 		camera.aspect = w / h;
 		camera.updateProjectionMatrix();
 		(stars.material as THREE.ShaderMaterial).uniforms.uHeight.value = h;
@@ -78,6 +121,7 @@ export async function mountScene(
 	window.addEventListener('resize', onResize);
 
 	return {
+		stats,
 		dispose() {
 			cancelAnimationFrame(raf);
 			window.removeEventListener('resize', onResize);
@@ -87,7 +131,13 @@ export async function mountScene(
 			(stars.material as THREE.Material).dispose();
 			sol.geometry.dispose();
 			(sol.material as THREE.Material).dispose();
+			systemMarkers.dispose();
+			repEdges.dispose();
+			travelEdges.dispose();
 			container.removeChild(renderer.domElement);
+			if (labelRenderer.domElement.parentNode === container) {
+				container.removeChild(labelRenderer.domElement);
+			}
 		}
 	};
 }
