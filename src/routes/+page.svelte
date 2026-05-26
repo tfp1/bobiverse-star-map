@@ -31,8 +31,16 @@
 			.then((h) => {
 				if (cancelled) {
 					h.dispose();
+					return;
+				}
+				handle = h;
+				// `tier` may have changed via clicks or `hashchange`
+				// while the scene was still loading. Reconcile so the
+				// rendered overlay matches the current selector state
+				// rather than the initialTier we mounted with.
+				if (tier !== initial.tier) {
+					stats = h.applyTier(tier);
 				} else {
-					handle = h;
 					stats = h.stats;
 				}
 			})
@@ -102,7 +110,7 @@
 			</button>
 		{/each}
 	</div>
-	<InfoPanel {selection} onClose={() => (selection = null)} />
+	<InfoPanel {selection} {tier} onClose={() => (selection = null)} />
 </div>
 
 <style>

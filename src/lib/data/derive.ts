@@ -94,24 +94,70 @@ export function systemsVisibleAt(overlay: Overlay, tier: number): Set<string> {
 	return out;
 }
 
-/** Bobs whose origin_system is `systemName`. */
-export function bobsAt(overlay: Overlay, systemName: string): Bob[] {
-	return overlay.bobs.filter((b) => b.origin_system === systemName);
+/**
+ * Bobs whose origin_system is `systemName`. When `tier` is provided,
+ * residents are gated the same way the scene gates Bob pips — orphan
+ * Bobs (firstBookOf = null) only appear at tier 5.
+ */
+export function bobsAt(overlay: Overlay, systemName: string, tier?: number): Bob[] {
+	const all = overlay.bobs.filter((b) => b.origin_system === systemName);
+	if (tier == null) return all;
+	return all.filter((b) => {
+		const fb = firstBookOf(overlay, b.name);
+		if (fb == null) return tier >= MAX_TIER;
+		return fb <= tier;
+	});
 }
 
-/** Count of travel edges arriving at or leaving from `systemName`. */
+/**
+ * Count of travel edges arriving at or leaving from `systemName`.
+ * When `tier` is provided, both arrival and departure counts are
+ * restricted to edges with `first_book <= tier`.
+ */
 export function travelCountsAt(
 	overlay: Overlay,
-	systemName: string
+	systemName: string,
+	tier?: number
 ): { arrivals: number; departures: number } {
 	let arrivals = 0;
 	let departures = 0;
 	for (const t of overlay.travel) {
+		if (tier != null && (t.first_book == null || t.first_book > tier)) continue;
 		if (t.destination_system === systemName) arrivals++;
 	}
-	for (const seq of overlay.bobItinerary.values()) {
-		for (let i = 0; i + 1 < seq.length; i++) {
-			if (seq[i] === systemName) departures++;
+	if (tier == null) {
+		for (const seq of overlay.bobItinerary.values()) {
+			for (let i = 0; i + 1 < seq.length; i++) {
+				if (seq[i] === systemName) departures++;
+			}
+		}
+		return { arrivals, departures };
+	}
+	// Tier-restricted departures: a departure is a travel edge whose
+	// per-Bob predecessor stop (origin_system, or the previous in-tier
+	// destination) equals `systemName`. Mirrors the itinerary logic
+	// used by TravelEdges.buildItinerariesAtTier so the panel agrees
+	// with the rendered lines.
+	const byBobId = new Map<string, typeof overlay.travel>();
+	for (const t of overlay.travel) {
+		if (!t.bob_known) continue;
+		if (t.destination_type === 'off_map') continue;
+		if (!overlay.systems.has(t.destination_system)) continue;
+		if (t.first_book == null || t.first_book > tier) continue;
+		const primary = overlay.bobByName(t.bob);
+		if (!primary) continue;
+		const list = byBobId.get(primary.id) ?? [];
+		list.push(t);
+		byBobId.set(primary.id, list);
+	}
+	for (const bob of overlay.bobs) {
+		const travels = byBobId.get(bob.id);
+		if (!travels) continue;
+		travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
+		let prev = overlay.systems.has(bob.origin_system) ? bob.origin_system : null;
+		for (const t of travels) {
+			if (prev === systemName && t.destination_system !== systemName) departures++;
+			if (prev !== t.destination_system) prev = t.destination_system;
 		}
 	}
 	return { arrivals, departures };

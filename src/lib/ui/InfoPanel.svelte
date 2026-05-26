@@ -6,16 +6,17 @@
 	interface Props {
 		selection: Selection | null;
 		onClose: () => void;
+		tier: number;
 	}
-	let { selection, onClose }: Props = $props();
+	let { selection, onClose, tier }: Props = $props();
 
 	const overlay = getOverlay();
 
 	const view = $derived.by(() => {
 		if (!selection) return null;
 		if (selection.kind === 'system') {
-			const bobs = bobsAt(overlay, selection.systemName);
-			const counts = travelCountsAt(overlay, selection.systemName);
+			const bobs = bobsAt(overlay, selection.systemName, tier);
+			const counts = travelCountsAt(overlay, selection.systemName, tier);
 			return { kind: 'system' as const, name: selection.systemName, bobs, counts };
 		}
 		// Resolve by id, not name. data/bobs.json has display-name
