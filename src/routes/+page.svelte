@@ -2,15 +2,23 @@
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
 	import { mountScene, type SceneHandle, type SceneStats } from '$lib/three/Scene';
+	import type { Selection } from '$lib/three/picking';
+	import InfoPanel from '$lib/ui/InfoPanel.svelte';
 
 	let container: HTMLDivElement;
 	let error = $state<string | null>(null);
 	let stats = $state<SceneStats | null>(null);
+	let selection = $state<Selection | null>(null);
 
 	onMount(() => {
 		let handle: SceneHandle | undefined;
 		let cancelled = false;
-		mountScene(container, { starsBinUrl: `${base}/stars-near.bin` })
+		mountScene(container, {
+			starsBinUrl: `${base}/stars-near.bin`,
+			onSelect: (sel) => {
+				selection = sel;
+			}
+		})
 			.then((h) => {
 				if (cancelled) {
 					h.dispose();
@@ -40,7 +48,7 @@
 		<p>WASD to fly · drag mouse to look · R/F up/down · Q/E roll</p>
 		{#if stats}
 			<p class="small">
-				{stats.systems} systems ·
+				{stats.systems} systems · {stats.bobs} bobs ·
 				<span class="rep">{stats.replicationEdges} replication</span> ·
 				<span class="trv">{stats.travelEdges} travel</span> edges
 			</p>
@@ -48,6 +56,7 @@
 			<p class="small">loading…</p>
 		{/if}
 	</div>
+	<InfoPanel {selection} onClose={() => (selection = null)} />
 </div>
 
 <style>

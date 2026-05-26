@@ -4,11 +4,12 @@ import type { SpatialSystem } from '$lib/data/types';
 
 /**
  * One marker (small sphere + HTML label) per Bobiverse-relevant system.
- * Returns the Three.js group plus an array of disposable resources so
- * the scene teardown path can clean everything up.
+ * Returns the Three.js group, the marker meshes (for raycasting), and
+ * a dispose path so the scene teardown can clean everything up.
  */
 export interface SystemMarkersResult {
 	group: THREE.Group;
+	meshes: THREE.Mesh[];
 	dispose: () => void;
 }
 
@@ -21,11 +22,14 @@ export function makeSystemMarkers(systems: Iterable<SpatialSystem>): SystemMarke
 		opacity: 0.7
 	});
 	const labelEls: HTMLDivElement[] = [];
+	const meshes: THREE.Mesh[] = [];
 
 	for (const s of systems) {
 		const sphere = new THREE.Mesh(sphereGeom, sphereMat);
 		sphere.position.set(s.xyz[0], s.xyz[1], s.xyz[2]);
+		sphere.userData = { kind: 'system', systemName: s.name };
 		group.add(sphere);
+		meshes.push(sphere);
 
 		const el = document.createElement('div');
 		el.className = 'system-label';
@@ -38,6 +42,7 @@ export function makeSystemMarkers(systems: Iterable<SpatialSystem>): SystemMarke
 
 	return {
 		group,
+		meshes,
 		dispose() {
 			sphereGeom.dispose();
 			sphereMat.dispose();

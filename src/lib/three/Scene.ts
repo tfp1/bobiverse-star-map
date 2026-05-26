@@ -7,6 +7,8 @@ import { makeStarPoints } from './StarPoints';
 import { makeSystemMarkers } from './overlay/SystemMarkers';
 import { makeReplicationEdges } from './overlay/ReplicationEdges';
 import { makeTravelEdges } from './overlay/TravelEdges';
+import { makeBobNodes } from './overlay/BobNodes';
+import { attachPicking, type Selection } from './picking';
 
 export interface SceneHandle {
 	dispose: () => void;
@@ -15,12 +17,14 @@ export interface SceneHandle {
 
 export interface SceneStats {
 	systems: number;
+	bobs: number;
 	replicationEdges: number;
 	travelEdges: number;
 }
 
 export interface SceneOptions {
 	starsBinUrl: string;
+	onSelect?: (sel: Selection | null) => void;
 }
 
 export async function mountScene(
@@ -97,9 +101,19 @@ export async function mountScene(
 	scene.add(repEdges.object);
 	const travelEdges = makeTravelEdges(overlay, edgeResolution);
 	scene.add(travelEdges.object);
+	const bobNodes = makeBobNodes(overlay);
+	scene.add(bobNodes.group);
+
+	const picking = attachPicking({
+		camera,
+		canvas: renderer.domElement,
+		targets: [...systemMarkers.meshes, ...bobNodes.meshes],
+		onSelect: opts.onSelect ?? (() => {})
+	});
 
 	const stats: SceneStats = {
 		systems: overlay.systems.size,
+		bobs: bobNodes.stats.drawn,
 		replicationEdges: repEdges.stats.drawn,
 		travelEdges: travelEdges.stats.drawn
 	};
@@ -142,6 +156,8 @@ export async function mountScene(
 			systemMarkers.dispose();
 			repEdges.dispose();
 			travelEdges.dispose();
+			bobNodes.dispose();
+			picking.dispose();
 			container.removeChild(renderer.domElement);
 			if (labelRenderer.domElement.parentNode === container) {
 				container.removeChild(labelRenderer.domElement);
