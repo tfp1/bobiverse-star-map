@@ -1,4 +1,6 @@
 unzipped_books/
+inbound/
+
 
 # SvelteKit / Node
 node_modules/
