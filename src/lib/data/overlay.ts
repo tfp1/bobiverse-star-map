@@ -13,14 +13,23 @@ import type {
 export interface Overlay {
 	bobs: Bob[];
 	bobById: Map<string, Bob>;
+	/**
+	 * Resolves a Bob display name to the primary record. `data/bobs.json`
+	 * has name collisions (Elmer/Elmer_v4 etc.) where the "_vN" record is a
+	 * restored-from-backup variant; replication and travel rows reference
+	 * the original character by name, so we always attach to the
+	 * non-versioned record when both exist.
+	 */
+	bobByName: (name: string) => Bob | undefined;
 	replication: ReplicationEdge[];
 	travel: TravelEdge[];
 	systems: Map<string, SpatialSystem>;
 	/**
-	 * Per-Bob, chronologically-ordered system sequence: origin_system first,
-	 * then each travel edge with destination_type=='system' or 'place_in_system'
-	 * (resolved to its destination_system). off_map destinations are dropped
-	 * for PR2 — they'll be rendered under the non-spatial convention (#14).
+	 * Per-Bob (keyed by id), chronologically-ordered system sequence:
+	 * origin_system first, then each travel edge with destination_type
+	 * 'system' or 'place_in_system' resolved to its destination_system.
+	 * off_map destinations are dropped for PR2 — they'll be rendered
+	 * under the non-spatial convention (#14).
 	 */
 	bobItinerary: Map<string, string[]>;
 }
@@ -43,25 +52,50 @@ function buildSystems(): Map<string, SpatialSystem> {
 	return out;
 }
 
+/**
+ * Build a display-name → primary-record map. `data/bobs.json` has
+ * collisions (Elmer/Elmer_v4, Loki/Loki_v4, ???/???) where the "_vN"
+ * record is a restored-from-backup variant of the same character.
+ * Edge rows reference the original by name; always attach to the
+ * non-versioned record when both exist.
+ */
+function buildNameToPrimary(bobs: Bob[]): Map<string, Bob> {
+	const byName = new Map<string, Bob[]>();
+	for (const b of bobs) {
+		const list = byName.get(b.name) ?? [];
+		list.push(b);
+		byName.set(b.name, list);
+	}
+	const out = new Map<string, Bob>();
+	for (const [name, records] of byName) {
+		const primary = records.find((r) => !/_v\d+$/.test(r.id)) ?? records[0];
+		out.set(name, primary);
+	}
+	return out;
+}
+
 function buildItineraries(
 	bobs: Bob[],
 	travel: TravelEdge[],
-	systems: Map<string, SpatialSystem>
+	systems: Map<string, SpatialSystem>,
+	nameToPrimary: Map<string, Bob>
 ): Map<string, string[]> {
-	const byBob = new Map<string, TravelEdge[]>();
+	const byId = new Map<string, TravelEdge[]>();
 	for (const t of travel) {
 		if (!t.bob_known) continue;
 		if (t.destination_type === 'off_map') continue;
 		if (!systems.has(t.destination_system)) continue;
-		const list = byBob.get(t.bob) ?? [];
+		const primary = nameToPrimary.get(t.bob);
+		if (!primary) continue;
+		const list = byId.get(primary.id) ?? [];
 		list.push(t);
-		byBob.set(t.bob, list);
+		byId.set(primary.id, list);
 	}
 	const itin = new Map<string, string[]>();
 	for (const bob of bobs) {
 		const seq: string[] = [];
 		if (systems.has(bob.origin_system)) seq.push(bob.origin_system);
-		const travels = byBob.get(bob.name);
+		const travels = byId.get(bob.id);
 		if (travels) {
 			travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
 			for (const t of travels) {
@@ -69,7 +103,7 @@ function buildItineraries(
 				if (seq[seq.length - 1] !== dest) seq.push(dest);
 			}
 		}
-		if (seq.length) itin.set(bob.name, seq);
+		if (seq.length > 1) itin.set(bob.id, seq);
 	}
 	return itin;
 }
@@ -80,10 +114,19 @@ export function getOverlay(): Overlay {
 	if (cached) return cached;
 	const bobs = (bobsRaw as unknown as { bobs: Bob[] }).bobs;
 	const bobById = new Map(bobs.map((b) => [b.id, b]));
+	const nameToPrimary = buildNameToPrimary(bobs);
 	const replication = (repRaw as unknown as { edges: ReplicationEdge[] }).edges;
 	const travel = (travelRaw as unknown as { edges: TravelEdge[] }).edges;
 	const systems = buildSystems();
-	const bobItinerary = buildItineraries(bobs, travel, systems);
-	cached = { bobs, bobById, replication, travel, systems, bobItinerary };
+	const bobItinerary = buildItineraries(bobs, travel, systems, nameToPrimary);
+	cached = {
+		bobs,
+		bobById,
+		bobByName: (name) => nameToPrimary.get(name),
+		replication,
+		travel,
+		systems,
+		bobItinerary
+	};
 	return cached;
 }

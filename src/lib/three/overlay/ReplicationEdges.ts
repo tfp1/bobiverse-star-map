@@ -28,8 +28,8 @@ export function makeReplicationEdges(overlay: Overlay): ReplicationEdgesResult {
 			dropped++;
 			continue;
 		}
-		const parent = overlay.bobs.find((b) => b.name === edge.parent);
-		const child = overlay.bobs.find((b) => b.name === edge.child);
+		const parent = overlay.bobByName(edge.parent);
+		const child = overlay.bobByName(edge.child);
 		if (!parent || !child) {
 			dropped++;
 			continue;
