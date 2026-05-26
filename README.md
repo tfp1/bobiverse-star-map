@@ -58,10 +58,41 @@ timeline has at least one self-noted inconsistency. Treat anything marked
 
 ## Status
 
-Design + source-gathering phase. Data model and extraction approach are
-settled; the **ambition dial** (static explorer → timeline scrubber → guided
-story) is an open call for the owner — see `handoff.md` §8. Do not scaffold the
-site beyond a static explorer without that decision.
+v0 scaffold landing: SvelteKit + adapter-static + Three.js, with the Gaia DR3
+nearby-star sample (`static/stars-near.bin`, extended with 18 named Bobiverse
+host systems — see `scripts/append_named_systems.py`) rendered as a point cloud
+in Explore mode. The Bobiverse overlay graph (replication + travel edges,
+spoiler selector, info panels) is the next slice — see issue #11.
+
+## Run it
+
+```bash
+npm install
+npm run dev        # localhost dev server
+npm run build      # static site → build/
+npm run preview    # serve the built site locally
+npm run check      # svelte-check + typescript
+```
+
+Controls (Explore mode): WASD to fly, drag mouse to look, R/F up/down, Q/E
+roll. Sol sits at the origin.
+
+## Deploy
+
+Auto-deploys to GitHub Pages from `main` via `.github/workflows/deploy.yml`.
+The workflow sets `BASE_PATH=/bobiverse-star-map` so asset URLs match the
+project-page subpath. The site is published at
+`https://tfp1.github.io/bobiverse-star-map/`.
+
+## stars-near.bin provenance
+
+The committed `static/stars-near.bin` is **not** the raw Gaia DR3 sample
+shipped with gaia-mary. It is that file with 18 records appended for
+Bobiverse-relevant named host systems that Gaia dropped to its bright-star
+saturation cut (Alpha Cen, Epsilon Eridani, Epsilon Indi, Eta Cas, Eta Lep,
+Omicron² Eri, etc.). See `scripts/append_named_systems.py` and handoff.md §D3.
+The append is idempotent and one-shot; re-running needs the original 53,836-
+record file checked out fresh.
 
 ---
 
