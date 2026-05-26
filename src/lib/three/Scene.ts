@@ -48,7 +48,12 @@ export async function mountScene(
 		0.01,
 		2000
 	);
-	camera.position.set(0, 0, 0); // Sol at origin
+	// Pull back from Sol so the user lands looking at the local
+	// cluster rather than inside the Sol marker. The named-system
+	// triangle (Alpha Cen ~1.3pc, Epsilon Eri ~3.2pc, Epsilon Indi
+	// ~3.6pc) fits comfortably in the foreground from here.
+	camera.position.set(5, 3, 8);
+	camera.lookAt(0, 0, 0);
 
 	const controls = new FlyControls(camera, renderer.domElement);
 	controls.movementSpeed = 8; // parsec/sec
@@ -87,9 +92,10 @@ export async function mountScene(
 	const overlay = getOverlay();
 	const systemMarkers = makeSystemMarkers(overlay.systems.values());
 	scene.add(systemMarkers.group);
-	const repEdges = makeReplicationEdges(overlay);
+	const edgeResolution = new THREE.Vector2(container.clientWidth, container.clientHeight);
+	const repEdges = makeReplicationEdges(overlay, edgeResolution);
 	scene.add(repEdges.object);
-	const travelEdges = makeTravelEdges(overlay);
+	const travelEdges = makeTravelEdges(overlay, edgeResolution);
 	scene.add(travelEdges.object);
 
 	const stats: SceneStats = {
@@ -117,6 +123,8 @@ export async function mountScene(
 		camera.aspect = w / h;
 		camera.updateProjectionMatrix();
 		(stars.material as THREE.ShaderMaterial).uniforms.uHeight.value = h;
+		repEdges.setResolution(w, h);
+		travelEdges.setResolution(w, h);
 	};
 	window.addEventListener('resize', onResize);
 
