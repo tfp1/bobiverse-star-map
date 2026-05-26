@@ -85,6 +85,8 @@ export async function mountScene(
 			renderer.dispose();
 			stars.geometry.dispose();
 			(stars.material as THREE.Material).dispose();
+			sol.geometry.dispose();
+			(sol.material as THREE.Material).dispose();
 			container.removeChild(renderer.domElement);
 		}
 	};
