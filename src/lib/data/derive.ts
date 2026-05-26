@@ -121,11 +121,10 @@ export function travelCountsAt(
 ): { arrivals: number; departures: number } {
 	let arrivals = 0;
 	let departures = 0;
-	for (const t of overlay.travel) {
-		if (tier != null && (t.first_book == null || t.first_book > tier)) continue;
-		if (t.destination_system === systemName) arrivals++;
-	}
 	if (tier == null) {
+		for (const t of overlay.travel) {
+			if (t.destination_system === systemName) arrivals++;
+		}
 		for (const seq of overlay.bobItinerary.values()) {
 			for (let i = 0; i + 1 < seq.length; i++) {
 				if (seq[i] === systemName) departures++;
@@ -133,11 +132,15 @@ export function travelCountsAt(
 		}
 		return { arrivals, departures };
 	}
-	// Tier-restricted departures: a departure is a travel edge whose
-	// per-Bob predecessor stop (origin_system, or the previous in-tier
-	// destination) equals `systemName`. Mirrors the itinerary logic
-	// used by TravelEdges.buildItinerariesAtTier so the panel agrees
-	// with the rendered lines.
+	// Tier-restricted path. Both arrivals and departures must mirror
+	// the same filters TravelEdges.buildItinerariesAtTier applies, so
+	// the panel counts agree with the rendered travel lines:
+	//   - edge.first_book <= tier
+	//   - destination resolves to a known system (off_map dropped)
+	//   - bob_known and primary Bob resolves
+	//   - primary Bob is visible at this tier (covers Hal at GL877
+	//     who is firstBookOf=null and thus hidden until tier 5)
+	const view = buildTierView(overlay, tier);
 	const byBobId = new Map<string, typeof overlay.travel>();
 	for (const t of overlay.travel) {
 		if (!t.bob_known) continue;
@@ -146,18 +149,21 @@ export function travelCountsAt(
 		if (t.first_book == null || t.first_book > tier) continue;
 		const primary = overlay.bobByName(t.bob);
 		if (!primary) continue;
+		if (!view.bobVisible(primary.name)) continue;
+		if (t.destination_system === systemName) arrivals++;
 		const list = byBobId.get(primary.id) ?? [];
 		list.push(t);
 		byBobId.set(primary.id, list);
 	}
 	for (const bob of overlay.bobs) {
+		if (!view.bobVisible(bob.name)) continue;
 		const travels = byBobId.get(bob.id);
 		if (!travels) continue;
 		travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
 		let prev = overlay.systems.has(bob.origin_system) ? bob.origin_system : null;
 		for (const t of travels) {
 			if (prev === systemName && t.destination_system !== systemName) departures++;
-			if (prev !== t.destination_system) prev = t.destination_system;
+			prev = t.destination_system;
 		}
 	}
 	return { arrivals, departures };
