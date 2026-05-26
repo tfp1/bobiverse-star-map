@@ -8,15 +8,24 @@
 
 	onMount(() => {
 		let handle: SceneHandle | undefined;
+		let cancelled = false;
 		mountScene(container, { starsBinUrl: `${base}/stars-near.bin` })
 			.then((h) => {
-				handle = h;
+				if (cancelled) {
+					h.dispose();
+				} else {
+					handle = h;
+				}
 			})
 			.catch((e: unknown) => {
+				if (cancelled) return;
 				error = e instanceof Error ? e.message : String(e);
 				console.error(e);
 			});
-		return () => handle?.dispose();
+		return () => {
+			cancelled = true;
+			handle?.dispose();
+		};
 	});
 </script>
 

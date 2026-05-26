@@ -36,7 +36,17 @@ export async function mountScene(
 	controls.dragToLook = true;
 	controls.autoForward = false;
 
-	const field = await loadStarsBin(opts.starsBinUrl);
+	let field;
+	try {
+		field = await loadStarsBin(opts.starsBinUrl);
+	} catch (err) {
+		controls.dispose();
+		renderer.dispose();
+		if (renderer.domElement.parentNode === container) {
+			container.removeChild(renderer.domElement);
+		}
+		throw err;
+	}
 	const stars = makeStarPoints(field);
 	scene.add(stars);
 
