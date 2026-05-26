@@ -15,6 +15,7 @@ export interface PickingOptions {
 
 export interface PickingHandle {
 	dispose: () => void;
+	setTargets: (meshes: THREE.Mesh[]) => void;
 }
 
 /**
@@ -28,7 +29,8 @@ export interface PickingHandle {
  * pointer-events:none) doesn't swallow them.
  */
 export function attachPicking(opts: PickingOptions): PickingHandle {
-	const { camera, canvas, targets, onSelect } = opts;
+	const { camera, canvas, onSelect } = opts;
+	let targets = opts.targets;
 	const dragThreshold = opts.dragThreshold ?? 5;
 	const raycaster = new THREE.Raycaster();
 	const ndc = new THREE.Vector2();
@@ -76,6 +78,9 @@ export function attachPicking(opts: PickingOptions): PickingHandle {
 	canvas.addEventListener('pointerup', onUp);
 
 	return {
+		setTargets(meshes: THREE.Mesh[]) {
+			targets = meshes;
+		},
 		dispose() {
 			canvas.removeEventListener('pointerdown', onDown);
 			canvas.removeEventListener('pointerup', onUp);

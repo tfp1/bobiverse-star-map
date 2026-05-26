@@ -1,6 +1,40 @@
 import type { Overlay } from './overlay';
 import type { Bob } from './types';
 
+export const MAX_TIER = 5;
+
+/**
+ * Precomputed visibility state for one tier value. Built once per tier
+ * change and passed to the overlay renderers so each one doesn't
+ * re-walk the overlay.
+ */
+export interface TierView {
+	tier: number;
+	visibleSystems: Set<string>;
+	bobVisible: (bobName: string) => boolean;
+}
+
+export function buildTierView(overlay: Overlay, tier: number): TierView {
+	const visibleSystems = systemsVisibleAt(overlay, tier);
+	// Memoize firstBookOf — replication is small but called per-Bob per build.
+	const fbCache = new Map<string, number | null>();
+	const fbOf = (name: string): number | null => {
+		if (fbCache.has(name)) return fbCache.get(name)!;
+		const v = firstBookOf(overlay, name);
+		fbCache.set(name, v);
+		return v;
+	};
+	return {
+		tier,
+		visibleSystems,
+		bobVisible(bobName: string) {
+			const fb = fbOf(bobName);
+			if (fb == null) return tier >= MAX_TIER;
+			return fb <= tier;
+		}
+	};
+}
+
 /**
  * `data/bobs.json` does not carry first_book directly. Derive it from
  * the earliest replication edge that names the Bob as parent or child.
@@ -15,6 +49,49 @@ export function firstBookOf(overlay: Overlay, bobName: string): number | null {
 		if (min == null || edge.first_book < min) min = edge.first_book;
 	}
 	return min;
+}
+
+/**
+ * Is this Bob visible at `tier`? A Bob with no replication-edge appearance
+ * (firstBookOf returns null) is treated as MAX_TIER-only: it's likely a
+ * late-discovered stub (Hugh/Lenny/Mud) whose first book is genuinely
+ * unknown, so hide until the all-spoilers tier.
+ */
+export function bobVisibleAt(overlay: Overlay, bob: Bob, tier: number): boolean {
+	const fb = firstBookOf(overlay, bob.name);
+	if (fb == null) return tier >= MAX_TIER;
+	return fb <= tier;
+}
+
+/**
+ * Set of system names that have ANY visible content (Bob with origin
+ * there, or replication/travel edge endpoint there) at the given tier.
+ * Sol is always included as the spatial origin so the camera anchor
+ * stays meaningful even at tier 1.
+ */
+export function systemsVisibleAt(overlay: Overlay, tier: number): Set<string> {
+	const out = new Set<string>();
+	out.add('Sol');
+	for (const bob of overlay.bobs) {
+		if (!overlay.systems.has(bob.origin_system)) continue;
+		if (bobVisibleAt(overlay, bob, tier)) out.add(bob.origin_system);
+	}
+	for (const e of overlay.replication) {
+		if (e.first_book == null || e.first_book > tier) continue;
+		if (!e.parent_known || !e.child_known) continue;
+		const p = overlay.bobByName(e.parent);
+		const c = overlay.bobByName(e.child);
+		if (p && overlay.systems.has(p.origin_system)) out.add(p.origin_system);
+		if (c && overlay.systems.has(c.origin_system)) out.add(c.origin_system);
+	}
+	for (const t of overlay.travel) {
+		if (t.first_book == null || t.first_book > tier) continue;
+		if (t.destination_type === 'off_map') continue;
+		if (overlay.systems.has(t.destination_system)) out.add(t.destination_system);
+		const bob = overlay.bobByName(t.bob);
+		if (bob && overlay.systems.has(bob.origin_system)) out.add(bob.origin_system);
+	}
+	return out;
 }
 
 /** Bobs whose origin_system is `systemName`. */

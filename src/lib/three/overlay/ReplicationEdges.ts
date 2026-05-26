@@ -3,6 +3,7 @@ import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import type { Overlay } from '$lib/data/overlay';
+import type { TierView } from '$lib/data/derive';
 
 /**
  * Replication edges: parent Bob → child Bob, drawn between the two
@@ -25,7 +26,8 @@ export interface ReplicationEdgesResult {
 
 export function makeReplicationEdges(
 	overlay: Overlay,
-	resolution: THREE.Vector2
+	resolution: THREE.Vector2,
+	view?: TierView
 ): ReplicationEdgesResult {
 	const positions: number[] = [];
 	let drawn = 0;
@@ -35,6 +37,12 @@ export function makeReplicationEdges(
 		if (!edge.parent_known || !edge.child_known) {
 			dropped++;
 			continue;
+		}
+		if (view) {
+			if (edge.first_book == null || edge.first_book > view.tier) {
+				dropped++;
+				continue;
+			}
 		}
 		const parent = overlay.bobByName(edge.parent);
 		const child = overlay.bobByName(edge.child);

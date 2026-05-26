@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { Overlay } from '$lib/data/overlay';
+import type { TierView } from '$lib/data/derive';
 import type { Bob } from '$lib/data/types';
 
 /**
@@ -36,15 +37,21 @@ function colourForGen(gen: number): number {
 	return GEN_COLOURS[Math.min(gen, 6)];
 }
 
-export function makeBobNodes(overlay: Overlay): BobNodesResult {
+export function makeBobNodes(overlay: Overlay, view?: TierView): BobNodesResult {
 	const group = new THREE.Group();
 	group.renderOrder = 3; // above edges
 
-	// Bucket Bobs by their spatial origin_system.
+	// Bucket Bobs by their spatial origin_system, filtered by tier.
+	// Bobs with no replication-edge appearance (firstBookOf -> null) are
+	// hidden until tier === 5 — see TierView.bobVisible.
 	const byOrigin = new Map<string, Bob[]>();
 	let skipped = 0;
 	for (const bob of overlay.bobs) {
 		if (!overlay.systems.has(bob.origin_system)) {
+			skipped++;
+			continue;
+		}
+		if (view && !view.bobVisible(bob.name)) {
 			skipped++;
 			continue;
 		}

@@ -4,17 +4,26 @@
 	import { mountScene, type SceneHandle, type SceneStats } from '$lib/three/Scene';
 	import type { Selection } from '$lib/three/picking';
 	import InfoPanel from '$lib/ui/InfoPanel.svelte';
+	import { parseHash, writeHash } from '$lib/url/hash';
+
+	const DEFAULT_TIER = 1;
+	const BOOKS = [1, 2, 3, 4, 5] as const;
 
 	let container: HTMLDivElement;
 	let error = $state<string | null>(null);
 	let stats = $state<SceneStats | null>(null);
 	let selection = $state<Selection | null>(null);
+	let tier = $state<number>(DEFAULT_TIER);
+	let handle: SceneHandle | undefined;
 
 	onMount(() => {
-		let handle: SceneHandle | undefined;
+		const initial = parseHash(window.location.hash, { tier: DEFAULT_TIER });
+		tier = initial.tier;
+
 		let cancelled = false;
 		mountScene(container, {
 			starsBinUrl: `${base}/stars-near.bin`,
+			initialTier: tier,
 			onSelect: (sel) => {
 				selection = sel;
 			}
@@ -32,11 +41,35 @@
 				error = e instanceof Error ? e.message : String(e);
 				console.error(e);
 			});
+
+		const onHashChange = () => {
+			const next = parseHash(window.location.hash, { tier: DEFAULT_TIER });
+			if (next.tier !== tier) {
+				tier = next.tier;
+				selection = null;
+				if (handle) stats = handle.applyTier(tier);
+			}
+		};
+		window.addEventListener('hashchange', onHashChange);
+
 		return () => {
 			cancelled = true;
+			window.removeEventListener('hashchange', onHashChange);
 			handle?.dispose();
+			handle = undefined;
 		};
 	});
+
+	function selectTier(next: number) {
+		if (next === tier) return;
+		tier = next;
+		// Clear stale selection — the picked entity may have been gated out.
+		selection = null;
+		// replaceState does NOT fire 'hashchange', so drive the rebuild
+		// directly here. Other tabs / manual hash edits go through onHashChange.
+		history.replaceState(null, '', writeHash({ tier }));
+		if (handle) stats = handle.applyTier(tier);
+	}
 </script>
 
 <div class="root" bind:this={container}>
@@ -55,6 +88,19 @@
 		{:else if !error}
 			<p class="small">loading…</p>
 		{/if}
+	</div>
+	<div class="tier-picker" role="group" aria-label="Spoiler tier: maximum book to reveal">
+		<span class="tier-label">Through book</span>
+		{#each BOOKS as b}
+			<button
+				type="button"
+				class:active={b === tier}
+				aria-pressed={b === tier}
+				onclick={() => selectTier(b)}
+			>
+				{b}
+			</button>
+		{/each}
 	</div>
 	<InfoPanel {selection} onClose={() => (selection = null)} />
 </div>
@@ -101,6 +147,44 @@
 	}
 	.hud .trv {
 		color: #ffb15c;
+	}
+	.tier-picker {
+		position: absolute;
+		top: 12px;
+		right: 16px;
+		display: flex;
+		gap: 4px;
+		align-items: center;
+		padding: 6px 8px;
+		background: rgba(0, 8, 24, 0.55);
+		border: 1px solid rgba(111, 195, 255, 0.35);
+		border-radius: 4px;
+	}
+	.tier-label {
+		font-size: 0.7rem;
+		opacity: 0.7;
+		margin-right: 6px;
+		letter-spacing: 0.02em;
+	}
+	.tier-picker button {
+		background: transparent;
+		color: #cfe4ff;
+		border: 1px solid rgba(111, 195, 255, 0.35);
+		border-radius: 3px;
+		padding: 2px 8px;
+		font-size: 0.8rem;
+		cursor: pointer;
+		font-family: inherit;
+		min-width: 24px;
+	}
+	.tier-picker button:hover {
+		border-color: rgba(111, 195, 255, 0.7);
+		color: #fff;
+	}
+	.tier-picker button.active {
+		background: rgba(111, 195, 255, 0.25);
+		border-color: rgba(111, 195, 255, 0.9);
+		color: #fff;
 	}
 	.error {
 		position: absolute;
