@@ -1,24 +1,32 @@
 import * as THREE from 'three';
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import type { Overlay } from '$lib/data/overlay';
 
 /**
  * Replication edges: parent Bob → child Bob, drawn between the two
- * Bobs' origin_system positions. Edges where parent and child share
- * an origin_system collapse to a single point and are dropped (a
- * Bob spawning in the same star is more naturally a per-system
- * pip, which lands with the info-panel PR).
+ * Bobs' origin_system positions. Same-system replications collapse to
+ * a single point and are dropped (more naturally a per-system pip,
+ * which lands with the info-panel PR). Endpoints that don't resolve
+ * to a known spatial system are also dropped — they'll come back
+ * with the non-spatial render decision (#14).
  *
- * Edges whose endpoints don't resolve to a known spatial system
- * (e.g. unknown origin, off-map seeds) are dropped here. They'll
- * come back when non-spatial rendering (#14) is decided.
+ * Rendered with Line2 / LineMaterial so linewidth in pixels is
+ * actually respected (LineBasicMaterial.linewidth is ignored on
+ * essentially every WebGL implementation).
  */
 export interface ReplicationEdgesResult {
-	object: THREE.LineSegments;
+	object: LineSegments2;
+	setResolution: (w: number, h: number) => void;
 	dispose: () => void;
 	stats: { drawn: number; dropped: number };
 }
 
-export function makeReplicationEdges(overlay: Overlay): ReplicationEdgesResult {
+export function makeReplicationEdges(
+	overlay: Overlay,
+	resolution: THREE.Vector2
+): ReplicationEdgesResult {
 	const positions: number[] = [];
 	let drawn = 0;
 	let dropped = 0;
@@ -44,19 +52,26 @@ export function makeReplicationEdges(overlay: Overlay): ReplicationEdgesResult {
 		drawn++;
 	}
 
-	const geom = new THREE.BufferGeometry();
-	geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-	const mat = new THREE.LineBasicMaterial({
+	const geom = new LineSegmentsGeometry();
+	geom.setPositions(positions);
+	const mat = new LineMaterial({
 		color: 0x9b7cff,
+		linewidth: 1.5,
 		transparent: true,
-		opacity: 0.55,
-		depthWrite: false
+		opacity: 0.85,
+		depthTest: false,
+		resolution
 	});
-	const object = new THREE.LineSegments(geom, mat);
+	const object = new LineSegments2(geom, mat);
+	object.renderOrder = 1;
+	object.computeLineDistances();
 
 	return {
 		object,
 		stats: { drawn, dropped },
+		setResolution(w: number, h: number) {
+			mat.resolution.set(w, h);
+		},
 		dispose() {
 			geom.dispose();
 			mat.dispose();

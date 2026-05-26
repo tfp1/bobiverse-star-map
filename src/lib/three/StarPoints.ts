@@ -24,10 +24,13 @@ export function makeStarPoints(field: StarField): THREE.Points {
 	const sizes = new Float32Array(count);
 	for (let i = 0; i < count; i++) {
 		bpRpToRgb(bpRp[i], colors, i * 3);
-		// Brighter (more negative M) → bigger. M ranges roughly [-5, 15] in
-		// this volume. Clamp + log-ish curve so the dimmest aren't dots.
+		// Brighter (more negative M_G) → larger sprite. M_G in this volume
+		// spans roughly [-5, 15]; a 1.5^-m curve plus a small additive floor
+		// keeps the dimmest stars at sub-pixel-equivalent size without
+		// vanishing entirely. The previous +0.5 floor was about 30× too
+		// large at the typical viewing distance and produced the bloom.
 		const m = Math.max(-5, Math.min(15, absMag[i]));
-		sizes[i] = Math.pow(1.4, -m) * 0.04 + 0.5;
+		sizes[i] = Math.pow(1.5, -m) * 0.02 + 0.015;
 	}
 	geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 	geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
@@ -58,13 +61,16 @@ export function makeStarPoints(field: StarField): THREE.Points {
 				vec2 uv = gl_PointCoord - 0.5;
 				float d = length(uv);
 				if (d > 0.5) discard;
-				float a = smoothstep(0.5, 0.1, d);
+				// Tight falloff: solid core out to d=0.35, then a hard
+				// ramp to fully transparent at d=0.5. Stars read as
+				// crisp pinpoints instead of fuzzy bloom.
+				float a = 1.0 - smoothstep(0.35, 0.5, d);
 				gl_FragColor = vec4(vColor, a);
 			}
 		`,
 		transparent: true,
 		depthWrite: false,
-		blending: THREE.AdditiveBlending,
+		blending: THREE.NormalBlending,
 		vertexColors: true
 	});
 
