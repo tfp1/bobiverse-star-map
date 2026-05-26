@@ -18,7 +18,11 @@
 			const counts = travelCountsAt(overlay, selection.systemName);
 			return { kind: 'system' as const, name: selection.systemName, bobs, counts };
 		}
-		const bob = overlay.bobByName(selection.bobName);
+		// Resolve by id, not name. data/bobs.json has display-name
+		// collisions (Elmer/Elmer_v4, Loki/Loki_v4) so a click on a
+		// Loki_v4 pip would otherwise show the primary Loki record.
+		// bobByName is for edge rows that only carry the name string.
+		const bob = overlay.bobById.get(selection.bobId);
 		if (!bob) return null;
 		return {
 			kind: 'bob' as const,
