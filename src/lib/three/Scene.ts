@@ -17,6 +17,7 @@ import { makeMegastructureNodes } from './overlay/MegastructureNodes';
 import { makeGrids } from './Grids';
 import { makeDropLines } from './DropLines';
 import { makeSkyboxLabels } from './SkyboxLabels';
+import { makeReplicationBursts } from './ReplicationBursts';
 import { attachPicking, type Selection } from './picking';
 
 export interface SceneHandle {
@@ -31,6 +32,12 @@ export interface SceneHandle {
 	frameEcliptic: () => void;
 	/** Re-pivot orbit on a named system / bob and fly closer. */
 	focusOn: (sel: Selection) => void;
+	/**
+	 * Continuous (float) scrubber year for shader-driven edge fade-in
+	 * and replication bursts. Null disables animation (Explore mode).
+	 * Cheap — uniform write, no rebuild.
+	 */
+	setDisplayedYear: (year: number | null) => void;
 }
 
 export interface SceneStats {
@@ -157,6 +164,20 @@ export async function mountScene(
 		dropLines: ReturnType<typeof makeDropLines>;
 	}
 
+	let currentDisplayedYear: number | null = null;
+
+	// Replication bursts live OUTSIDE the bundle so their per-instance
+	// prevDisplayedYear / triggered state survive applyView's rebuild.
+	// Otherwise a year-crossing that coincides with an integer rebuild
+	// would land on a fresh module with prev=null and skip the
+	// (prev, year] comparison that drives the burst trigger.
+	const repBursts = makeReplicationBursts(
+		overlay,
+		opts.initialTier ?? MAX_TIER,
+		opts.initialYearMax ?? null
+	);
+	scene.add(repBursts.object);
+
 	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
 		const view = buildTierView(overlay, tier, yearMax);
 		const systemMarkers = makeSystemMarkers(overlay.systems.values(), view.visibleSystems);
@@ -179,6 +200,13 @@ export async function mountScene(
 			dropPositions.push(m.position.clone());
 		}
 		const dropLines = makeDropLines(dropPositions);
+		// Seed the newly-built edge materials with the current scrubber
+		// position so newly-included edges don't pop on the boundary year.
+		// (repBursts is built once at scene-mount; setView keeps its
+		// prevDisplayedYear intact so the crossing comparison survives.)
+		const y = currentDisplayedYear ?? yearMax;
+		repEdges.setDisplayedYear(y);
+		travelEdges.setDisplayedYear(y);
 		return {
 			systemMarkers,
 			offMapMarkers,
@@ -314,6 +342,8 @@ export async function mountScene(
 		}
 		controls.update();
 		grids.update(camera);
+		bundle.travelEdges.tickFlow(dt);
+		repBursts.tick();
 		composer.render(dt);
 		labelRenderer.render(scene, camera);
 		skyboxLabels.update(camera, container.clientWidth, container.clientHeight);
@@ -343,6 +373,10 @@ export async function mountScene(
 			disposeOverlay(bundle);
 			bundle = buildOverlay(tier, yearMax);
 			addBundle(bundle);
+			// Refresh burst candidates against the new view, but keep the
+			// module's prevDisplayedYear so the next setDisplayedYear call
+			// (with the new yearFloat) still triggers any crossings.
+			repBursts.setView(overlay, tier, yearMax);
 			picking.setTargets(pickTargets(bundle));
 			stats.systems = bundle.systemMarkers.meshes.length + bundle.offMapMarkers.meshes.length;
 			stats.megastructures = bundle.megastructureNodes.meshes.length;
@@ -355,6 +389,12 @@ export async function mountScene(
 		recenter,
 		frameEcliptic,
 		focusOn,
+		setDisplayedYear(year: number | null) {
+			currentDisplayedYear = year;
+			bundle.repEdges.setDisplayedYear(year);
+			bundle.travelEdges.setDisplayedYear(year);
+			repBursts.setDisplayedYear(year);
+		},
 		dispose() {
 			cancelAnimationFrame(raf);
 			window.removeEventListener('resize', onResize);
@@ -367,6 +407,8 @@ export async function mountScene(
 			(sol.material as THREE.Material).dispose();
 			grids.dispose();
 			skyboxLabels.dispose();
+			scene.remove(repBursts.object);
+			repBursts.dispose();
 			disposeOverlay(bundle);
 			picking.dispose();
 			container.removeChild(renderer.domElement);
