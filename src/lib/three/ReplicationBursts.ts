@@ -38,6 +38,13 @@ export interface ReplicationBurstsResult {
 }
 
 interface BurstCandidate {
+	/**
+	 * Stable identifier across setView rebuilds. Combines chapter_code
+	 * (or a synthesised marker) with parent+child names so a burst
+	 * triggered for B1.C17 Bob→Riker keeps its wall-clock timestamp
+	 * when the candidate list is recomputed for a new (tier, yearMax).
+	 */
+	key: string;
 	pos: THREE.Vector3;
 	year: number;
 }
@@ -48,7 +55,8 @@ function collectCandidates(
 	yearMaxBuffered: number | null
 ): BurstCandidate[] {
 	const out: BurstCandidate[] = [];
-	for (const edge of overlay.replication) {
+	for (let i = 0; i < overlay.replication.length; i++) {
+		const edge = overlay.replication[i];
 		if (!edge.parent_known || !edge.child_known) continue;
 		if (edge.first_book == null || edge.first_book > tier) continue;
 		if (edge.date_year == null) continue;
@@ -57,7 +65,9 @@ function collectCandidates(
 		if (!child) continue;
 		const s = overlay.systems.get(child.origin_system);
 		if (!s) continue;
+		const code = edge.chapter_code ?? `idx${i}`;
 		out.push({
+			key: `${code}|${edge.parent}->${edge.child}`,
 			pos: new THREE.Vector3(s.xyz[0], s.xyz[1], s.xyz[2]),
 			year: edge.date_year
 		});
@@ -77,8 +87,11 @@ export function makeReplicationBursts(
 		tier,
 		yearMax == null ? null : yearMax + FADE_BUFFER
 	);
-	// Pre-allocate generously so setView can usually reuse the buffer
-	// without reallocating (cheap path during playback).
+	// Wall-clock trigger time per candidate, keyed stably so the value
+	// survives setView rebuilds — a burst fired at year 2145 must keep
+	// fading through its full lifetime even when the integer year ticks
+	// to 2146 and persist() rebuilds the view.
+	const triggeredByKey = new Map<string, number>();
 	let capacity = Math.max(256, candidates.length * 2);
 	let positions = new Float32Array(capacity * 3);
 	let triggeredAt = new Float32Array(capacity);
@@ -169,9 +182,10 @@ export function makeReplicationBursts(
 					// play cycle straddling a year boundary doesn't restart them.
 					const now = material.uniforms.uNow.value;
 					for (let i = 0; i < candidates.length; i++) {
-						const y = candidates[i].year;
-						if (y > prevDisplayedYear && y <= year && triggeredAt[i] < 0) {
+						const c = candidates[i];
+						if (c.year > prevDisplayedYear && c.year <= year && triggeredAt[i] < 0) {
 							triggeredAt[i] = now;
+							triggeredByKey.set(c.key, now);
 							triggeredAttr.needsUpdate = true;
 						}
 					}
@@ -179,9 +193,10 @@ export function makeReplicationBursts(
 					// Backward scrub: un-trigger anything we've now rewound past
 					// so a subsequent forward crossing fires fresh.
 					for (let i = 0; i < candidates.length; i++) {
-						const y = candidates[i].year;
-						if (y > year && y <= prevDisplayedYear && triggeredAt[i] >= 0) {
+						const c = candidates[i];
+						if (c.year > year && c.year <= prevDisplayedYear && triggeredAt[i] >= 0) {
 							triggeredAt[i] = -1;
+							triggeredByKey.delete(c.key);
 							triggeredAttr.needsUpdate = true;
 						}
 					}
@@ -193,34 +208,43 @@ export function makeReplicationBursts(
 			material.uniforms.uNow.value = nowSec();
 		},
 		setView(o: Overlay, t: number, ym: number | null) {
-			// Recompute candidate set without disturbing prevDisplayedYear,
-			// so a year-crossing immediately following this call still
-			// triggers correctly. Reuses the geometry buffers in place
-			// when the new count fits; reallocates only when growing.
+			// Recompute candidate set, preserving the wall-clock trigger
+			// time for any candidate still in the view (so an active
+			// burst keeps fading through its full lifetime even when
+			// the integer year ticks and applyView rebuilds). Only
+			// candidates that drop out of the view forget their trigger
+			// stamp; new candidates start untriggered.
 			const next = collectCandidates(o, t, ym == null ? null : ym + FADE_BUFFER);
 			if (next.length > capacity) {
 				capacity = Math.max(capacity * 2, next.length);
 				positions = new Float32Array(capacity * 3);
 				triggeredAt = new Float32Array(capacity);
-				for (let i = 0; i < capacity; i++) triggeredAt[i] = -1;
 				posAttr = new THREE.BufferAttribute(positions, 3);
 				geom.setAttribute('position', posAttr);
 				triggeredAttr = new THREE.BufferAttribute(triggeredAt, 1);
 				triggeredAttr.setUsage(THREE.DynamicDrawUsage);
 				geom.setAttribute('triggeredAt', triggeredAttr);
-			} else {
-				// Reset trigger state for slots we're about to overwrite.
-				// Candidates that disappear (tier dropped) shouldn't leave
-				// ghost rings; new candidates start untriggered.
-				for (let i = 0; i < capacity; i++) triggeredAt[i] = -1;
-				triggeredAttr.needsUpdate = true;
 			}
+			// Compute the new key set so we can prune the map of stale
+			// entries (candidates that left the view) and avoid the map
+			// growing without bound across tier flips.
+			const liveKeys = new Set<string>();
+			for (let i = 0; i < next.length; i++) liveKeys.add(next[i].key);
+			for (const k of triggeredByKey.keys()) {
+				if (!liveKeys.has(k)) triggeredByKey.delete(k);
+			}
+			// Rewrite position and triggered buffers from the new
+			// candidate list, sourcing each slot's trigger time from
+			// the persistent map.
 			for (let i = 0; i < next.length; i++) {
 				positions[i * 3 + 0] = next[i].pos.x;
 				positions[i * 3 + 1] = next[i].pos.y;
 				positions[i * 3 + 2] = next[i].pos.z;
+				triggeredAt[i] = triggeredByKey.get(next[i].key) ?? -1;
 			}
+			for (let i = next.length; i < capacity; i++) triggeredAt[i] = -1;
 			posAttr.needsUpdate = true;
+			triggeredAttr.needsUpdate = true;
 			geom.setDrawRange(0, next.length);
 			candidates = next;
 			// prevDisplayedYear deliberately untouched: the next
