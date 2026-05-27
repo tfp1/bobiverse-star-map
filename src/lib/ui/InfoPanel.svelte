@@ -13,10 +13,11 @@
 	interface Props {
 		selection: Selection | null;
 		onClose: () => void;
+		onFocus?: (sel: Selection) => void;
 		tier: number;
 		yearMax: number | null;
 	}
-	let { selection, onClose, tier, yearMax }: Props = $props();
+	let { selection, onClose, onFocus, tier, yearMax }: Props = $props();
 
 	const overlay = getOverlay();
 
@@ -88,7 +89,14 @@
 
 {#if view}
 	<aside class="panel">
-		<button class="close" onclick={onClose} aria-label="Close">×</button>
+		<div class="panel-actions">
+			{#if onFocus && selection}
+				<button class="focus" onclick={() => selection && onFocus(selection)} aria-label="Focus camera on this object">
+					Focus
+				</button>
+			{/if}
+			<button class="close" onclick={onClose} aria-label="Close">×</button>
+		</div>
 		{#if view.kind === 'system'}
 			<h2>{view.name}</h2>
 			<p class="sub">{systemSubtitle(view.systemKind)}</p>
@@ -174,10 +182,30 @@
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 	}
-	.close {
+	.panel-actions {
 		position: absolute;
 		top: 6px;
 		right: 8px;
+		display: flex;
+		gap: 6px;
+		align-items: center;
+	}
+	.focus {
+		background: transparent;
+		border: 1px solid rgba(111, 195, 255, 0.45);
+		color: #cfe4ff;
+		font-size: 0.72rem;
+		line-height: 1;
+		cursor: pointer;
+		padding: 3px 8px;
+		border-radius: 3px;
+		font-family: inherit;
+	}
+	.focus:hover {
+		border-color: rgba(111, 195, 255, 0.85);
+		color: #fff;
+	}
+	.close {
 		background: transparent;
 		border: 0;
 		color: #98a8c4;

@@ -1,6 +1,9 @@
 import * as THREE from 'three';
-import { FlyControls } from 'three/addons/controls/FlyControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { loadStarsBin } from '$lib/stars/loadStarsBin';
 import { getOverlay } from '$lib/data/overlay';
 import { buildTierView, MAX_TIER } from '$lib/data/derive';
@@ -11,18 +14,27 @@ import { makeTravelEdges } from './overlay/TravelEdges';
 import { makeBobNodes } from './overlay/BobNodes';
 import { makeOffMapMarkers } from './overlay/OffMapMarkers';
 import { makeMegastructureNodes } from './overlay/MegastructureNodes';
+import { makeGrids } from './Grids';
+import { makeDropLines } from './DropLines';
+import { makeSkyboxLabels } from './SkyboxLabels';
 import { attachPicking, type Selection } from './picking';
 
 export interface SceneHandle {
 	dispose: () => void;
 	stats: SceneStats;
 	applyView: (view: { tier: number; yearMax: number | null }) => SceneStats;
+	/** Animate to a (eye, target) view with cubic easing. */
+	flyTo: (eye: THREE.Vector3, target: THREE.Vector3, ms?: number) => void;
+	/** Recenter on Sol and frame the local cloud. */
+	recenter: () => void;
+	/** Top-down view along +Y axis. */
+	frameGalacticPlane: () => void;
+	/** Re-pivot orbit on a named system / bob and fly closer. */
+	focusOn: (sel: Selection) => void;
 }
 
 export interface SceneStats {
-	/** Total system markers drawn: catalog stars + off-map ring nodes. */
 	systems: number;
-	/** Host-bound megastructure nodes drawn (Heaven's River, Matryoshka). */
 	megastructures: number;
 	bobs: number;
 	replicationEdges: number;
@@ -32,11 +44,14 @@ export interface SceneStats {
 export interface SceneOptions {
 	starsBinUrl: string;
 	onSelect?: (sel: Selection | null) => void;
-	/** Reading-order tier 1..5; defaults to MAX_TIER (show everything). */
 	initialTier?: number;
-	/** Timeline scrubber upper bound; null = no time gating. */
 	initialYearMax?: number | null;
 }
+
+const INITIAL_EYE = new THREE.Vector3(5, 3, 8);
+const INITIAL_TARGET = new THREE.Vector3(0, 0, 0);
+const PLANE_EYE = new THREE.Vector3(0, 18, 0.01); // y-up top-down; tiny z to avoid degenerate up
+const PLANE_TARGET = new THREE.Vector3(0, 0, 0);
 
 export async function mountScene(
 	container: HTMLElement,
@@ -63,22 +78,48 @@ export async function mountScene(
 		0.01,
 		2000
 	);
-	// Pull back from Sol so the user lands looking at the local
-	// cluster rather than inside the Sol marker. The named-system
-	// triangle (Alpha Cen ~1.3pc, Epsilon Eri ~3.2pc, Epsilon Indi
-	// ~3.6pc) fits comfortably in the foreground from here.
-	camera.position.set(5, 3, 8);
-	camera.lookAt(0, 0, 0);
+	camera.position.copy(INITIAL_EYE);
+	camera.lookAt(INITIAL_TARGET);
 
-	const controls = new FlyControls(camera, renderer.domElement);
-	controls.movementSpeed = 8; // parsec/sec
-	controls.rollSpeed = 0.6;
-	controls.dragToLook = true;
-	controls.autoForward = false;
+	const controls = new OrbitControls(camera, renderer.domElement);
+	controls.target.copy(INITIAL_TARGET);
+	controls.enableDamping = true;
+	controls.dampingFactor = 0.05;
+	controls.minDistance = 0.02;
+	controls.maxDistance = 200;
+	controls.enablePan = true;
+	controls.panSpeed = 0.8;
+	controls.rotateSpeed = 0.7;
+	controls.zoomSpeed = 0.9;
+	controls.screenSpacePanning = true; // pan in screen plane, not on the world XZ floor
+	controls.update();
+
+	// Reference grids and skybox labels mount before the overlay so the
+	// star points and markers draw on top of them.
+	const grids = makeGrids({ planeSpacing: 3, offsetCount: 1, radius: 16, gridStep: 1 });
+	scene.add(grids.group);
+
+	const skyboxLabels = makeSkyboxLabels(container);
+
+	// Bloom post-pass — gentle, so bright stars and Sol get a subtle halo
+	// without turning into glow blobs. Strength stays low to keep the
+	// star-point shader's crisp falloff intact.
+	const composer = new EffectComposer(renderer);
+	composer.addPass(new RenderPass(scene, camera));
+	const bloom = new UnrealBloomPass(
+		new THREE.Vector2(container.clientWidth, container.clientHeight),
+		0.35, // strength
+		0.6,  // radius
+		0.85  // threshold (only bright pixels bloom)
+	);
+	composer.addPass(bloom);
 
 	const cleanupPartial = () => {
 		controls.dispose();
 		renderer.dispose();
+		composer.dispose();
+		grids.dispose();
+		skyboxLabels.dispose();
 		if (renderer.domElement.parentNode === container) {
 			container.removeChild(renderer.domElement);
 		}
@@ -97,9 +138,8 @@ export async function mountScene(
 	const stars = makeStarPoints(field);
 	scene.add(stars);
 
-	// Mark Sol with a faint sphere at the origin so the user knows where they are.
 	const sol = new THREE.Mesh(
-		new THREE.SphereGeometry(0.05, 12, 12),
+		new THREE.SphereGeometry(0.06, 16, 12),
 		new THREE.MeshBasicMaterial({ color: 0xffe9a8 })
 	);
 	scene.add(sol);
@@ -107,8 +147,6 @@ export async function mountScene(
 	const overlay = getOverlay();
 	const edgeResolution = new THREE.Vector2(container.clientWidth, container.clientHeight);
 
-	// Overlay groups rebuilt on every view change. Holding the current
-	// renderer handles in a single object makes dispose + swap symmetric.
 	interface OverlayBundle {
 		systemMarkers: ReturnType<typeof makeSystemMarkers>;
 		offMapMarkers: ReturnType<typeof makeOffMapMarkers>;
@@ -116,6 +154,7 @@ export async function mountScene(
 		repEdges: ReturnType<typeof makeReplicationEdges>;
 		travelEdges: ReturnType<typeof makeTravelEdges>;
 		bobNodes: ReturnType<typeof makeBobNodes>;
+		dropLines: ReturnType<typeof makeDropLines>;
 	}
 
 	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
@@ -130,7 +169,25 @@ export async function mountScene(
 		const repEdges = makeReplicationEdges(overlay, edgeResolution, view);
 		const travelEdges = makeTravelEdges(overlay, edgeResolution, view);
 		const bobNodes = makeBobNodes(overlay, view);
-		return { systemMarkers, offMapMarkers, megastructureNodes, repEdges, travelEdges, bobNodes };
+		// Drop lines from each visible catalog-star marker to the central
+		// plane. Off-map ring markers sit far from the cloud and would
+		// flood the view with stems; skip them.
+		const dropPositions: THREE.Vector3[] = [];
+		for (const m of systemMarkers.meshes) {
+			// Skip Sol itself — already on the plane.
+			if (m.userData?.systemName === 'Sol') continue;
+			dropPositions.push(m.position.clone());
+		}
+		const dropLines = makeDropLines(dropPositions);
+		return {
+			systemMarkers,
+			offMapMarkers,
+			megastructureNodes,
+			repEdges,
+			travelEdges,
+			bobNodes,
+			dropLines
+		};
 	};
 
 	const disposeOverlay = (b: OverlayBundle) => {
@@ -140,12 +197,14 @@ export async function mountScene(
 		scene.remove(b.repEdges.object);
 		scene.remove(b.travelEdges.object);
 		scene.remove(b.bobNodes.group);
+		scene.remove(b.dropLines.object);
 		b.systemMarkers.dispose();
 		b.offMapMarkers.dispose();
 		b.megastructureNodes.dispose();
 		b.repEdges.dispose();
 		b.travelEdges.dispose();
 		b.bobNodes.dispose();
+		b.dropLines.dispose();
 	};
 
 	const initialTier = opts.initialTier ?? MAX_TIER;
@@ -158,6 +217,7 @@ export async function mountScene(
 		scene.add(b.repEdges.object);
 		scene.add(b.travelEdges.object);
 		scene.add(b.bobNodes.group);
+		scene.add(b.dropLines.object);
 	};
 	const pickTargets = (b: OverlayBundle): THREE.Mesh[] => [
 		...b.systemMarkers.meshes,
@@ -182,13 +242,81 @@ export async function mountScene(
 		travelEdges: bundle.travelEdges.stats.drawn
 	};
 
+	// flyTo: cubic ease-in-out between current (eye, target) and a destination.
+	// We animate `controls.target` and the camera position in lockstep so
+	// the user keeps a recognisable framing through the move.
+	interface FlyState {
+		startEye: THREE.Vector3;
+		startTarget: THREE.Vector3;
+		endEye: THREE.Vector3;
+		endTarget: THREE.Vector3;
+		t0: number;
+		duration: number;
+	}
+	let fly: FlyState | null = null;
+	const easeInOutCubic = (x: number) =>
+		x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+	const flyTo = (eye: THREE.Vector3, target: THREE.Vector3, ms = 900) => {
+		fly = {
+			startEye: camera.position.clone(),
+			startTarget: controls.target.clone(),
+			endEye: eye.clone(),
+			endTarget: target.clone(),
+			t0: performance.now(),
+			duration: ms
+		};
+	};
+
+	const recenter = () => flyTo(INITIAL_EYE, INITIAL_TARGET);
+	const frameGalacticPlane = () => flyTo(PLANE_EYE, PLANE_TARGET);
+
+	const focusOn = (sel: Selection) => {
+		let pos: THREE.Vector3 | null = null;
+		if (sel.kind === 'system') {
+			const s = overlay.resolveSystem(sel.systemName);
+			if (s) pos = new THREE.Vector3(s.xyz[0], s.xyz[1], s.xyz[2]);
+		} else if (sel.kind === 'megastructure') {
+			const m = overlay.megastructures.find((x) => x.name === sel.megastructureName);
+			if (m) {
+				const host = overlay.resolveSystem(m.host);
+				if (host) pos = new THREE.Vector3(host.xyz[0], host.xyz[1], host.xyz[2]);
+			}
+		} else if (sel.kind === 'bob') {
+			// Bob nodes sit near their current system; use the mesh position
+			// from the live overlay bundle (cheaper than re-deriving).
+			const mesh = bundle.bobNodes.meshes.find(
+				(m) => (m.userData as { bobId?: string }).bobId === sel.bobId
+			);
+			if (mesh) pos = mesh.position.clone();
+		}
+		if (!pos) return;
+		// Position the camera at a fixed offset from the focus point that
+		// keeps the same viewing direction we currently have, so the
+		// framing feels like "lean in" rather than "teleport".
+		const offset = camera.position.clone().sub(controls.target);
+		const dist = Math.max(offset.length(), 0.3);
+		const targetDist = Math.min(dist, 3); // pull in if we were further out
+		offset.setLength(targetDist);
+		flyTo(pos.clone().add(offset), pos);
+	};
+
 	const clock = new THREE.Clock();
 	let raf = 0;
 	const tick = () => {
 		const dt = clock.getDelta();
-		controls.update(dt);
-		renderer.render(scene, camera);
+		if (fly) {
+			const t = Math.min(1, (performance.now() - fly.t0) / fly.duration);
+			const e = easeInOutCubic(t);
+			camera.position.lerpVectors(fly.startEye, fly.endEye, e);
+			controls.target.lerpVectors(fly.startTarget, fly.endTarget, e);
+			if (t >= 1) fly = null;
+		}
+		controls.update();
+		grids.update(camera);
+		composer.render(dt);
 		labelRenderer.render(scene, camera);
+		skyboxLabels.update(camera, container.clientWidth, container.clientHeight);
 		raf = requestAnimationFrame(tick);
 	};
 	raf = requestAnimationFrame(tick);
@@ -198,6 +326,8 @@ export async function mountScene(
 		const h = container.clientHeight;
 		renderer.setSize(w, h);
 		labelRenderer.setSize(w, h);
+		composer.setSize(w, h);
+		bloom.setSize(w, h);
 		camera.aspect = w / h;
 		camera.updateProjectionMatrix();
 		(stars.material as THREE.ShaderMaterial).uniforms.uHeight.value = h;
@@ -221,15 +351,22 @@ export async function mountScene(
 			stats.travelEdges = bundle.travelEdges.stats.drawn;
 			return { ...stats };
 		},
+		flyTo,
+		recenter,
+		frameGalacticPlane,
+		focusOn,
 		dispose() {
 			cancelAnimationFrame(raf);
 			window.removeEventListener('resize', onResize);
 			controls.dispose();
+			composer.dispose();
 			renderer.dispose();
 			stars.geometry.dispose();
 			(stars.material as THREE.Material).dispose();
 			sol.geometry.dispose();
 			(sol.material as THREE.Material).dispose();
+			grids.dispose();
+			skyboxLabels.dispose();
 			disposeOverlay(bundle);
 			picking.dispose();
 			container.removeChild(renderer.domElement);

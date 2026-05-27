@@ -39,6 +39,28 @@ from collections import OrderedDict
 BIN_BASE_COUNT = 53836  # the inherited count; sentinel for idempotency check
 RECORD_SIZE = 20        # 5 × float32
 
+# Coordinate frame: the inherited stars-near.bin is in HELIOCENTRIC ECLIPTIC
+# XYZ (J2000), verified empirically — 3 of the nearest backdrop stars
+# (Barnard, Wolf 359, Lalande 21185) match exact when the equatorial unit
+# vector is rotated by the obliquity ε around the X-axis. Our ref_xyz_pc
+# inputs from SIMBAD are equatorial (ICRS), so we apply that same rotation
+# before writing so the named systems share the bin's frame.
+OBLIQUITY_DEG = 23.4392911  # IAU 2006 obliquity at J2000.0
+_OB_RAD = math.radians(OBLIQUITY_DEG)
+_OB_COS = math.cos(_OB_RAD)
+_OB_SIN = math.sin(_OB_RAD)
+
+
+def equatorial_to_ecliptic(xyz):
+    """Rotate a heliocentric ICRS (equatorial) XYZ vector into the
+    heliocentric ecliptic frame used by stars-near.bin."""
+    x, y, z = xyz
+    return (
+        x,
+        y * _OB_COS + z * _OB_SIN,
+        -y * _OB_SIN + z * _OB_COS,
+    )
+
 # ────────────────────────────────────────────────────────────────────────
 # Pecaut & Mamajek 2013 main-sequence colors (subset for SpTs we use)
 # Source: http://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.txt
@@ -179,9 +201,13 @@ def main():
             print(f"  SKIP {name}: missing xyz or spt")
             continue
         m_g, bp_rp = compute_M_and_color(s.get("ref_v_mag"), s.get("ref_distance_pc"), spt)
+        # ref_xyz_pc is equatorial (ICRS); rotate into the bin's ecliptic
+        # frame before appending. See OBLIQUITY_DEG note at top.
+        xyz_ecl = list(equatorial_to_ecliptic(xyz))
         to_append.append({
             "name": name,
-            "xyz": xyz,
+            "xyz": xyz_ecl,
+            "xyz_equatorial": list(xyz),
             "spt": spt,
             "v_mag": s.get("ref_v_mag"),
             "distance_pc": s.get("ref_distance_pc"),
@@ -228,7 +254,8 @@ def main():
         s = mapping["systems"][r["name"]]
         s["index"] = idx
         s["byte_offset"] = 4 + idx * RECORD_SIZE
-        s["bin_xyz_pc"] = list(r["xyz"])
+        s["bin_xyz_pc"] = list(r["xyz"])  # ecliptic frame (matches bin)
+        s["bin_xyz_pc_equatorial"] = list(r["xyz_equatorial"])
         s["bin_M_abs_g"] = r["M_abs_g"]
         s["bin_BP_RP"] = r["BP_RP"]
         s["match_distance_pc"] = 0.0
@@ -236,7 +263,7 @@ def main():
         # Preserve diagnostic but mark as obsolete
         s.setdefault("notes", "")
         s["notes"] = ("APPENDED to stars-near.bin from SIMBAD reference data; "
-                      "Mamajek 2013 SpT→photometry. " +
+                      "Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. " +
                       (s.get("notes") or "")).strip()
         # Drop the old diagnostic — it described the failed crossmatch
         s.pop("nearest_record_index_diagnostic", None)
@@ -262,9 +289,10 @@ def main():
     named_doc["$bin_file"] = args.bin
     named_doc["$bin_record_count"] = new_count
     named_doc["$source_photometry"] = (
-        "Positions from SIMBAD (RA/Dec/parallax). Photometry computed from "
-        "V_mag + distance + spectral type via Pecaut & Mamajek 2013 main-sequence "
-        "color table."
+        "Positions from SIMBAD (RA/Dec/parallax), rotated equatorial→ecliptic "
+        f"(obliquity ε={OBLIQUITY_DEG}°) to match the bin's heliocentric "
+        "ecliptic frame. Photometry computed from V_mag + distance + spectral "
+        "type via Pecaut & Mamajek 2013 main-sequence color table."
     )
     named_doc["named_systems"] = []
     for r in to_append:
@@ -273,7 +301,8 @@ def main():
             "name": r["name"],
             "index": idx,
             "byte_offset": 4 + idx * RECORD_SIZE,
-            "xyz_pc": list(r["xyz"]),
+            "xyz_pc": list(r["xyz"]),                       # ecliptic (bin frame)
+            "xyz_pc_equatorial": list(r["xyz_equatorial"]), # ICRS, for reference
             "M_abs_g": r["M_abs_g"],
             "BP_RP": r["BP_RP"],
             "spt": r["spt"],
