@@ -16,9 +16,12 @@ Pecaut & Mamajek 2013 main-sequence color/temperature table
 Values are exact for canonical SpTs and linearly interpolated otherwise.
 
 IDEMPOTENT: refuses to re-append if the bin's count is already > 53836.
-To rerun cleanly: `git checkout static/stars-near.bin` first (and if the
-bin is already at the post-append count, also truncate it back to 53836
-records — the SvelteKit `static/` copy is the only one tracked in git).
+The tracked `static/stars-near.bin` is committed in its post-append
+state (the renderer needs it that way), so a plain re-run from a fresh
+checkout would hit the idempotency guard. Pass `--reset` to truncate
+the bin back to the base 53836 records and regenerate in one step:
+
+    python3 scripts/append_named_systems.py --reset
 
 OUTPUTS:
   static/stars-near.bin             — extended in-place (19 new records appended)
@@ -170,6 +173,18 @@ def read_count(bin_path):
         return struct.unpack("<I", f.read(4))[0]
 
 
+def reset_to_base(bin_path):
+    """Truncate the bin back to its inherited base (BIN_BASE_COUNT records)
+    and rewrite the header. Lets the script regenerate from a tracked
+    post-append file in one step instead of requiring a separate
+    truncate-by-hand step before re-running."""
+    new_size = 4 + BIN_BASE_COUNT * RECORD_SIZE
+    with open(bin_path, "r+b") as f:
+        f.truncate(new_size)
+        f.seek(0)
+        f.write(struct.pack("<I", BIN_BASE_COUNT))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bin", default="static/stars-near.bin")
@@ -177,14 +192,30 @@ def main():
     ap.add_argument("--named-out", default="data/named_systems.json")
     ap.add_argument("--dry-run", action="store_true",
                     help="Compute photometry and report; do not modify files.")
+    ap.add_argument("--reset", action="store_true",
+                    help=(f"Truncate the bin back to the inherited base count "
+                          f"({BIN_BASE_COUNT}) before appending. Use this to "
+                          "regenerate from a fresh checkout — the tracked "
+                          "static/stars-near.bin is already post-append, so a "
+                          "plain re-run hits the idempotency guard."))
     args = ap.parse_args()
 
-    # Idempotency check
     current_count = read_count(args.bin)
+    if args.reset and not args.dry_run:
+        if current_count == BIN_BASE_COUNT:
+            print(f"{args.bin} already at base count {BIN_BASE_COUNT}; nothing to reset.")
+        else:
+            print(f"Resetting {args.bin}: {current_count} → {BIN_BASE_COUNT} records.")
+            reset_to_base(args.bin)
+            current_count = BIN_BASE_COUNT
+
+    # Idempotency check — runs after any --reset so we can confirm we landed
+    # at the expected base.
     if current_count != BIN_BASE_COUNT:
         print(f"REFUSING: {args.bin} count is {current_count} (expected base {BIN_BASE_COUNT}).")
-        print("This bin file has already been modified. To rerun cleanly:")
-        print(f"  git checkout {args.bin}")
+        print("This bin file has already been modified. To regenerate from "
+              "the tracked post-append file, re-run with --reset:")
+        print(f"  python3 scripts/append_named_systems.py --reset")
         sys.exit(1)
 
     with open(args.mapping) as f:
@@ -262,11 +293,18 @@ def main():
         s["bin_BP_RP"] = r["BP_RP"]
         s["match_distance_pc"] = 0.0
         s["confidence"] = "appended"
-        # Preserve diagnostic but mark as obsolete
-        s.setdefault("notes", "")
-        s["notes"] = ("APPENDED to stars-near.bin from SIMBAD reference data; "
-                      "Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. " +
-                      (s.get("notes") or "")).strip()
+        # Preserve diagnostic but mark as obsolete. Strip any prior
+        # "APPENDED ..." prefix(es) so re-running with --reset doesn't
+        # accumulate duplicate banners.
+        notes_prefix = ("APPENDED to stars-near.bin from SIMBAD reference data; "
+                        "Mamajek 2013 SpT→photometry")
+        existing = (s.get("notes") or "")
+        while existing.startswith(notes_prefix):
+            sep = existing.find(". ")
+            existing = existing[sep + 2:] if sep != -1 else ""
+        s["notes"] = (
+            f"{notes_prefix}; rotated equatorial→ecliptic. {existing}"
+        ).strip()
         # Drop the old diagnostic — it described the failed crossmatch
         s.pop("nearest_record_index_diagnostic", None)
 
@@ -328,8 +366,7 @@ def main():
         json.dump(named_doc, f, indent=2, ensure_ascii=False)
     print(f"Named lookup written: {args.named_out}")
 
-    print(f"\nDone. To restore original bin: git checkout {args.bin} "
-          f"(then truncate to {BIN_BASE_COUNT} records if the index already shows post-append count).")
+    print(f"\nDone. To regenerate from scratch: python3 scripts/append_named_systems.py --reset")
 
 
 if __name__ == "__main__":

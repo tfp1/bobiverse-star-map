@@ -41,7 +41,7 @@
       "bin_BP_RP": 0.89,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. A+B unresolved at bin resolution; Proxima is a separate M5.5Ve dwarf at M~15.6 and is excluded by the M<13 faint cut. | expected abs G ~4.7 (from SpT=G2V); bin M_at_nearest=8.98 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. A+B unresolved at bin resolution; Proxima is a separate M5.5Ve dwarf at M~15.6 and is excluded by the M<13 faint cut. | expected abs G ~4.7 (from SpT=G2V); bin M_at_nearest=8.98 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         -0.503764483037594,
         -0.42124360694779406,
@@ -73,7 +73,7 @@
       "bin_BP_RP": 1.27,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~6.2 (from SpT=K2V); bin M_at_nearest=12.26 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~6.2 (from SpT=K2V); bin M_at_nearest=12.26 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         1.9010711311344013,
         2.5442388661071664,
@@ -105,7 +105,7 @@
       "bin_BP_RP": 1.62,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~7.4 (from SpT=K5V); bin M_at_nearest=4.32 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~7.4 (from SpT=K5V); bin M_at_nearest=4.32 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         1.7404371604966822,
         -0.9710955321954181,
@@ -137,7 +137,7 @@
       "bin_BP_RP": 1.1,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Subgiant; abs G ~4.5 (brighter than dwarf K0). | expected abs G ~4.5 (from SpT=K0+IV); bin M_at_nearest=12.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. Subgiant; abs G ~4.5 (brighter than dwarf K0). | expected abs G ~4.5 (from SpT=K0+IV); bin M_at_nearest=12.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         5.0331151203100175,
         7.409365603078356,
@@ -169,7 +169,7 @@
       "bin_BP_RP": 1.04,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~3.8 (from SpT=G8IV); bin M_at_nearest=2.68",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~3.8 (from SpT=G8IV); bin M_at_nearest=2.68",
       "bin_xyz_pc_equatorial": [
         1.3118508612251116,
         -2.084660135034255,
@@ -201,7 +201,7 @@
       "bin_BP_RP": 0.85,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.4 (from SpT=F9VFe-1.4CH-0.7); bin M_at_nearest=4.07",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~4.4 (from SpT=F9VFe-1.4CH-0.7); bin M_at_nearest=4.07",
       "bin_xyz_pc_equatorial": [
         3.024769604957011,
         -2.3964686437908513,
@@ -233,7 +233,7 @@
       "bin_BP_RP": 0.85,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.5 (from SpT=G0V); bin M_at_nearest=11.90 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~4.5 (from SpT=G0V); bin M_at_nearest=11.90 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         1.6352199390131525,
         0.18451109039563746,
@@ -265,7 +265,7 @@
       "bin_BP_RP": 0.85,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~4.5 (from SpT=F9.5V); bin M_at_nearest=10.56 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~4.5 (from SpT=F9.5V); bin M_at_nearest=10.56 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         3.6405680015492403,
         0.319635833480984,
@@ -297,7 +297,7 @@
       "bin_BP_RP": 0.94,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~5.2 (from SpT=G5V); bin M_at_nearest=11.53 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~5.2 (from SpT=G5V); bin M_at_nearest=11.53 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         5.972076449632488,
         7.0771146893134285,
@@ -329,7 +329,7 @@
       "bin_BP_RP": 0.85,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Binary; B not separately resolved in bin. | expected abs G ~4.4 (from SpT=F9V); bin M_at_nearest=5.23",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. Binary; B not separately resolved in bin. | expected abs G ~4.4 (from SpT=F9V); bin M_at_nearest=5.23",
       "bin_xyz_pc_equatorial": [
         3.082826896645744,
         0.6708251992799281,
@@ -361,7 +361,7 @@
       "bin_BP_RP": 0.62,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Heaven's River megastructure host (Bender's final destination). | expected abs G ~3.0 (from SpT=F2V); bin M_at_nearest=6.54 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. Heaven's River megastructure host (Bender's final destination). | expected abs G ~3.0 (from SpT=F2V); bin M_at_nearest=6.54 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         0.22748049495927614,
         14.50049766543667,
@@ -393,7 +393,7 @@
       "bin_BP_RP": 0.75,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~3.7 (from SpT=F6V); bin M_at_nearest=9.00 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~3.7 (from SpT=F6V); bin M_at_nearest=9.00 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         2.4004942549662385,
         7.594924217068753,
@@ -425,7 +425,7 @@
       "bin_BP_RP": 0.97,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. expected abs G ~5.4 (from SpT=G6V); bin M_at_nearest=10.06 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. expected abs G ~5.4 (from SpT=G6V); bin M_at_nearest=10.06 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         2.837938244963318,
         3.379954094602925,
@@ -457,7 +457,7 @@
       "bin_BP_RP": 1.1,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. = 40 Eridani. Triple system; A anchors. Vulcan/Romulus host. | expected abs G ~5.8 (from SpT=K0V); bin M_at_nearest=4.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. = 40 Eridani. Triple system; A anchors. Vulcan/Romulus host. | expected abs G ~5.8 (from SpT=K0V); bin M_at_nearest=4.18 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         2.1907637514128377,
         4.45575287860129,
@@ -489,7 +489,7 @@
       "bin_BP_RP": 2.45,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. Red-dwarf binary; abs G ~9.7, should be inside the bin's M<13 cut. | expected abs G ~9.7 (from SpT=M2.5V); bin M_at_nearest=11.90",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. Red-dwarf binary; abs G ~9.7, should be inside the bin's M<13 cut. | expected abs G ~9.7 (from SpT=M2.5V); bin M_at_nearest=11.90",
       "bin_xyz_pc_equatorial": [
         3.010534888169505,
         0.95472824066061,
@@ -521,7 +521,7 @@
       "bin_BP_RP": 2.8,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3V at d~8.6 pc; abs G ~10.4 — within bin faint cut, should be present despite handoff.md flagging it as 'at risk'. Others' home star in canon (destroyed B3C70). | expected abs G ~10.0 (from SpT=M3V); bin M_at_nearest=11.41 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. M3V at d~8.6 pc; abs G ~10.4 — within bin faint cut, should be present despite handoff.md flagging it as 'at risk'. Others' home star in canon (destroyed B3C70). | expected abs G ~10.0 (from SpT=M3V); bin M_at_nearest=11.41 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         2.01444302749832,
         -0.7757084872910589,
@@ -553,7 +553,7 @@
       "bin_BP_RP": 2.8,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3.5V at d~28 pc; abs G ~10.4 — well inside the bin's M<13 cut. Handoff flagged as 'at risk' but should be present. | expected abs G ~10.4 (from SpT=M3.5V); bin M_at_nearest=11.95 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. M3.5V at d~28 pc; abs G ~10.4 — well inside the bin's M<13 cut. Handoff flagged as 'at risk' but should be present. | expected abs G ~10.4 (from SpT=M3.5V); bin M_at_nearest=11.95 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         11.562660668996376,
         -0.0984669999651225,
@@ -585,7 +585,7 @@
       "bin_BP_RP": 2.8,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M3.5+M3.0 binary at d~9.4 pc; abs G ~10. Odin host (B3C20). | expected abs G ~10.0 (from SpT=M3.5+M3.0); bin M_at_nearest=4.66 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. M3.5+M3.0 binary at d~9.4 pc; abs G ~10. Odin host (B3C20). | expected abs G ~10.0 (from SpT=M3.5+M3.0); bin M_at_nearest=4.66 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         6.331459550646949,
         6.434884571710723,
@@ -617,7 +617,7 @@
       "bin_BP_RP": 2.2,
       "match_distance_pc": 0.0,
       "confidence": "appended",
-      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry. M1V at d~12.8 pc; abs G ~9. New Pav host post-B3C45. | expected abs G ~9.0 (from SpT=M1V); bin M_at_nearest=4.74 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
+      "notes": "APPENDED to stars-near.bin from SIMBAD reference data; Mamajek 2013 SpT→photometry; rotated equatorial→ecliptic. M1V at d~12.8 pc; abs G ~9. New Pav host post-B3C45. | expected abs G ~9.0 (from SpT=M1V); bin M_at_nearest=4.74 | NEAREST RECORD IS NOT A MATCH — system absent from stars-near.bin. Probably caused by Gaia DR3 bright-star saturation cut (val's source data). Nearest-record fields below are diagnostic, not authoritative.",
       "bin_xyz_pc_equatorial": [
         -1.6503080384182565,
         -7.598604662616319,
@@ -898,7 +898,7 @@
         "bobs_at_system": []
       }
     ],
-    "last_updated": "2026-05-27T17:23:28.592700Z",
+    "last_updated": "2026-05-27T20:29:40.753782Z",
     "bin_record_count_after_append": 53855
   }
 }

@@ -1,6 +1,6 @@
 {
   "$schema_version": "1.0.0",
-  "$generated_at": "2026-05-27T17:23:28.594815Z",
+  "$generated_at": "2026-05-27T20:29:40.755664Z",
   "$bin_file": "static/stars-near.bin",
   "$bin_record_count": 53855,
   "$source_photometry": "Positions from SIMBAD (RA/Dec/parallax), rotated equatorial→ecliptic (obliquity ε=23.4392911°) to match the bin's heliocentric ecliptic frame. Photometry computed from V_mag + distance + spectral type via Pecaut & Mamajek 2013 main-sequence color table.",
