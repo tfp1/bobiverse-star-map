@@ -43,6 +43,10 @@ export function makeReplicationEdges(
 				dropped++;
 				continue;
 			}
+			if (!view.dateVisible(edge.date_year)) {
+				dropped++;
+				continue;
+			}
 		}
 		const parent = overlay.bobByName(edge.parent);
 		const child = overlay.bobByName(edge.child);

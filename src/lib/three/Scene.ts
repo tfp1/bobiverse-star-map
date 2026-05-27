@@ -14,7 +14,7 @@ import { attachPicking, type Selection } from './picking';
 export interface SceneHandle {
 	dispose: () => void;
 	stats: SceneStats;
-	applyTier: (tier: number) => SceneStats;
+	applyView: (view: { tier: number; yearMax: number | null }) => SceneStats;
 }
 
 export interface SceneStats {
@@ -29,6 +29,8 @@ export interface SceneOptions {
 	onSelect?: (sel: Selection | null) => void;
 	/** Reading-order tier 1..5; defaults to MAX_TIER (show everything). */
 	initialTier?: number;
+	/** Timeline scrubber upper bound; null = no time gating. */
+	initialYearMax?: number | null;
 }
 
 export async function mountScene(
@@ -110,8 +112,8 @@ export async function mountScene(
 		bobNodes: ReturnType<typeof makeBobNodes>;
 	}
 
-	const buildOverlay = (tier: number): OverlayBundle => {
-		const view = buildTierView(overlay, tier);
+	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
+		const view = buildTierView(overlay, tier, yearMax);
 		const systemMarkers = makeSystemMarkers(overlay.systems.values(), view.visibleSystems);
 		const repEdges = makeReplicationEdges(overlay, edgeResolution, view);
 		const travelEdges = makeTravelEdges(overlay, edgeResolution, view);
@@ -131,7 +133,8 @@ export async function mountScene(
 	};
 
 	const initialTier = opts.initialTier ?? MAX_TIER;
-	let bundle = buildOverlay(initialTier);
+	const initialYearMax = opts.initialYearMax ?? null;
+	let bundle = buildOverlay(initialTier, initialYearMax);
 	scene.add(bundle.systemMarkers.group);
 	scene.add(bundle.repEdges.object);
 	scene.add(bundle.travelEdges.object);
@@ -177,9 +180,9 @@ export async function mountScene(
 
 	return {
 		stats,
-		applyTier(tier: number): SceneStats {
+		applyView({ tier, yearMax }: { tier: number; yearMax: number | null }): SceneStats {
 			disposeOverlay(bundle);
-			bundle = buildOverlay(tier);
+			bundle = buildOverlay(tier, yearMax);
 			scene.add(bundle.systemMarkers.group);
 			scene.add(bundle.repEdges.object);
 			scene.add(bundle.travelEdges.object);

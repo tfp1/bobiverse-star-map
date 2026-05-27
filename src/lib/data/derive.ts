@@ -4,19 +4,33 @@ import type { Bob } from './types';
 export const MAX_TIER = 5;
 
 /**
- * Precomputed visibility state for one tier value. Built once per tier
- * change and passed to the overlay renderers so each one doesn't
- * re-walk the overlay.
+ * Precomputed visibility state for one (tier, yearMax) pair. Built once
+ * per filter change and passed to the overlay renderers so each one
+ * doesn't re-walk the overlay.
+ *
+ * `yearMax` null means "no time gating" (Explore mode). When set
+ * (Timeline mode), entities with a null in-world date are hidden —
+ * they can't be placed on a chronological axis, so a chronological
+ * filter has nothing to compare them against.
  */
 export interface TierView {
 	tier: number;
+	yearMax: number | null;
 	visibleSystems: Set<string>;
 	bobVisible: (bobName: string) => boolean;
+	/**
+	 * True when the in-world year for an entity should be considered
+	 * visible at the current yearMax. Null is hidden under any active
+	 * time gate and always visible when no gate is set.
+	 */
+	dateVisible: (year: number | null) => boolean;
 }
 
-export function buildTierView(overlay: Overlay, tier: number): TierView {
-	const visibleSystems = systemsVisibleAt(overlay, tier);
-	// Memoize firstBookOf — replication is small but called per-Bob per build.
+export function buildTierView(
+	overlay: Overlay,
+	tier: number,
+	yearMax: number | null = null
+): TierView {
 	const fbCache = new Map<string, number | null>();
 	const fbOf = (name: string): number | null => {
 		if (fbCache.has(name)) return fbCache.get(name)!;
@@ -24,14 +38,31 @@ export function buildTierView(overlay: Overlay, tier: number): TierView {
 		fbCache.set(name, v);
 		return v;
 	};
+	const fdCache = new Map<string, number | null>();
+	const fdOf = (name: string): number | null => {
+		if (fdCache.has(name)) return fdCache.get(name)!;
+		const v = firstDateOf(overlay, name);
+		fdCache.set(name, v);
+		return v;
+	};
+	const dateVisible = (year: number | null): boolean => {
+		if (yearMax == null) return true;
+		return year != null && year <= yearMax;
+	};
+	const bobVisible = (bobName: string): boolean => {
+		const fb = fbOf(bobName);
+		const tierOk = fb == null ? tier >= MAX_TIER : fb <= tier;
+		if (!tierOk) return false;
+		if (yearMax == null) return true;
+		return dateVisible(fdOf(bobName));
+	};
+	const visibleSystems = systemsVisibleAt(overlay, tier, yearMax);
 	return {
 		tier,
+		yearMax,
 		visibleSystems,
-		bobVisible(bobName: string) {
-			const fb = fbOf(bobName);
-			if (fb == null) return tier >= MAX_TIER;
-			return fb <= tier;
-		}
+		bobVisible,
+		dateVisible
 	};
 }
 
@@ -52,32 +83,79 @@ export function firstBookOf(overlay: Overlay, bobName: string): number | null {
 }
 
 /**
- * Is this Bob visible at `tier`? A Bob with no replication-edge appearance
- * (firstBookOf returns null) is treated as MAX_TIER-only: it's likely a
- * late-discovered stub (Hugh/Lenny/Mud) whose first book is genuinely
- * unknown, so hide until the all-spoilers tier.
+ * Earliest in-world year a Bob can be placed on the timeline. Falls
+ * back through bobs.json (online_year, then created_year) to the
+ * earliest replication edge that names the Bob as parent or child,
+ * then the earliest travel edge by the Bob. Returns null only when
+ * NONE of those carry a date — those Bobs cannot be placed in
+ * Timeline mode and are hidden whenever yearMax is set.
  */
-export function bobVisibleAt(overlay: Overlay, bob: Bob, tier: number): boolean {
+export function firstDateOf(overlay: Overlay, bobName: string): number | null {
+	const bob = overlay.bobByName(bobName);
+	let min: number | null = null;
+	const consider = (y: number | null | undefined) => {
+		if (y == null) return;
+		if (min == null || y < min) min = y;
+	};
+	if (bob) {
+		consider(bob.online_year);
+		consider(bob.created_year);
+	}
+	for (const e of overlay.replication) {
+		if (e.parent !== bobName && e.child !== bobName) continue;
+		consider(e.date_year);
+	}
+	for (const t of overlay.travel) {
+		if (t.bob !== bobName) continue;
+		consider(t.date_year);
+	}
+	return min;
+}
+
+/**
+ * Is this Bob visible at `tier` (and optionally at `yearMax`)? A Bob
+ * with no replication-edge appearance is treated as MAX_TIER-only —
+ * it's likely a late-discovered stub (Hugh/Lenny/Mud) whose first
+ * book is genuinely unknown, so hide until the all-spoilers tier.
+ * When `yearMax` is set, a Bob whose firstDateOf returns null is
+ * also hidden (no anchor to place them on the chronological axis).
+ */
+export function bobVisibleAt(
+	overlay: Overlay,
+	bob: Bob,
+	tier: number,
+	yearMax: number | null = null
+): boolean {
 	const fb = firstBookOf(overlay, bob.name);
-	if (fb == null) return tier >= MAX_TIER;
-	return fb <= tier;
+	const tierOk = fb == null ? tier >= MAX_TIER : fb <= tier;
+	if (!tierOk) return false;
+	if (yearMax == null) return true;
+	const fd = firstDateOf(overlay, bob.name);
+	return fd != null && fd <= yearMax;
 }
 
 /**
  * Set of system names that have ANY visible content (Bob with origin
- * there, or replication/travel edge endpoint there) at the given tier.
- * Sol is always included as the spatial origin so the camera anchor
- * stays meaningful even at tier 1.
+ * there, or replication/travel edge endpoint there) at the given
+ * tier and yearMax. Sol is always included as the spatial origin so
+ * the camera anchor stays meaningful even at tier 1 / year 2133.
  */
-export function systemsVisibleAt(overlay: Overlay, tier: number): Set<string> {
+export function systemsVisibleAt(
+	overlay: Overlay,
+	tier: number,
+	yearMax: number | null = null
+): Set<string> {
 	const out = new Set<string>();
 	out.add('Sol');
+	const dateOk = (y: number | null): boolean =>
+		yearMax == null ? true : y != null && y <= yearMax;
 	for (const bob of overlay.bobs) {
 		if (!overlay.systems.has(bob.origin_system)) continue;
-		if (bobVisibleAt(overlay, bob, tier)) out.add(bob.origin_system);
+		if (bobVisibleAt(overlay, bob, tier, yearMax)) out.add(bob.origin_system);
 	}
 	for (const e of overlay.replication) {
 		if (e.first_book == null || e.first_book > tier) continue;
+		if (!dateOk(e.date_year)) continue;
 		if (!e.parent_known || !e.child_known) continue;
 		const p = overlay.bobByName(e.parent);
 		const c = overlay.bobByName(e.child);
@@ -86,6 +164,7 @@ export function systemsVisibleAt(overlay: Overlay, tier: number): Set<string> {
 	}
 	for (const t of overlay.travel) {
 		if (t.first_book == null || t.first_book > tier) continue;
+		if (!dateOk(t.date_year)) continue;
 		if (t.destination_type === 'off_map') continue;
 		if (overlay.systems.has(t.destination_system)) out.add(t.destination_system);
 		const bob = overlay.bobByName(t.bob);
@@ -97,27 +176,32 @@ export function systemsVisibleAt(overlay: Overlay, tier: number): Set<string> {
 /**
  * Bobs whose origin_system is `systemName`. When `tier` is provided,
  * residents are gated the same way the scene gates Bob pips — orphan
- * Bobs (firstBookOf = null) only appear at tier 5.
+ * Bobs (firstBookOf = null) only appear at tier 5. When `yearMax` is
+ * also provided, Bobs with no date anchor are dropped.
  */
-export function bobsAt(overlay: Overlay, systemName: string, tier?: number): Bob[] {
+export function bobsAt(
+	overlay: Overlay,
+	systemName: string,
+	tier?: number,
+	yearMax: number | null = null
+): Bob[] {
 	const all = overlay.bobs.filter((b) => b.origin_system === systemName);
 	if (tier == null) return all;
-	return all.filter((b) => {
-		const fb = firstBookOf(overlay, b.name);
-		if (fb == null) return tier >= MAX_TIER;
-		return fb <= tier;
-	});
+	return all.filter((b) => bobVisibleAt(overlay, b, tier, yearMax));
 }
 
 /**
  * Count of travel edges arriving at or leaving from `systemName`.
  * When `tier` is provided, both arrival and departure counts are
- * restricted to edges with `first_book <= tier`.
+ * restricted to edges with `first_book <= tier`. When `yearMax`
+ * is also provided, edges with date_year > yearMax (or null) are
+ * dropped, matching the rendered TravelEdges set.
  */
 export function travelCountsAt(
 	overlay: Overlay,
 	systemName: string,
-	tier?: number
+	tier?: number,
+	yearMax: number | null = null
 ): { arrivals: number; departures: number } {
 	let arrivals = 0;
 	let departures = 0;
@@ -136,17 +220,19 @@ export function travelCountsAt(
 	// the same filters TravelEdges.buildItinerariesAtTier applies, so
 	// the panel counts agree with the rendered travel lines:
 	//   - edge.first_book <= tier
+	//   - edge.date_year <= yearMax (when yearMax is set)
 	//   - destination resolves to a known system (off_map dropped)
 	//   - bob_known and primary Bob resolves
 	//   - primary Bob is visible at this tier (covers Hal at GL877
 	//     who is firstBookOf=null and thus hidden until tier 5)
-	const view = buildTierView(overlay, tier);
+	const view = buildTierView(overlay, tier, yearMax);
 	const byBobId = new Map<string, typeof overlay.travel>();
 	for (const t of overlay.travel) {
 		if (!t.bob_known) continue;
 		if (t.destination_type === 'off_map') continue;
 		if (!overlay.systems.has(t.destination_system)) continue;
 		if (t.first_book == null || t.first_book > tier) continue;
+		if (!view.dateVisible(t.date_year)) continue;
 		const primary = overlay.bobByName(t.bob);
 		if (!primary) continue;
 		if (!view.bobVisible(primary.name)) continue;
