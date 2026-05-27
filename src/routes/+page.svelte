@@ -192,8 +192,8 @@
 			<button type="button" onclick={() => handle?.recenter()} aria-label="Recenter on Sol">⌂ Sol</button>
 			<button
 				type="button"
-				onclick={() => handle?.frameGalacticPlane()}
-				aria-label="Top-down view of the galactic plane">⊥ Plane</button
+				onclick={() => handle?.frameEcliptic()}
+				aria-label="Top-down view of the ecliptic plane">⊥ Ecliptic</button
 			>
 		</div>
 		{#if stats}

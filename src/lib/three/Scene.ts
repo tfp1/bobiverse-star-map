@@ -27,8 +27,8 @@ export interface SceneHandle {
 	flyTo: (eye: THREE.Vector3, target: THREE.Vector3, ms?: number) => void;
 	/** Recenter on Sol and frame the local cloud. */
 	recenter: () => void;
-	/** Top-down view along +Y axis. */
-	frameGalacticPlane: () => void;
+	/** Top-down view along +Y axis (the ecliptic plane — the bin's reference plane). */
+	frameEcliptic: () => void;
 	/** Re-pivot orbit on a named system / bob and fly closer. */
 	focusOn: (sel: Selection) => void;
 }
@@ -269,7 +269,7 @@ export async function mountScene(
 	};
 
 	const recenter = () => flyTo(INITIAL_EYE, INITIAL_TARGET);
-	const frameGalacticPlane = () => flyTo(PLANE_EYE, PLANE_TARGET);
+	const frameEcliptic = () => flyTo(PLANE_EYE, PLANE_TARGET);
 
 	const focusOn = (sel: Selection) => {
 		let pos: THREE.Vector3 | null = null;
@@ -353,7 +353,7 @@ export async function mountScene(
 		},
 		flyTo,
 		recenter,
-		frameGalacticPlane,
+		frameEcliptic,
 		focusOn,
 		dispose() {
 			cancelAnimationFrame(raf);

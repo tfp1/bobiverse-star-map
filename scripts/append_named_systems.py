@@ -16,10 +16,12 @@ Pecaut & Mamajek 2013 main-sequence color/temperature table
 Values are exact for canonical SpTs and linearly interpolated otherwise.
 
 IDEMPOTENT: refuses to re-append if the bin's count is already > 53836.
-To rerun cleanly: `git checkout stars-near.bin` first.
+To rerun cleanly: `git checkout static/stars-near.bin` first (and if the
+bin is already at the post-append count, also truncate it back to 53836
+records — the SvelteKit `static/` copy is the only one tracked in git).
 
 OUTPUTS:
-  stars-near.bin                    — extended in-place (18 new records appended)
+  static/stars-near.bin             — extended in-place (19 new records appended)
   data/system_to_star_index.json    — updated in-place: each appended system
                                        gets a real index/byte_offset and
                                        physically-honest bin_M_abs_g / bin_BP_RP
@@ -170,7 +172,7 @@ def read_count(bin_path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--bin", default="stars-near.bin")
+    ap.add_argument("--bin", default="static/stars-near.bin")
     ap.add_argument("--mapping", default="data/system_to_star_index.json")
     ap.add_argument("--named-out", default="data/named_systems.json")
     ap.add_argument("--dry-run", action="store_true",
@@ -326,7 +328,8 @@ def main():
         json.dump(named_doc, f, indent=2, ensure_ascii=False)
     print(f"Named lookup written: {args.named_out}")
 
-    print(f"\nDone. To restore original bin: git checkout {args.bin}")
+    print(f"\nDone. To restore original bin: git checkout {args.bin} "
+          f"(then truncate to {BIN_BASE_COUNT} records if the index already shows post-append count).")
 
 
 if __name__ == "__main__":
