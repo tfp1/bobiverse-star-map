@@ -35,6 +35,7 @@ function buildItinerariesAtTier(overlay: Overlay, view: TierView): string[][] {
 		if (t.destination_type === 'off_map') continue;
 		if (!overlay.systems.has(t.destination_system)) continue;
 		if (t.first_book == null || t.first_book > view.tier) continue;
+		if (!view.dateVisible(t.date_year)) continue;
 		const primary = overlay.bobByName(t.bob);
 		if (!primary) continue;
 		if (!view.bobVisible(primary.name)) continue;
