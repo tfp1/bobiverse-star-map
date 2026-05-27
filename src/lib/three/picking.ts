@@ -2,7 +2,8 @@ import * as THREE from 'three';
 
 export type Selection =
 	| { kind: 'system'; systemName: string }
-	| { kind: 'bob'; bobId: string; bobName: string };
+	| { kind: 'bob'; bobId: string; bobName: string }
+	| { kind: 'megastructure'; megastructureName: string };
 
 export interface PickingOptions {
 	camera: THREE.Camera;
@@ -64,11 +65,14 @@ export function attachPicking(opts: PickingOptions): PickingHandle {
 		const data = hit.userData as
 			| { kind: 'system'; systemName: string }
 			| { kind: 'bob'; bobId: string; bobName: string }
+			| { kind: 'megastructure'; megastructureName: string }
 			| Record<string, never>;
 		if (data.kind === 'system') {
 			onSelect({ kind: 'system', systemName: data.systemName });
 		} else if (data.kind === 'bob') {
 			onSelect({ kind: 'bob', bobId: data.bobId, bobName: data.bobName });
+		} else if (data.kind === 'megastructure') {
+			onSelect({ kind: 'megastructure', megastructureName: data.megastructureName });
 		} else {
 			onSelect(null);
 		}

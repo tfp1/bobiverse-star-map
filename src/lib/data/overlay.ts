@@ -2,8 +2,10 @@ import bobsRaw from '../../../data/bobs.json';
 import repRaw from '../../../data/edges_replication.json';
 import travelRaw from '../../../data/edges_travel.json';
 import sysRaw from '../../../data/system_to_star_index.json';
+import { getNonSpatial } from './nonSpatial';
 import type {
 	Bob,
+	Megastructure,
 	ReplicationEdge,
 	TravelEdge,
 	SystemRef,
@@ -23,13 +25,30 @@ export interface Overlay {
 	bobByName: (name: string) => Bob | undefined;
 	replication: ReplicationEdge[];
 	travel: TravelEdge[];
+	/** Spatial (catalog-star) systems keyed by name. Sol included at origin. */
 	systems: Map<string, SpatialSystem>;
 	/**
+	 * Off-map placeholder systems (handoff D6/D7). Includes
+	 * gazetteer off_map_systems + Sgr A* + hostless megastructures
+	 * (Hub Zero, Federation Capital). Carry an XYZ on the ~120 pc
+	 * ring sphere so travel edges can land on them.
+	 */
+	offMap: Map<string, SpatialSystem>;
+	/** first_book + date_year for each off-map node. */
+	offMapMeta: Map<string, { first_book: number; date_year: number | null }>;
+	/** Host-bound megastructures (handoff D9): HR @ Eta Leporis etc. */
+	megastructures: Megastructure[];
+	/**
+	 * Unified name → SpatialSystem lookup across both `systems` and
+	 * `offMap`. Use this when resolving a travel edge's destination.
+	 */
+	resolveSystem: (name: string) => SpatialSystem | undefined;
+	/**
 	 * Per-Bob (keyed by id), chronologically-ordered system sequence:
-	 * origin_system first, then each travel edge with destination_type
-	 * 'system' or 'place_in_system' resolved to its destination_system.
-	 * off_map destinations are dropped for PR2 — they'll be rendered
-	 * under the non-spatial convention (#14).
+	 * origin_system first, then each travel edge with a resolvable
+	 * destination (catalog star OR off-map ring marker). Wormhole-
+	 * specific path rendering is the renderer's call (handoff D8) —
+	 * the itinerary is shape-agnostic.
 	 */
 	bobItinerary: Map<string, string[]>;
 }
@@ -42,12 +61,12 @@ function buildSystems(): Map<string, SpatialSystem> {
 	for (const [name, rec] of Object.entries(systems)) {
 		if (rec.type !== 'catalog_star') continue;
 		if (name === 'Sol') {
-			out.set(name, { name, xyz: [0, 0, 0] });
+			out.set(name, { name, xyz: [0, 0, 0], kind: 'catalog_star' });
 			continue;
 		}
 		const xyz = rec.bin_xyz_pc ?? rec.ref_xyz_pc;
 		if (!xyz || xyz.length !== 3) continue;
-		out.set(name, { name, xyz: [xyz[0], xyz[1], xyz[2]] });
+		out.set(name, { name, xyz: [xyz[0], xyz[1], xyz[2]], kind: 'catalog_star' });
 	}
 	return out;
 }
@@ -77,14 +96,15 @@ function buildNameToPrimary(bobs: Bob[]): Map<string, Bob> {
 function buildItineraries(
 	bobs: Bob[],
 	travel: TravelEdge[],
-	systems: Map<string, SpatialSystem>,
+	resolveSystem: (name: string) => SpatialSystem | undefined,
 	nameToPrimary: Map<string, Bob>
 ): Map<string, string[]> {
 	const byId = new Map<string, TravelEdge[]>();
 	for (const t of travel) {
 		if (!t.bob_known) continue;
-		if (t.destination_type === 'off_map') continue;
-		if (!systems.has(t.destination_system)) continue;
+		const destName = travelDestinationName(t);
+		if (destName == null) continue;
+		if (!resolveSystem(destName)) continue;
 		const primary = nameToPrimary.get(t.bob);
 		if (!primary) continue;
 		const list = byId.get(primary.id) ?? [];
@@ -94,18 +114,30 @@ function buildItineraries(
 	const itin = new Map<string, string[]>();
 	for (const bob of bobs) {
 		const seq: string[] = [];
-		if (systems.has(bob.origin_system)) seq.push(bob.origin_system);
+		if (resolveSystem(bob.origin_system)) seq.push(bob.origin_system);
 		const travels = byId.get(bob.id);
 		if (travels) {
 			travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
 			for (const t of travels) {
-				const dest = t.destination_system;
-				if (seq[seq.length - 1] !== dest) seq.push(dest);
+				const dest = travelDestinationName(t);
+				if (dest != null && seq[seq.length - 1] !== dest) seq.push(dest);
 			}
 		}
 		if (seq.length > 1) itin.set(bob.id, seq);
 	}
 	return itin;
+}
+
+/**
+ * Canonical destination name for a travel edge — destination_system
+ * if the resolver bound it to a catalog star, otherwise destination_raw
+ * for off_map rows (which carry the off-map system name on the ring
+ * sphere). Returns null when neither is usable.
+ */
+export function travelDestinationName(t: TravelEdge): string | null {
+	if (t.destination_system) return t.destination_system;
+	if (t.destination_type === 'off_map' && t.destination_raw) return t.destination_raw;
+	return null;
 }
 
 let cached: Overlay | null = null;
@@ -118,7 +150,10 @@ export function getOverlay(): Overlay {
 	const replication = (repRaw as unknown as { edges: ReplicationEdge[] }).edges;
 	const travel = (travelRaw as unknown as { edges: TravelEdge[] }).edges;
 	const systems = buildSystems();
-	const bobItinerary = buildItineraries(bobs, travel, systems, nameToPrimary);
+	const { offMap, offMapMeta, megastructures } = getNonSpatial(systems);
+	const resolveSystem = (name: string): SpatialSystem | undefined =>
+		systems.get(name) ?? offMap.get(name);
+	const bobItinerary = buildItineraries(bobs, travel, resolveSystem, nameToPrimary);
 	cached = {
 		bobs,
 		bobById,
@@ -126,6 +161,10 @@ export function getOverlay(): Overlay {
 		replication,
 		travel,
 		systems,
+		offMap,
+		offMapMeta,
+		megastructures,
+		resolveSystem,
 		bobItinerary
 	};
 	return cached;

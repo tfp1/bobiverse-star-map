@@ -9,6 +9,8 @@ import { makeSystemMarkers } from './overlay/SystemMarkers';
 import { makeReplicationEdges } from './overlay/ReplicationEdges';
 import { makeTravelEdges } from './overlay/TravelEdges';
 import { makeBobNodes } from './overlay/BobNodes';
+import { makeOffMapMarkers } from './overlay/OffMapMarkers';
+import { makeMegastructureNodes } from './overlay/MegastructureNodes';
 import { attachPicking, type Selection } from './picking';
 
 export interface SceneHandle {
@@ -102,11 +104,12 @@ export async function mountScene(
 	const overlay = getOverlay();
 	const edgeResolution = new THREE.Vector2(container.clientWidth, container.clientHeight);
 
-	// The four overlay groups are rebuilt on every tier change. Holding
-	// the current renderer handles in a single object makes dispose +
-	// swap symmetric.
+	// Overlay groups rebuilt on every view change. Holding the current
+	// renderer handles in a single object makes dispose + swap symmetric.
 	interface OverlayBundle {
 		systemMarkers: ReturnType<typeof makeSystemMarkers>;
+		offMapMarkers: ReturnType<typeof makeOffMapMarkers>;
+		megastructureNodes: ReturnType<typeof makeMegastructureNodes>;
 		repEdges: ReturnType<typeof makeReplicationEdges>;
 		travelEdges: ReturnType<typeof makeTravelEdges>;
 		bobNodes: ReturnType<typeof makeBobNodes>;
@@ -115,18 +118,28 @@ export async function mountScene(
 	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
 		const view = buildTierView(overlay, tier, yearMax);
 		const systemMarkers = makeSystemMarkers(overlay.systems.values(), view.visibleSystems);
+		const offMapMarkers = makeOffMapMarkers(overlay.offMap.values(), view.visibleSystems);
+		const megastructureNodes = makeMegastructureNodes(
+			overlay,
+			edgeResolution,
+			view.visibleMegastructures
+		);
 		const repEdges = makeReplicationEdges(overlay, edgeResolution, view);
 		const travelEdges = makeTravelEdges(overlay, edgeResolution, view);
 		const bobNodes = makeBobNodes(overlay, view);
-		return { systemMarkers, repEdges, travelEdges, bobNodes };
+		return { systemMarkers, offMapMarkers, megastructureNodes, repEdges, travelEdges, bobNodes };
 	};
 
 	const disposeOverlay = (b: OverlayBundle) => {
 		scene.remove(b.systemMarkers.group);
+		scene.remove(b.offMapMarkers.group);
+		scene.remove(b.megastructureNodes.group);
 		scene.remove(b.repEdges.object);
 		scene.remove(b.travelEdges.object);
 		scene.remove(b.bobNodes.group);
 		b.systemMarkers.dispose();
+		b.offMapMarkers.dispose();
+		b.megastructureNodes.dispose();
 		b.repEdges.dispose();
 		b.travelEdges.dispose();
 		b.bobNodes.dispose();
@@ -135,15 +148,26 @@ export async function mountScene(
 	const initialTier = opts.initialTier ?? MAX_TIER;
 	const initialYearMax = opts.initialYearMax ?? null;
 	let bundle = buildOverlay(initialTier, initialYearMax);
-	scene.add(bundle.systemMarkers.group);
-	scene.add(bundle.repEdges.object);
-	scene.add(bundle.travelEdges.object);
-	scene.add(bundle.bobNodes.group);
+	const addBundle = (b: OverlayBundle) => {
+		scene.add(b.systemMarkers.group);
+		scene.add(b.offMapMarkers.group);
+		scene.add(b.megastructureNodes.group);
+		scene.add(b.repEdges.object);
+		scene.add(b.travelEdges.object);
+		scene.add(b.bobNodes.group);
+	};
+	const pickTargets = (b: OverlayBundle): THREE.Mesh[] => [
+		...b.systemMarkers.meshes,
+		...b.offMapMarkers.meshes,
+		...b.megastructureNodes.meshes,
+		...b.bobNodes.meshes
+	];
+	addBundle(bundle);
 
 	const picking = attachPicking({
 		camera,
 		canvas: renderer.domElement,
-		targets: [...bundle.systemMarkers.meshes, ...bundle.bobNodes.meshes],
+		targets: pickTargets(bundle),
 		onSelect: opts.onSelect ?? (() => {})
 	});
 
@@ -175,6 +199,7 @@ export async function mountScene(
 		(stars.material as THREE.ShaderMaterial).uniforms.uHeight.value = h;
 		bundle.repEdges.setResolution(w, h);
 		bundle.travelEdges.setResolution(w, h);
+		bundle.megastructureNodes.setResolution(w, h);
 	};
 	window.addEventListener('resize', onResize);
 
@@ -183,11 +208,8 @@ export async function mountScene(
 		applyView({ tier, yearMax }: { tier: number; yearMax: number | null }): SceneStats {
 			disposeOverlay(bundle);
 			bundle = buildOverlay(tier, yearMax);
-			scene.add(bundle.systemMarkers.group);
-			scene.add(bundle.repEdges.object);
-			scene.add(bundle.travelEdges.object);
-			scene.add(bundle.bobNodes.group);
-			picking.setTargets([...bundle.systemMarkers.meshes, ...bundle.bobNodes.meshes]);
+			addBundle(bundle);
+			picking.setTargets(pickTargets(bundle));
 			stats.systems = bundle.systemMarkers.meshes.length;
 			stats.bobs = bundle.bobNodes.stats.drawn;
 			stats.replicationEdges = bundle.repEdges.stats.drawn;

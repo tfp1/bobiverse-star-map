@@ -18,7 +18,26 @@
 		if (selection.kind === 'system') {
 			const bobs = bobsAt(overlay, selection.systemName, tier, yearMax);
 			const counts = travelCountsAt(overlay, selection.systemName, tier, yearMax);
-			return { kind: 'system' as const, name: selection.systemName, bobs, counts };
+			const sys = overlay.resolveSystem(selection.systemName);
+			const kind = sys?.kind ?? 'catalog_star';
+			// Megastructures hosted at this catalog star (HR @ Eta Leporis etc.) —
+			// surfaced in the system panel as a related-node row per D9/D10.
+			const hostedMegastructures = overlay.megastructures.filter(
+				(m) => m.host === selection.systemName
+			);
+			return {
+				kind: 'system' as const,
+				name: selection.systemName,
+				bobs,
+				counts,
+				systemKind: kind,
+				hostedMegastructures
+			};
+		}
+		if (selection.kind === 'megastructure') {
+			const m = overlay.megastructures.find((x) => x.name === selection.megastructureName);
+			if (!m) return null;
+			return { kind: 'megastructure' as const, m };
 		}
 		// Resolve by id, not name. data/bobs.json has display-name
 		// collisions (Elmer/Elmer_v4, Loki/Loki_v4) so a click on a
@@ -33,6 +52,15 @@
 			firstBook: firstBookOf(overlay, bob.name)
 		};
 	});
+
+	function systemSubtitle(kind: string): string {
+		if (kind === 'off_map') return 'Off-map system';
+		if (kind === 'sgr_a_star') return 'Sagittarius A* · galactic center';
+		return 'System';
+	}
+	function megastructureSubtitle(subtype: 'topopolis' | 'dyson_variant'): string {
+		return subtype === 'topopolis' ? 'Topopolis · Quinlan megastructure' : 'Dyson-variant brain';
+	}
 </script>
 
 {#if view}
@@ -40,7 +68,7 @@
 		<button class="close" onclick={onClose} aria-label="Close">×</button>
 		{#if view.kind === 'system'}
 			<h2>{view.name}</h2>
-			<p class="sub">System</p>
+			<p class="sub">{systemSubtitle(view.systemKind)}</p>
 			<dl>
 				<dt>Bob residents</dt>
 				<dd>{view.bobs.length}</dd>
@@ -57,6 +85,31 @@
 							<span class="gen gen-{Math.min(bob.generation, 6)}">G{bob.generation}</span>
 							{bob.name}
 						</li>
+					{/each}
+				</ul>
+			{/if}
+			{#if view.hostedMegastructures.length > 0}
+				<h3>Megastructures at this system</h3>
+				<ul class="sub-list">
+					{#each view.hostedMegastructures as m (m.name)}
+						<li>{m.name}</li>
+					{/each}
+				</ul>
+			{/if}
+		{:else if view.kind === 'megastructure'}
+			<h2>{view.m.name}</h2>
+			<p class="sub">{megastructureSubtitle(view.m.subtype)}</p>
+			<dl>
+				<dt>Host system</dt>
+				<dd>{view.m.host}</dd>
+				<dt>First appears in</dt>
+				<dd>Book {view.m.first_book}</dd>
+			</dl>
+			{#if view.m.sub_locations.length > 0}
+				<h3>Sub-locations</h3>
+				<ul class="sub-list">
+					{#each view.m.sub_locations as loc}
+						<li>{loc}</li>
 					{/each}
 				</ul>
 			{/if}
@@ -158,6 +211,20 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
+	}
+	.sub-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+		font-size: 0.78rem;
+		color: #cfe4ff;
+	}
+	.sub-list li {
+		padding-left: 8px;
+		border-left: 1px solid rgba(111, 195, 255, 0.35);
 	}
 	.gen {
 		display: inline-block;

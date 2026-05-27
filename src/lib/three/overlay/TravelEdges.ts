@@ -3,6 +3,7 @@ import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import type { Overlay } from '$lib/data/overlay';
+import { travelDestinationName } from '$lib/data/overlay';
 import type { TierView } from '$lib/data/derive';
 
 /**
@@ -32,8 +33,9 @@ function buildItinerariesAtTier(overlay: Overlay, view: TierView): string[][] {
 	const byBobId = new Map<string, typeof overlay.travel>();
 	for (const t of overlay.travel) {
 		if (!t.bob_known) continue;
-		if (t.destination_type === 'off_map') continue;
-		if (!overlay.systems.has(t.destination_system)) continue;
+		const destName = travelDestinationName(t);
+		if (destName == null) continue;
+		if (!overlay.resolveSystem(destName)) continue;
 		if (t.first_book == null || t.first_book > view.tier) continue;
 		if (!view.dateVisible(t.date_year)) continue;
 		const primary = overlay.bobByName(t.bob);
@@ -49,10 +51,11 @@ function buildItinerariesAtTier(overlay: Overlay, view: TierView): string[][] {
 		const travels = byBobId.get(bob.id);
 		if (!travels) continue;
 		const seq: string[] = [];
-		if (overlay.systems.has(bob.origin_system)) seq.push(bob.origin_system);
+		if (overlay.resolveSystem(bob.origin_system)) seq.push(bob.origin_system);
 		travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
 		for (const t of travels) {
-			if (seq[seq.length - 1] !== t.destination_system) seq.push(t.destination_system);
+			const dest = travelDestinationName(t);
+			if (dest != null && seq[seq.length - 1] !== dest) seq.push(dest);
 		}
 		if (seq.length > 1) out.push(seq);
 	}
@@ -71,8 +74,8 @@ export function makeTravelEdges(
 
 	for (const seq of sequences) {
 		for (let i = 0; i + 1 < seq.length; i++) {
-			const a = overlay.systems.get(seq[i]);
-			const b = overlay.systems.get(seq[i + 1]);
+			const a = overlay.resolveSystem(seq[i]);
+			const b = overlay.resolveSystem(seq[i + 1]);
 			if (!a || !b) continue;
 			positions.push(a.xyz[0], a.xyz[1], a.xyz[2], b.xyz[0], b.xyz[1], b.xyz[2]);
 			drawn++;
