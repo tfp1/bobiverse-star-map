@@ -1,43 +1,44 @@
 import * as THREE from 'three';
 import type { Overlay } from '$lib/data/overlay';
-import type { ReplicationEdge } from '$lib/data/types';
 
 /**
  * Transient ring-flash at the child Bob's spawn position when a
- * replication edge crosses the scrubber year. Reads as "a Bob was
- * born here" in Timeline mode without needing text.
+ * replication edge's in-world year crosses the scrubber. Reads as
+ * "a Bob was born here" in Timeline mode without text.
  *
- * Each burst is a small instanced quad rendered through an additive
- * shader; lifetime ~1.5 s, fades from full to zero, scale eases out.
- * The set of bursts in flight is rebuilt whenever applyView changes
- * (so e.g. scrubbing back resets them); per-frame we just tick t/lifetime.
+ * Trigger and lifetime are separate: a year-crossing (detected on the
+ * JS side from successive setDisplayedYear calls) writes a wall-clock
+ * timestamp into a per-instance attribute; the shader uses
+ * `uNow - triggeredAt` for age. That way the burst always lasts
+ * BURST_LIFETIME_S real seconds — independent of playback speed,
+ * pause, or backward scrubs (which un-trigger the burst so a
+ * subsequent forward scrub re-fires it).
  */
 
 export const BURST_LIFETIME_S = 1.5;
-const RING_INNER = 0.35;
-const RING_OUTER = 0.5;
 const START_RADIUS_PC = 0.2;
 const END_RADIUS_PC = 1.4;
-const COLOR = 0xd3c0ff; // soft lavender — adjacent to the replication-edge color
+const COLOR = 0xd3c0ff;
 
 export interface ReplicationBurstsResult {
 	object: THREE.Points;
 	setDisplayedYear: (year: number | null) => void;
+	/** Push wall-clock time forward each frame so burst age advances. */
+	tick: () => void;
 	dispose: () => void;
 }
 
-interface Burst {
+interface BurstCandidate {
 	pos: THREE.Vector3;
 	year: number;
 }
 
-interface BuildArgs {
-	overlay: Overlay;
-	bursts: Burst[];
-}
-
-function collectBursts(overlay: Overlay, tier: number, yearMaxBuffered: number | null): Burst[] {
-	const out: Burst[] = [];
+function collectCandidates(
+	overlay: Overlay,
+	tier: number,
+	yearMaxBuffered: number | null
+): BurstCandidate[] {
+	const out: BurstCandidate[] = [];
 	for (const edge of overlay.replication) {
 		if (!edge.parent_known || !edge.child_known) continue;
 		if (edge.first_book == null || edge.first_book > tier) continue;
@@ -62,26 +63,29 @@ export function makeReplicationBursts(
 ): ReplicationBurstsResult {
 	const FADE_BUFFER = 3;
 	const yearMaxBuffered = yearMax == null ? null : yearMax + FADE_BUFFER;
-	const bursts = collectBursts(overlay, tier, yearMaxBuffered);
+	const candidates = collectCandidates(overlay, tier, yearMaxBuffered);
+	const N = Math.max(1, candidates.length);
 
-	const N = Math.max(1, bursts.length);
 	const positions = new Float32Array(N * 3);
-	const burstYears = new Float32Array(N);
-	for (let i = 0; i < bursts.length; i++) {
-		positions[i * 3 + 0] = bursts[i].pos.x;
-		positions[i * 3 + 1] = bursts[i].pos.y;
-		positions[i * 3 + 2] = bursts[i].pos.z;
-		burstYears[i] = bursts[i].year;
+	// Per-instance state. triggeredAt < 0 → not yet fired (or rewound).
+	const triggeredAt = new Float32Array(N);
+	for (let i = 0; i < N; i++) triggeredAt[i] = -1;
+	for (let i = 0; i < candidates.length; i++) {
+		positions[i * 3 + 0] = candidates[i].pos.x;
+		positions[i * 3 + 1] = candidates[i].pos.y;
+		positions[i * 3 + 2] = candidates[i].pos.z;
 	}
 
 	const geom = new THREE.BufferGeometry();
 	geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-	geom.setAttribute('burstYear', new THREE.BufferAttribute(burstYears, 1));
-	geom.setDrawRange(0, bursts.length);
+	const triggeredAttr = new THREE.BufferAttribute(triggeredAt, 1);
+	triggeredAttr.setUsage(THREE.DynamicDrawUsage);
+	geom.setAttribute('triggeredAt', triggeredAttr);
+	geom.setDrawRange(0, candidates.length);
 
 	const material = new THREE.ShaderMaterial({
 		uniforms: {
-			uDisplayedYear: { value: -1 },
+			uNow: { value: 0 },
 			uLifetime: { value: BURST_LIFETIME_S },
 			uPixelRatio: { value: window.devicePixelRatio },
 			uHeight: { value: window.innerHeight },
@@ -90,26 +94,20 @@ export function makeReplicationBursts(
 			uEndRadius: { value: END_RADIUS_PC }
 		},
 		vertexShader: /* glsl */ `
-			attribute float burstYear;
+			attribute float triggeredAt;
 			varying float vAge;
-			uniform float uDisplayedYear;
+			uniform float uNow;
 			uniform float uLifetime;
 			uniform float uPixelRatio;
 			uniform float uHeight;
 			uniform float uStartRadius;
 			uniform float uEndRadius;
 			void main() {
-				// Age in seconds-since-burst, assuming the scrubber's "1 year"
-				// of in-world time maps to 1 second of burst lifetime when
-				// scrubbing slowly. The shader doesn't see playback speed
-				// directly — it just computes a 0..1 progress over the
-				// fade window.
-				vAge = uDisplayedYear - burstYear; // in years
+				vAge = (triggeredAt < 0.0) ? -1.0 : (uNow - triggeredAt);
 				vec4 mv = modelViewMatrix * vec4(position, 1.0);
 				gl_Position = projectionMatrix * mv;
 				float scale = uHeight * projectionMatrix[1][1] * 0.5;
-				// Ring radius grows from start to end over the lifetime
-				float t = clamp(vAge / uLifetime, 0.0, 1.0);
+				float t = (vAge < 0.0) ? 0.0 : clamp(vAge / uLifetime, 0.0, 1.0);
 				float r = mix(uStartRadius, uEndRadius, t);
 				gl_PointSize = max(2.0, r * scale / -mv.z) * uPixelRatio * 2.0;
 			}
@@ -122,8 +120,7 @@ export function makeReplicationBursts(
 				if (vAge < 0.0 || vAge > uLifetime) discard;
 				float t = vAge / uLifetime;
 				vec2 uv = gl_PointCoord - 0.5;
-				float d = length(uv) * 2.0; // 0..~1
-				// Ring band centred at 0.85 of the sprite, widening with t
+				float d = length(uv) * 2.0;
 				float ringWidth = mix(0.10, 0.04, t);
 				float ringCenter = 0.85;
 				float band = smoothstep(ringCenter + ringWidth, ringCenter, d) *
@@ -142,10 +139,44 @@ export function makeReplicationBursts(
 	object.frustumCulled = false;
 	object.renderOrder = 3;
 
+	let prevDisplayedYear: number | null = null;
+	const nowSec = () => performance.now() / 1000;
+
 	return {
 		object,
 		setDisplayedYear(year: number | null) {
-			material.uniforms.uDisplayedYear.value = year == null ? -1 : year;
+			// Update uNow on every call so the shader stays in lockstep with
+			// wall-clock even when the scene's tick loop is otherwise idle.
+			material.uniforms.uNow.value = nowSec();
+			if (year != null && prevDisplayedYear != null) {
+				if (year > prevDisplayedYear) {
+					// Forward crossing: trigger candidates whose year is in
+					// (prev, year]. Skip already-firing bursts so a play→pause→
+					// play cycle straddling a year boundary doesn't restart them.
+					const now = material.uniforms.uNow.value;
+					for (let i = 0; i < candidates.length; i++) {
+						const y = candidates[i].year;
+						if (y > prevDisplayedYear && y <= year && triggeredAt[i] < 0) {
+							triggeredAt[i] = now;
+							triggeredAttr.needsUpdate = true;
+						}
+					}
+				} else if (year < prevDisplayedYear) {
+					// Backward scrub: un-trigger anything we've now rewound past
+					// so a subsequent forward crossing fires fresh.
+					for (let i = 0; i < candidates.length; i++) {
+						const y = candidates[i].year;
+						if (y > year && y <= prevDisplayedYear && triggeredAt[i] >= 0) {
+							triggeredAt[i] = -1;
+							triggeredAttr.needsUpdate = true;
+						}
+					}
+				}
+			}
+			prevDisplayedYear = year;
+		},
+		tick() {
+			material.uniforms.uNow.value = nowSec();
 		},
 		dispose() {
 			geom.dispose();

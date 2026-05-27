@@ -337,6 +337,7 @@ export async function mountScene(
 		controls.update();
 		grids.update(camera);
 		bundle.travelEdges.tickFlow(dt);
+		bundle.repBursts.tick();
 		composer.render(dt);
 		labelRenderer.render(scene, camera);
 		skyboxLabels.update(camera, container.clientWidth, container.clientHeight);
