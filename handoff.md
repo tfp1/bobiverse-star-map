@@ -7,6 +7,26 @@ Read it fully before writing code.
 
 ---
 
+## Status — as of 2026-05-27
+
+**v0 visualization shipped.** Live at https://tfp1.github.io/bobiverse-star-map/.
+Issue #11 closed. Five PRs landed: #17 (scaffold) → #19 (overlay graph) →
+#20 (render polish) → #21 (Bob pips + picking + info panel) → #22
+(spoiler-tier selector). The reading-order gate from §D2 is implemented as
+`#book=N` in the URL hash and a 5-button picker top-right.
+
+**Open work** (issues, not in this doc — `gh issue list`):
+- #12 — Timeline mode (in-world-date scrubber, additive to Explore)
+- #13 — Story mode (POV-guided tour)
+- #14 — Non-spatial rendering design (off_map / wormhole / Sgr A* / megastructure currently silently dropped by the renderer; see #14 status comment for what the v0 code actually does)
+
+§§1–7 below remain the source of truth for committed decisions and the
+data model. §8 open questions are partially resolved (Explore mode is
+done; Timeline / Story / non-spatial are issue-tracked). §9's
+"suggested first moves" is now historical — v0 is in main.
+
+---
+
 ## 0. What this project is
 
 A web-based interactive map of the Bobiverse (Dennis E. Taylor, books 1–5),
