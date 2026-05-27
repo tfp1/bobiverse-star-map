@@ -102,6 +102,10 @@
 		let lastTs = 0;
 		let yearFloat = year;
 		let lastYear = year;
+		const pushDisplayed = () => {
+			if (!handle) return;
+			handle.setDisplayedYear(mode === 'timeline' ? yearFloat : null);
+		};
 		const loop = (ts: number) => {
 			raf = requestAnimationFrame(loop);
 			if (!playing || mode !== 'timeline') {
@@ -110,6 +114,7 @@
 					yearFloat = year;
 					lastYear = year;
 				}
+				pushDisplayed();
 				return;
 			}
 			if (year !== lastYear) {
@@ -126,6 +131,7 @@
 				lastYear = year;
 				playing = false;
 				persist();
+				pushDisplayed();
 				return;
 			}
 			const rounded = Math.floor(yearFloat);
@@ -134,6 +140,7 @@
 				lastYear = year;
 				persist();
 			}
+			pushDisplayed();
 		};
 		raf = requestAnimationFrame(loop);
 

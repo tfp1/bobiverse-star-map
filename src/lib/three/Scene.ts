@@ -17,6 +17,7 @@ import { makeMegastructureNodes } from './overlay/MegastructureNodes';
 import { makeGrids } from './Grids';
 import { makeDropLines } from './DropLines';
 import { makeSkyboxLabels } from './SkyboxLabels';
+import { makeReplicationBursts } from './ReplicationBursts';
 import { attachPicking, type Selection } from './picking';
 
 export interface SceneHandle {
@@ -31,6 +32,12 @@ export interface SceneHandle {
 	frameEcliptic: () => void;
 	/** Re-pivot orbit on a named system / bob and fly closer. */
 	focusOn: (sel: Selection) => void;
+	/**
+	 * Continuous (float) scrubber year for shader-driven edge fade-in
+	 * and replication bursts. Null disables animation (Explore mode).
+	 * Cheap — uniform write, no rebuild.
+	 */
+	setDisplayedYear: (year: number | null) => void;
 }
 
 export interface SceneStats {
@@ -155,7 +162,10 @@ export async function mountScene(
 		travelEdges: ReturnType<typeof makeTravelEdges>;
 		bobNodes: ReturnType<typeof makeBobNodes>;
 		dropLines: ReturnType<typeof makeDropLines>;
+		repBursts: ReturnType<typeof makeReplicationBursts>;
 	}
+
+	let currentDisplayedYear: number | null = null;
 
 	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
 		const view = buildTierView(overlay, tier, yearMax);
@@ -179,6 +189,14 @@ export async function mountScene(
 			dropPositions.push(m.position.clone());
 		}
 		const dropLines = makeDropLines(dropPositions);
+		const repBursts = makeReplicationBursts(overlay, tier, yearMax);
+		// Push the most recent displayedYear into the freshly-built bundle
+		// so newly-included edges and bursts inherit the current scrubber
+		// position (avoids a one-frame pop at the boundary year).
+		const y = currentDisplayedYear ?? yearMax;
+		repEdges.setDisplayedYear(y);
+		travelEdges.setDisplayedYear(y);
+		repBursts.setDisplayedYear(y);
 		return {
 			systemMarkers,
 			offMapMarkers,
@@ -186,7 +204,8 @@ export async function mountScene(
 			repEdges,
 			travelEdges,
 			bobNodes,
-			dropLines
+			dropLines,
+			repBursts
 		};
 	};
 
@@ -198,6 +217,7 @@ export async function mountScene(
 		scene.remove(b.travelEdges.object);
 		scene.remove(b.bobNodes.group);
 		scene.remove(b.dropLines.object);
+		scene.remove(b.repBursts.object);
 		b.systemMarkers.dispose();
 		b.offMapMarkers.dispose();
 		b.megastructureNodes.dispose();
@@ -205,6 +225,7 @@ export async function mountScene(
 		b.travelEdges.dispose();
 		b.bobNodes.dispose();
 		b.dropLines.dispose();
+		b.repBursts.dispose();
 	};
 
 	const initialTier = opts.initialTier ?? MAX_TIER;
@@ -218,6 +239,7 @@ export async function mountScene(
 		scene.add(b.travelEdges.object);
 		scene.add(b.bobNodes.group);
 		scene.add(b.dropLines.object);
+		scene.add(b.repBursts.object);
 	};
 	const pickTargets = (b: OverlayBundle): THREE.Mesh[] => [
 		...b.systemMarkers.meshes,
@@ -314,6 +336,7 @@ export async function mountScene(
 		}
 		controls.update();
 		grids.update(camera);
+		bundle.travelEdges.tickFlow(dt);
 		composer.render(dt);
 		labelRenderer.render(scene, camera);
 		skyboxLabels.update(camera, container.clientWidth, container.clientHeight);
@@ -355,6 +378,12 @@ export async function mountScene(
 		recenter,
 		frameEcliptic,
 		focusOn,
+		setDisplayedYear(year: number | null) {
+			currentDisplayedYear = year;
+			bundle.repEdges.setDisplayedYear(year);
+			bundle.travelEdges.setDisplayedYear(year);
+			bundle.repBursts.setDisplayedYear(year);
+		},
 		dispose() {
 			cancelAnimationFrame(raf);
 			window.removeEventListener('resize', onResize);
