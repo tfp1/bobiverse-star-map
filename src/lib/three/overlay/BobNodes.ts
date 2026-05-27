@@ -51,7 +51,12 @@ export function makeBobNodes(overlay: Overlay, view?: TierView): BobNodesResult 
 			skipped++;
 			continue;
 		}
-		if (view && !view.bobVisible(bob.name)) {
+		// Per-record visibility — `overlay.bobs` carries backup-variant
+		// rows (Elmer_v4 etc.) alongside the primary record under the
+		// same display name. bobVisibleRec checks this bob's own id and
+		// skips the edge fallback for variants, so a dateless _vN does
+		// not inherit the primary's anchors.
+		if (view && !view.bobVisibleRec(bob)) {
 			skipped++;
 			continue;
 		}

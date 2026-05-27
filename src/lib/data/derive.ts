@@ -17,13 +17,42 @@ export interface TierView {
 	tier: number;
 	yearMax: number | null;
 	visibleSystems: Set<string>;
+	/**
+	 * Name-keyed visibility — for edge rows (replication/travel) that
+	 * reference Bobs only by display name and have no record id.
+	 * Resolves through bobByName, so backup-variant ids (Elmer_v4 etc.)
+	 * collapse to the primary's anchors. DO NOT call from per-record
+	 * code paths (BobNodes, system-residents); use bobVisibleRec.
+	 */
 	bobVisible: (bobName: string) => boolean;
+	/**
+	 * Record-keyed visibility — for code paths that iterate
+	 * `overlay.bobs` directly and can disambiguate Elmer from
+	 * Elmer_v4. Variant records contribute only their own dates and
+	 * are excluded from the firstBookOf/firstDateOf edge fallback
+	 * (edges aren't attributed to a specific restore-variant), so a
+	 * dateless _vN record stays hidden in Timeline mode and at
+	 * sub-MAX tiers — matching the "backup restore is a late reveal"
+	 * intent.
+	 */
+	bobVisibleRec: (bob: Bob) => boolean;
 	/**
 	 * True when the in-world year for an entity should be considered
 	 * visible at the current yearMax. Null is hidden under any active
 	 * time gate and always visible when no gate is set.
 	 */
 	dateVisible: (year: number | null) => boolean;
+}
+
+/**
+ * Backup-restore variant: data/bobs.json carries restored-from-backup
+ * variants as `<Name>_v<N>` rows that share a display name with the
+ * primary record. Used to decide whether to apply the edge-derived
+ * book/date fallbacks (which are name-keyed and would otherwise
+ * pull the primary's anchors into the variant).
+ */
+function isVariantId(id: string): boolean {
+	return /_v\d+$/.test(id);
 }
 
 export function buildTierView(
@@ -56,12 +85,14 @@ export function buildTierView(
 		if (yearMax == null) return true;
 		return dateVisible(fdOf(bobName));
 	};
+	const bobVisibleRec = (bob: Bob): boolean => bobVisibleAt(overlay, bob, tier, yearMax);
 	const visibleSystems = systemsVisibleAt(overlay, tier, yearMax);
 	return {
 		tier,
 		yearMax,
 		visibleSystems,
 		bobVisible,
+		bobVisibleRec,
 		dateVisible
 	};
 }
@@ -89,6 +120,11 @@ export function firstBookOf(overlay: Overlay, bobName: string): number | null {
  * then the earliest travel edge by the Bob. Returns null only when
  * NONE of those carry a date — those Bobs cannot be placed in
  * Timeline mode and are hidden whenever yearMax is set.
+ *
+ * Name-keyed. Resolves bobByName for the bobs.json fallback, which
+ * collapses backup-variant ids (Elmer_v4) onto the primary record.
+ * Per-record callers should go through bobVisibleAt / TierView's
+ * bobVisibleRec, which skips the edge fallback for variants.
  */
 export function firstDateOf(overlay: Overlay, bobName: string): number | null {
 	const bob = overlay.bobByName(bobName);
@@ -113,12 +149,16 @@ export function firstDateOf(overlay: Overlay, bobName: string): number | null {
 }
 
 /**
- * Is this Bob visible at `tier` (and optionally at `yearMax`)? A Bob
- * with no replication-edge appearance is treated as MAX_TIER-only —
- * it's likely a late-discovered stub (Hugh/Lenny/Mud) whose first
- * book is genuinely unknown, so hide until the all-spoilers tier.
- * When `yearMax` is set, a Bob whose firstDateOf returns null is
- * also hidden (no anchor to place them on the chronological axis).
+ * Is this specific Bob record visible at `tier` (and optionally at
+ * `yearMax`)? Per-record (id-aware): backup-variant rows (Elmer_v4
+ * etc.) do NOT inherit the primary's edge-derived anchors, because
+ * edges aren't attributed to a specific restore-variant. A variant
+ * with no own dates is effectively an orphan stub — visible only
+ * at tier 5 and hidden whenever yearMax is set.
+ *
+ * For primary records: a Bob with no replication-edge appearance is
+ * treated as MAX_TIER-only (Hugh/Lenny/Mud). Under yearMax, a Bob
+ * whose firstDateOf returns null is hidden (no chronological anchor).
  */
 export function bobVisibleAt(
 	overlay: Overlay,
@@ -126,11 +166,18 @@ export function bobVisibleAt(
 	tier: number,
 	yearMax: number | null = null
 ): boolean {
-	const fb = firstBookOf(overlay, bob.name);
+	const variant = isVariantId(bob.id);
+	const fb = variant ? null : firstBookOf(overlay, bob.name);
 	const tierOk = fb == null ? tier >= MAX_TIER : fb <= tier;
 	if (!tierOk) return false;
 	if (yearMax == null) return true;
-	const fd = firstDateOf(overlay, bob.name);
+	let fd: number | null;
+	if (variant) {
+		// Only this record's own dates count; no edge fallback.
+		fd = bob.online_year ?? bob.created_year ?? null;
+	} else {
+		fd = firstDateOf(overlay, bob.name);
+	}
 	return fd != null && fd <= yearMax;
 }
 
