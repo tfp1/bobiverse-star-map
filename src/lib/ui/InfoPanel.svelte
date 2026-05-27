@@ -2,9 +2,11 @@
 	import type { Selection } from '$lib/three/picking';
 	import { getOverlay } from '$lib/data/overlay';
 	import {
+		bobVisibleAt,
 		bobsAt,
 		firstBookOf,
 		megastructuresVisibleAt,
+		systemsVisibleAt,
 		travelCountsAt
 	} from '$lib/data/derive';
 
@@ -20,16 +22,26 @@
 
 	const view = $derived.by(() => {
 		if (!selection) return null;
+		// Selection survives across tier / scrubber changes (so the user
+		// can keep their place while exploring). When the selected entity
+		// has been gated out of the rendered scene by the current
+		// (tier, yearMax), close the panel — same panel/renderer parity
+		// rule as the per-entity counts. The panel reopens automatically
+		// if the user scrubs forward past the entity's visibility again,
+		// because $derived re-evaluates and selection is still set.
 		if (selection.kind === 'system') {
+			const sys = overlay.resolveSystem(selection.systemName);
+			if (!sys) return null;
+			const visibleSystems = systemsVisibleAt(overlay, tier, yearMax);
+			if (!visibleSystems.has(selection.systemName)) return null;
 			const bobs = bobsAt(overlay, selection.systemName, tier, yearMax);
 			const counts = travelCountsAt(overlay, selection.systemName, tier, yearMax);
-			const sys = overlay.resolveSystem(selection.systemName);
-			const kind = sys?.kind ?? 'catalog_star';
+			const kind = sys.kind ?? 'catalog_star';
 			// Megastructures hosted at this catalog star (HR @ Eta Leporis etc.) —
 			// surfaced as a related-node row per D9/D10. Must match the rendered
-			// scene's visibility (panel/renderer parity): a tier-1 click on
-			// Epsilon Eridani should NOT leak Matryoshka Brain (B4/2225).
-			const visibleMegas = megastructuresVisibleAt(overlay, tier, yearMax);
+			// scene's visibility: a tier-1 click on Epsilon Eridani should NOT
+			// leak Matryoshka Brain (B4/2225).
+			const visibleMegas = megastructuresVisibleAt(overlay, tier, yearMax, visibleSystems);
 			const hostedMegastructures = overlay.megastructures.filter(
 				(m) => m.host === selection.systemName && visibleMegas.has(m.name)
 			);
@@ -43,6 +55,8 @@
 			};
 		}
 		if (selection.kind === 'megastructure') {
+			const visibleMegas = megastructuresVisibleAt(overlay, tier, yearMax);
+			if (!visibleMegas.has(selection.megastructureName)) return null;
 			const m = overlay.megastructures.find((x) => x.name === selection.megastructureName);
 			if (!m) return null;
 			return { kind: 'megastructure' as const, m };
@@ -53,6 +67,7 @@
 		// bobByName is for edge rows that only carry the name string.
 		const bob = overlay.bobById.get(selection.bobId);
 		if (!bob) return null;
+		if (!bobVisibleAt(overlay, bob, tier, yearMax)) return null;
 		return {
 			kind: 'bob' as const,
 			bob,
