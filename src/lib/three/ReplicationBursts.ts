@@ -25,6 +25,15 @@ export interface ReplicationBurstsResult {
 	setDisplayedYear: (year: number | null) => void;
 	/** Push wall-clock time forward each frame so burst age advances. */
 	tick: () => void;
+	/**
+	 * Recompute candidate set (tier and/or year-buffer changed) without
+	 * resetting prevDisplayedYear or wall-clock state. The geometry's
+	 * position + triggeredAt buffers are reused if the new candidate
+	 * count fits; otherwise reallocated. Preserves the (prev, year]
+	 * comparison window across the call so a year-crossing that the
+	 * caller would push immediately afterwards still triggers.
+	 */
+	setView: (overlay: Overlay, tier: number, yearMax: number | null) => void;
 	dispose: () => void;
 }
 
@@ -56,20 +65,24 @@ function collectCandidates(
 	return out;
 }
 
+const FADE_BUFFER = 3;
+
 export function makeReplicationBursts(
 	overlay: Overlay,
 	tier: number,
 	yearMax: number | null
 ): ReplicationBurstsResult {
-	const FADE_BUFFER = 3;
-	const yearMaxBuffered = yearMax == null ? null : yearMax + FADE_BUFFER;
-	const candidates = collectCandidates(overlay, tier, yearMaxBuffered);
-	const N = Math.max(1, candidates.length);
-
-	const positions = new Float32Array(N * 3);
-	// Per-instance state. triggeredAt < 0 → not yet fired (or rewound).
-	const triggeredAt = new Float32Array(N);
-	for (let i = 0; i < N; i++) triggeredAt[i] = -1;
+	let candidates = collectCandidates(
+		overlay,
+		tier,
+		yearMax == null ? null : yearMax + FADE_BUFFER
+	);
+	// Pre-allocate generously so setView can usually reuse the buffer
+	// without reallocating (cheap path during playback).
+	let capacity = Math.max(256, candidates.length * 2);
+	let positions = new Float32Array(capacity * 3);
+	let triggeredAt = new Float32Array(capacity);
+	for (let i = 0; i < capacity; i++) triggeredAt[i] = -1;
 	for (let i = 0; i < candidates.length; i++) {
 		positions[i * 3 + 0] = candidates[i].pos.x;
 		positions[i * 3 + 1] = candidates[i].pos.y;
@@ -77,8 +90,9 @@ export function makeReplicationBursts(
 	}
 
 	const geom = new THREE.BufferGeometry();
-	geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-	const triggeredAttr = new THREE.BufferAttribute(triggeredAt, 1);
+	let posAttr = new THREE.BufferAttribute(positions, 3);
+	geom.setAttribute('position', posAttr);
+	let triggeredAttr = new THREE.BufferAttribute(triggeredAt, 1);
 	triggeredAttr.setUsage(THREE.DynamicDrawUsage);
 	geom.setAttribute('triggeredAt', triggeredAttr);
 	geom.setDrawRange(0, candidates.length);
@@ -177,6 +191,42 @@ export function makeReplicationBursts(
 		},
 		tick() {
 			material.uniforms.uNow.value = nowSec();
+		},
+		setView(o: Overlay, t: number, ym: number | null) {
+			// Recompute candidate set without disturbing prevDisplayedYear,
+			// so a year-crossing immediately following this call still
+			// triggers correctly. Reuses the geometry buffers in place
+			// when the new count fits; reallocates only when growing.
+			const next = collectCandidates(o, t, ym == null ? null : ym + FADE_BUFFER);
+			if (next.length > capacity) {
+				capacity = Math.max(capacity * 2, next.length);
+				positions = new Float32Array(capacity * 3);
+				triggeredAt = new Float32Array(capacity);
+				for (let i = 0; i < capacity; i++) triggeredAt[i] = -1;
+				posAttr = new THREE.BufferAttribute(positions, 3);
+				geom.setAttribute('position', posAttr);
+				triggeredAttr = new THREE.BufferAttribute(triggeredAt, 1);
+				triggeredAttr.setUsage(THREE.DynamicDrawUsage);
+				geom.setAttribute('triggeredAt', triggeredAttr);
+			} else {
+				// Reset trigger state for slots we're about to overwrite.
+				// Candidates that disappear (tier dropped) shouldn't leave
+				// ghost rings; new candidates start untriggered.
+				for (let i = 0; i < capacity; i++) triggeredAt[i] = -1;
+				triggeredAttr.needsUpdate = true;
+			}
+			for (let i = 0; i < next.length; i++) {
+				positions[i * 3 + 0] = next[i].pos.x;
+				positions[i * 3 + 1] = next[i].pos.y;
+				positions[i * 3 + 2] = next[i].pos.z;
+			}
+			posAttr.needsUpdate = true;
+			geom.setDrawRange(0, next.length);
+			candidates = next;
+			// prevDisplayedYear deliberately untouched: the next
+			// setDisplayedYear call from the playback loop will detect
+			// the year-crossing against the value pushed before the
+			// view change.
 		},
 		dispose() {
 			geom.dispose();

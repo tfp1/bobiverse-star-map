@@ -162,10 +162,21 @@ export async function mountScene(
 		travelEdges: ReturnType<typeof makeTravelEdges>;
 		bobNodes: ReturnType<typeof makeBobNodes>;
 		dropLines: ReturnType<typeof makeDropLines>;
-		repBursts: ReturnType<typeof makeReplicationBursts>;
 	}
 
 	let currentDisplayedYear: number | null = null;
+
+	// Replication bursts live OUTSIDE the bundle so their per-instance
+	// prevDisplayedYear / triggered state survive applyView's rebuild.
+	// Otherwise a year-crossing that coincides with an integer rebuild
+	// would land on a fresh module with prev=null and skip the
+	// (prev, year] comparison that drives the burst trigger.
+	const repBursts = makeReplicationBursts(
+		overlay,
+		opts.initialTier ?? MAX_TIER,
+		opts.initialYearMax ?? null
+	);
+	scene.add(repBursts.object);
 
 	const buildOverlay = (tier: number, yearMax: number | null): OverlayBundle => {
 		const view = buildTierView(overlay, tier, yearMax);
@@ -189,14 +200,13 @@ export async function mountScene(
 			dropPositions.push(m.position.clone());
 		}
 		const dropLines = makeDropLines(dropPositions);
-		const repBursts = makeReplicationBursts(overlay, tier, yearMax);
-		// Push the most recent displayedYear into the freshly-built bundle
-		// so newly-included edges and bursts inherit the current scrubber
-		// position (avoids a one-frame pop at the boundary year).
+		// Seed the newly-built edge materials with the current scrubber
+		// position so newly-included edges don't pop on the boundary year.
+		// (repBursts is built once at scene-mount; setView keeps its
+		// prevDisplayedYear intact so the crossing comparison survives.)
 		const y = currentDisplayedYear ?? yearMax;
 		repEdges.setDisplayedYear(y);
 		travelEdges.setDisplayedYear(y);
-		repBursts.setDisplayedYear(y);
 		return {
 			systemMarkers,
 			offMapMarkers,
@@ -204,8 +214,7 @@ export async function mountScene(
 			repEdges,
 			travelEdges,
 			bobNodes,
-			dropLines,
-			repBursts
+			dropLines
 		};
 	};
 
@@ -217,7 +226,6 @@ export async function mountScene(
 		scene.remove(b.travelEdges.object);
 		scene.remove(b.bobNodes.group);
 		scene.remove(b.dropLines.object);
-		scene.remove(b.repBursts.object);
 		b.systemMarkers.dispose();
 		b.offMapMarkers.dispose();
 		b.megastructureNodes.dispose();
@@ -225,7 +233,6 @@ export async function mountScene(
 		b.travelEdges.dispose();
 		b.bobNodes.dispose();
 		b.dropLines.dispose();
-		b.repBursts.dispose();
 	};
 
 	const initialTier = opts.initialTier ?? MAX_TIER;
@@ -239,7 +246,6 @@ export async function mountScene(
 		scene.add(b.travelEdges.object);
 		scene.add(b.bobNodes.group);
 		scene.add(b.dropLines.object);
-		scene.add(b.repBursts.object);
 	};
 	const pickTargets = (b: OverlayBundle): THREE.Mesh[] => [
 		...b.systemMarkers.meshes,
@@ -337,7 +343,7 @@ export async function mountScene(
 		controls.update();
 		grids.update(camera);
 		bundle.travelEdges.tickFlow(dt);
-		bundle.repBursts.tick();
+		repBursts.tick();
 		composer.render(dt);
 		labelRenderer.render(scene, camera);
 		skyboxLabels.update(camera, container.clientWidth, container.clientHeight);
@@ -367,6 +373,10 @@ export async function mountScene(
 			disposeOverlay(bundle);
 			bundle = buildOverlay(tier, yearMax);
 			addBundle(bundle);
+			// Refresh burst candidates against the new view, but keep the
+			// module's prevDisplayedYear so the next setDisplayedYear call
+			// (with the new yearFloat) still triggers any crossings.
+			repBursts.setView(overlay, tier, yearMax);
 			picking.setTargets(pickTargets(bundle));
 			stats.systems = bundle.systemMarkers.meshes.length + bundle.offMapMarkers.meshes.length;
 			stats.megastructures = bundle.megastructureNodes.meshes.length;
@@ -383,7 +393,7 @@ export async function mountScene(
 			currentDisplayedYear = year;
 			bundle.repEdges.setDisplayedYear(year);
 			bundle.travelEdges.setDisplayedYear(year);
-			bundle.repBursts.setDisplayedYear(year);
+			repBursts.setDisplayedYear(year);
 		},
 		dispose() {
 			cancelAnimationFrame(raf);
@@ -397,6 +407,8 @@ export async function mountScene(
 			(sol.material as THREE.Material).dispose();
 			grids.dispose();
 			skyboxLabels.dispose();
+			scene.remove(repBursts.object);
+			repBursts.dispose();
 			disposeOverlay(bundle);
 			picking.dispose();
 			container.removeChild(renderer.domElement);
