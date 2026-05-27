@@ -213,9 +213,19 @@ export function systemsVisibleAt(
 		if (t.first_book == null || t.first_book > tier) continue;
 		if (!dateOk(t.date_year)) continue;
 		if (t.destination_type === 'off_map') continue;
-		if (overlay.systems.has(t.destination_system)) out.add(t.destination_system);
+		if (!t.bob_known) continue;
+		// Match TravelEdges.buildItinerariesAtTier: a travel row only
+		// contributes to the visible scene when its primary Bob is
+		// itself visible at this tier/yearMax. Without this gate,
+		// orphan-tier Bobs (firstBookOf null, MAX_TIER-only) like
+		// Claude — whose only mention is a B2 travel to Gamma
+		// Pavonis — would light up destination markers at tiers
+		// 2–4 with no pip or edge actually drawn there.
 		const bob = overlay.bobByName(t.bob);
-		if (bob && overlay.systems.has(bob.origin_system)) out.add(bob.origin_system);
+		if (!bob) continue;
+		if (!bobVisibleAt(overlay, bob, tier, yearMax)) continue;
+		if (overlay.systems.has(t.destination_system)) out.add(t.destination_system);
+		if (overlay.systems.has(bob.origin_system)) out.add(bob.origin_system);
 	}
 	return out;
 }
