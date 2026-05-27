@@ -190,7 +190,9 @@
 		<p>WASD to fly · drag mouse to look · R/F up/down · Q/E roll</p>
 		{#if stats}
 			<p class="small">
-				{stats.systems} systems · {stats.bobs} bobs ·
+				{stats.systems} systems{stats.megastructures > 0
+					? ` · ${stats.megastructures} megastructures`
+					: ''} · {stats.bobs} bobs ·
 				<span class="rep">{stats.replicationEdges} replication</span> ·
 				<span class="trv">{stats.travelEdges} travel</span> edges
 			</p>
@@ -436,5 +438,20 @@
 		transform: translate(10px, -50%);
 		white-space: nowrap;
 		text-shadow: 0 0 4px #000;
+	}
+	:global(.off-map-label) {
+		color: #a8b8cc;
+		border-color: rgba(112, 136, 168, 0.55);
+		background: rgba(8, 14, 30, 0.65);
+		font-style: italic;
+	}
+	:global(.sgr-a-label) {
+		color: #f4c75a;
+		border-color: rgba(244, 199, 90, 0.7);
+	}
+	:global(.megastructure-label) {
+		color: #d8e8d0;
+		border-color: rgba(109, 208, 160, 0.6);
+		background: rgba(10, 24, 18, 0.7);
 	}
 </style>

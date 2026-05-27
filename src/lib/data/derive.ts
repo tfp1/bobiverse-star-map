@@ -1,5 +1,5 @@
 import type { Overlay } from './overlay';
-import type { Bob } from './types';
+import type { Bob, TravelEdge } from './types';
 
 export const MAX_TIER = 5;
 
@@ -16,7 +16,14 @@ export const MAX_TIER = 5;
 export interface TierView {
 	tier: number;
 	yearMax: number | null;
+	/**
+	 * Names of all systems that should render — catalog stars AND
+	 * off-map ring-sphere markers (handoff D6/D7). Consumers look up
+	 * the actual SpatialSystem record via overlay.resolveSystem(name).
+	 */
 	visibleSystems: Set<string>;
+	/** Names of host-bound megastructures (D9) that should render. */
+	visibleMegastructures: Set<string>;
 	/**
 	 * Name-keyed visibility — for edge rows (replication/travel) that
 	 * reference Bobs only by display name and have no record id.
@@ -87,10 +94,12 @@ export function buildTierView(
 	};
 	const bobVisibleRec = (bob: Bob): boolean => bobVisibleAt(overlay, bob, tier, yearMax);
 	const visibleSystems = systemsVisibleAt(overlay, tier, yearMax);
+	const visibleMegastructures = megastructuresVisibleAt(overlay, tier, yearMax, visibleSystems);
 	return {
 		tier,
 		yearMax,
 		visibleSystems,
+		visibleMegastructures,
 		bobVisible,
 		bobVisibleRec,
 		dateVisible
@@ -212,7 +221,6 @@ export function systemsVisibleAt(
 	for (const t of overlay.travel) {
 		if (t.first_book == null || t.first_book > tier) continue;
 		if (!dateOk(t.date_year)) continue;
-		if (t.destination_type === 'off_map') continue;
 		if (!t.bob_known) continue;
 		// Match TravelEdges.buildItinerariesAtTier: a travel row only
 		// contributes to the visible scene when its primary Bob is
@@ -224,8 +232,48 @@ export function systemsVisibleAt(
 		const bob = overlay.bobByName(t.bob);
 		if (!bob) continue;
 		if (!bobVisibleAt(overlay, bob, tier, yearMax)) continue;
-		if (overlay.systems.has(t.destination_system)) out.add(t.destination_system);
-		if (overlay.systems.has(bob.origin_system)) out.add(bob.origin_system);
+		const destName =
+			t.destination_system ?? (t.destination_type === 'off_map' ? t.destination_raw : null);
+		if (destName && overlay.resolveSystem(destName)) out.add(destName);
+		if (overlay.resolveSystem(bob.origin_system)) out.add(bob.origin_system);
+	}
+	// Off-map systems are independently visible at their own first_book
+	// (D6). Sgr A* + Centaurvania + Roanoke + Alien System + Jabberwocky
+	// have no travel edges pointing at them but should still appear on
+	// the ring sphere at tier 5. yearMax: gating respects offMapMeta's
+	// date_year, which is null for most (hidden in Timeline mode).
+	for (const [name, meta] of overlay.offMapMeta) {
+		if (meta.first_book > tier) continue;
+		if (!dateOk(meta.date_year)) continue;
+		out.add(name);
+	}
+	return out;
+}
+
+/**
+ * Set of host-bound megastructure names (handoff D9) that should
+ * render at the given tier and yearMax. A megastructure's first_book
+ * and date_year are intrinsic to the structure (encoded in
+ * nonSpatial.ts), so visibility is independent of travel edges —
+ * Heaven's River at Eta Leporis appears at tier 4 even though no
+ * travel edge specifies "to Heaven's River". The host must itself
+ * be in visibleSystems so the tether has somewhere to anchor.
+ */
+export function megastructuresVisibleAt(
+	overlay: Overlay,
+	tier: number,
+	yearMax: number | null = null,
+	visibleSystems?: Set<string>
+): Set<string> {
+	const out = new Set<string>();
+	const dateOk = (y: number | null): boolean =>
+		yearMax == null ? true : y != null && y <= yearMax;
+	const sys = visibleSystems ?? systemsVisibleAt(overlay, tier, yearMax);
+	for (const m of overlay.megastructures) {
+		if (m.first_book > tier) continue;
+		if (!dateOk(m.date_year)) continue;
+		if (!sys.has(m.host)) continue;
+		out.add(m.name);
 	}
 	return out;
 }
@@ -262,9 +310,11 @@ export function travelCountsAt(
 ): { arrivals: number; departures: number } {
 	let arrivals = 0;
 	let departures = 0;
+	const destOf = (t: TravelEdge): string | null =>
+		t.destination_system ?? (t.destination_type === 'off_map' ? t.destination_raw : null);
 	if (tier == null) {
 		for (const t of overlay.travel) {
-			if (t.destination_system === systemName) arrivals++;
+			if (destOf(t) === systemName) arrivals++;
 		}
 		for (const seq of overlay.bobItinerary.values()) {
 			for (let i = 0; i + 1 < seq.length; i++) {
@@ -278,7 +328,7 @@ export function travelCountsAt(
 	// the panel counts agree with the rendered travel lines:
 	//   - edge.first_book <= tier
 	//   - edge.date_year <= yearMax (when yearMax is set)
-	//   - destination resolves to a known system (off_map dropped)
+	//   - destination resolves to a known catalog star or off-map node
 	//   - bob_known and primary Bob resolves
 	//   - primary Bob is visible at this tier (covers Hal at GL877
 	//     who is firstBookOf=null and thus hidden until tier 5)
@@ -286,14 +336,15 @@ export function travelCountsAt(
 	const byBobId = new Map<string, typeof overlay.travel>();
 	for (const t of overlay.travel) {
 		if (!t.bob_known) continue;
-		if (t.destination_type === 'off_map') continue;
-		if (!overlay.systems.has(t.destination_system)) continue;
+		const destName = destOf(t);
+		if (destName == null) continue;
+		if (!overlay.resolveSystem(destName)) continue;
 		if (t.first_book == null || t.first_book > tier) continue;
 		if (!view.dateVisible(t.date_year)) continue;
 		const primary = overlay.bobByName(t.bob);
 		if (!primary) continue;
 		if (!view.bobVisible(primary.name)) continue;
-		if (t.destination_system === systemName) arrivals++;
+		if (destName === systemName) arrivals++;
 		const list = byBobId.get(primary.id) ?? [];
 		list.push(t);
 		byBobId.set(primary.id, list);
@@ -303,10 +354,11 @@ export function travelCountsAt(
 		const travels = byBobId.get(bob.id);
 		if (!travels) continue;
 		travels.sort((a, b) => (a.reading_order ?? 0) - (b.reading_order ?? 0));
-		let prev = overlay.systems.has(bob.origin_system) ? bob.origin_system : null;
+		let prev = overlay.resolveSystem(bob.origin_system) ? bob.origin_system : null;
 		for (const t of travels) {
-			if (prev === systemName && t.destination_system !== systemName) departures++;
-			prev = t.destination_system;
+			const dest = destOf(t);
+			if (prev === systemName && dest !== systemName) departures++;
+			prev = dest;
 		}
 	}
 	return { arrivals, departures };

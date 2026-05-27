@@ -35,7 +35,13 @@ export interface TravelEdge {
 	bob: string;
 	verb: string;
 	destination_raw: string;
-	destination_system: string;
+	/**
+	 * Resolved spatial-system name when destination_type is 'system'
+	 * or 'place_in_system'; null for off_map rows where the resolver
+	 * couldn't bind to a local-bubble star (destination_raw still
+	 * carries the off-map system name — Gamma Leporis A, Skippyland).
+	 */
+	destination_system: string | null;
 	destination_type: TravelDestType;
 	in_world_date: string | null;
 	date_year: number | null;
@@ -60,9 +66,30 @@ export interface SystemRef {
 
 /**
  * A system that resolves to a real spatial position. Sol is included
- * (at the origin) even though it has no bin record.
+ * (at the origin) even though it has no bin record. Off-map "ring
+ * sphere" placeholders (per handoff D6/D7) implement the same
+ * interface — they carry an XYZ so travel edges can land on them —
+ * and a `kind` discriminator so renderers can style them differently.
  */
 export interface SpatialSystem {
 	name: string;
 	xyz: [number, number, number];
+	kind?: 'catalog_star' | 'off_map' | 'sgr_a_star';
+}
+
+/**
+ * Host-bound megastructure node (handoff D9). Lives next to its host
+ * star at a small offset and renders with a distinctive icon. The
+ * `host` field points at a SpatialSystem name. `subtype` chooses the
+ * renderer icon (topopolis = thin torus, dyson_variant = lattice).
+ */
+export interface Megastructure {
+	name: string;
+	host: string;
+	subtype: 'topopolis' | 'dyson_variant';
+	first_book: number;
+	date_year: number | null;
+	xyz: [number, number, number];
+	/** Sub-locations nested under this megastructure in InfoPanel (D10). */
+	sub_locations: string[];
 }
