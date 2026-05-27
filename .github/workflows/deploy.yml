@@ -5,6 +5,14 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Opt JS-based actions (checkout, setup-node, configure-pages,
+# upload-pages-artifact, deploy-pages) into Node 24. Node 20 is
+# deprecated for action runtimes and will be removed from the
+# runner 2026-09-16; this clears the deprecation warning and
+# avoids the eventual hard-fail.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 permissions:
   contents: read
   pages: write
@@ -22,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - run: npm ci
