@@ -90,6 +90,68 @@ associating fan-work with personal infra). Easy to move later.
 and event extraction is fine. Do NOT redistribute prose. Fandom wiki text is
 CC-BY-SA (attribute if used). See §7 for acknowledgments.
 
+**D6 — Off-map distant systems: ghosted markers on a ring sphere at ~120 pc.**
+Closes #14. Off-map systems (Centaurvania, Roanoke, Alien System, Jabberwocky,
+Skippyland, Gamma Leporis A, plus hostless megastructures Hub Zero and the
+Wormhole Network) get placeholder positions on a sphere ~120 pc from Sol —
+~1.4× the local-bubble render radius, so they read as "outside the cloud"
+without being lost in space. Treatment: dotted/ringed sphere, dimmed colour,
+distinct icon class. Travel edges from in-cloud systems land on these
+markers normally. Where a real heliocentric direction is known (only Sgr A*
+right now), use the true bearing; otherwise distribute evenly with a stable
+seeded order so reloads are deterministic. Sidebar list mirrors them for
+keyboard/screen-reader access.
+
+```
+         Skippyland (~120 pc, no known direction)
+              o
+           .
+         .       .
+        .  [star cloud]
+         . . . .  ← real-XYZ Bobiverse systems
+           .
+         (~120 pc)
+              o
+         Jabberwocky
+```
+
+**D7 — Sagittarius A* = literal-direction beacon on the ring sphere.**
+Closes #14. Pinned at the true heliocentric unit vector toward RA 17h 45m,
+Dec −29° but at the same ~120 pc placeholder radius as D6 (a literal 26 000 ly
+breaks the canvas — direction beats distance). Distinct icon class from the
+"unknown-direction" off-map markers so the user can tell "we know which way
+this is" from "this is just over there somewhere."
+
+**D8 — Wormhole edges: dashed cyan arc out of the local plane.** Closes #14.
+When a travel edge gains a `via=wormhole` flag (data work pending — none
+exist yet), render with a bezier curve that bows out of the XY plane and a
+stippled cyan colour distinct from the orange Euclidean travel line. Reading:
+*not* a path through space. Per-endpoint sprites optional. Forward-looking
+— this is the decision the renderer will follow once the data is tagged.
+
+**D9 — Megastructures with a host: sibling node + tether to the host star.**
+Closes #14. Heaven's River (Eta Leporis) and Matryoshka Brain (Epsilon Eridani)
+each render as a small distinctive icon (HR = thin torus, Matryoshka =
+lattice sphere) offset ~0.3 pc from the host with a faint tether line. Own
+info panel, clickable for picking. Hostless megastructures (Hub Zero,
+Wormhole Network) ride the off-map ring per D6, not nested anywhere.
+
+```
+   Epsilon Eridani
+        ○───⋮ Matryoshka Brain
+                (lattice icon, own info panel)
+```
+
+**D10 — Internal/sub-locations live in the info panel, not as nodes.**
+Closes #14. Pure-network spaces (Virt, BobNet, Bobiverse) and megastructure
+sub-locations (Heaven's River's Garack's Spine, Three Lagoons, Galen Town,
+Elbow, Misty Falls, Six Hills, Cedar Rapids, Utopia River, Nirvana River,
+Arcadia River, Transit, Halep's Ending; Jabberwocky's continents Atlantis
+and Lemuria) never become top-level nodes. They appear as a nested list
+under the host node's info panel. Twelve HR sub-locations as separate
+clickable nodes would dominate the visible graph; the info panel is
+the right home.
+
 ---
 
 ## 2. The data model
@@ -353,10 +415,13 @@ on the Bart-clone-cohort theory.
   same graph.
 - **Books 4–5 fan timeline** — does one exist? Determines size of the prose-
   extraction gap. Search before committing to LLM scraping.
-- **Non-spatial rendering convention** — how to draw Sgr A* (off-scale beacon),
-  wormhole edges (topological, no path), and megastructures/internal locations
-  (Heaven's River, Skippyland). Decided THAT they're separate; not WHAT they
-  look like.
+- ~~**Non-spatial rendering convention**~~ — resolved via D6–D10 in §1.
+  Off-map distant + Sgr A* sit on a ~120 pc ring sphere (D6/D7); wormhole
+  edges draw as dashed cyan arcs bowing out of the XY plane (D8);
+  megastructures with a host nest beside it via tether (D9); internal +
+  sub-locations stay in the info panel (D10). Issue #14 closed. Renderer
+  still drops these silently — implementation tracked under a follow-up
+  issue.
 - **Source-of-truth on conflicts** — precedence rule agreed (dateline > prose
   summary > fan compilation), but each conflict in §6 still needs a human call.
 
