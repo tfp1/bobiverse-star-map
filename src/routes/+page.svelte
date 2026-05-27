@@ -190,7 +190,9 @@
 		<p>WASD to fly · drag mouse to look · R/F up/down · Q/E roll</p>
 		{#if stats}
 			<p class="small">
-				{stats.systems} systems · {stats.bobs} bobs ·
+				{stats.systems} systems{stats.megastructures > 0
+					? ` · ${stats.megastructures} megastructures`
+					: ''} · {stats.bobs} bobs ·
 				<span class="rep">{stats.replicationEdges} replication</span> ·
 				<span class="trv">{stats.travelEdges} travel</span> edges
 			</p>

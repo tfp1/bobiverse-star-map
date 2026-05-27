@@ -20,7 +20,10 @@ export interface SceneHandle {
 }
 
 export interface SceneStats {
+	/** Total system markers drawn: catalog stars + off-map ring nodes. */
 	systems: number;
+	/** Host-bound megastructure nodes drawn (Heaven's River, Matryoshka). */
+	megastructures: number;
 	bobs: number;
 	replicationEdges: number;
 	travelEdges: number;
@@ -172,7 +175,8 @@ export async function mountScene(
 	});
 
 	const stats: SceneStats = {
-		systems: bundle.systemMarkers.meshes.length,
+		systems: bundle.systemMarkers.meshes.length + bundle.offMapMarkers.meshes.length,
+		megastructures: bundle.megastructureNodes.meshes.length,
 		bobs: bundle.bobNodes.stats.drawn,
 		replicationEdges: bundle.repEdges.stats.drawn,
 		travelEdges: bundle.travelEdges.stats.drawn
@@ -210,7 +214,8 @@ export async function mountScene(
 			bundle = buildOverlay(tier, yearMax);
 			addBundle(bundle);
 			picking.setTargets(pickTargets(bundle));
-			stats.systems = bundle.systemMarkers.meshes.length;
+			stats.systems = bundle.systemMarkers.meshes.length + bundle.offMapMarkers.meshes.length;
+			stats.megastructures = bundle.megastructureNodes.meshes.length;
 			stats.bobs = bundle.bobNodes.stats.drawn;
 			stats.replicationEdges = bundle.repEdges.stats.drawn;
 			stats.travelEdges = bundle.travelEdges.stats.drawn;

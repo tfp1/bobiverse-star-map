@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { Selection } from '$lib/three/picking';
 	import { getOverlay } from '$lib/data/overlay';
-	import { bobsAt, firstBookOf, travelCountsAt } from '$lib/data/derive';
+	import {
+		bobsAt,
+		firstBookOf,
+		megastructuresVisibleAt,
+		travelCountsAt
+	} from '$lib/data/derive';
 
 	interface Props {
 		selection: Selection | null;
@@ -21,9 +26,12 @@
 			const sys = overlay.resolveSystem(selection.systemName);
 			const kind = sys?.kind ?? 'catalog_star';
 			// Megastructures hosted at this catalog star (HR @ Eta Leporis etc.) —
-			// surfaced in the system panel as a related-node row per D9/D10.
+			// surfaced as a related-node row per D9/D10. Must match the rendered
+			// scene's visibility (panel/renderer parity): a tier-1 click on
+			// Epsilon Eridani should NOT leak Matryoshka Brain (B4/2225).
+			const visibleMegas = megastructuresVisibleAt(overlay, tier, yearMax);
 			const hostedMegastructures = overlay.megastructures.filter(
-				(m) => m.host === selection.systemName
+				(m) => m.host === selection.systemName && visibleMegas.has(m.name)
 			);
 			return {
 				kind: 'system' as const,
