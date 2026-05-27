@@ -16,10 +16,15 @@ Pecaut & Mamajek 2013 main-sequence color/temperature table
 Values are exact for canonical SpTs and linearly interpolated otherwise.
 
 IDEMPOTENT: refuses to re-append if the bin's count is already > 53836.
-To rerun cleanly: `git checkout stars-near.bin` first.
+The tracked `static/stars-near.bin` is committed in its post-append
+state (the renderer needs it that way), so a plain re-run from a fresh
+checkout would hit the idempotency guard. Pass `--reset` to truncate
+the bin back to the base 53836 records and regenerate in one step:
+
+    python3 scripts/append_named_systems.py --reset
 
 OUTPUTS:
-  stars-near.bin                    — extended in-place (18 new records appended)
+  static/stars-near.bin             — extended in-place (19 new records appended)
   data/system_to_star_index.json    — updated in-place: each appended system
                                        gets a real index/byte_offset and
                                        physically-honest bin_M_abs_g / bin_BP_RP
@@ -38,6 +43,28 @@ from collections import OrderedDict
 
 BIN_BASE_COUNT = 53836  # the inherited count; sentinel for idempotency check
 RECORD_SIZE = 20        # 5 × float32
+
+# Coordinate frame: the inherited stars-near.bin is in HELIOCENTRIC ECLIPTIC
+# XYZ (J2000), verified empirically — 3 of the nearest backdrop stars
+# (Barnard, Wolf 359, Lalande 21185) match exact when the equatorial unit
+# vector is rotated by the obliquity ε around the X-axis. Our ref_xyz_pc
+# inputs from SIMBAD are equatorial (ICRS), so we apply that same rotation
+# before writing so the named systems share the bin's frame.
+OBLIQUITY_DEG = 23.4392911  # IAU 2006 obliquity at J2000.0
+_OB_RAD = math.radians(OBLIQUITY_DEG)
+_OB_COS = math.cos(_OB_RAD)
+_OB_SIN = math.sin(_OB_RAD)
+
+
+def equatorial_to_ecliptic(xyz):
+    """Rotate a heliocentric ICRS (equatorial) XYZ vector into the
+    heliocentric ecliptic frame used by stars-near.bin."""
+    x, y, z = xyz
+    return (
+        x,
+        y * _OB_COS + z * _OB_SIN,
+        -y * _OB_SIN + z * _OB_COS,
+    )
 
 # ────────────────────────────────────────────────────────────────────────
 # Pecaut & Mamajek 2013 main-sequence colors (subset for SpTs we use)
@@ -146,21 +173,49 @@ def read_count(bin_path):
         return struct.unpack("<I", f.read(4))[0]
 
 
+def reset_to_base(bin_path):
+    """Truncate the bin back to its inherited base (BIN_BASE_COUNT records)
+    and rewrite the header. Lets the script regenerate from a tracked
+    post-append file in one step instead of requiring a separate
+    truncate-by-hand step before re-running."""
+    new_size = 4 + BIN_BASE_COUNT * RECORD_SIZE
+    with open(bin_path, "r+b") as f:
+        f.truncate(new_size)
+        f.seek(0)
+        f.write(struct.pack("<I", BIN_BASE_COUNT))
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--bin", default="stars-near.bin")
+    ap.add_argument("--bin", default="static/stars-near.bin")
     ap.add_argument("--mapping", default="data/system_to_star_index.json")
     ap.add_argument("--named-out", default="data/named_systems.json")
     ap.add_argument("--dry-run", action="store_true",
                     help="Compute photometry and report; do not modify files.")
+    ap.add_argument("--reset", action="store_true",
+                    help=(f"Truncate the bin back to the inherited base count "
+                          f"({BIN_BASE_COUNT}) before appending. Use this to "
+                          "regenerate from a fresh checkout — the tracked "
+                          "static/stars-near.bin is already post-append, so a "
+                          "plain re-run hits the idempotency guard."))
     args = ap.parse_args()
 
-    # Idempotency check
     current_count = read_count(args.bin)
+    if args.reset and not args.dry_run:
+        if current_count == BIN_BASE_COUNT:
+            print(f"{args.bin} already at base count {BIN_BASE_COUNT}; nothing to reset.")
+        else:
+            print(f"Resetting {args.bin}: {current_count} → {BIN_BASE_COUNT} records.")
+            reset_to_base(args.bin)
+            current_count = BIN_BASE_COUNT
+
+    # Idempotency check — runs after any --reset so we can confirm we landed
+    # at the expected base.
     if current_count != BIN_BASE_COUNT:
         print(f"REFUSING: {args.bin} count is {current_count} (expected base {BIN_BASE_COUNT}).")
-        print("This bin file has already been modified. To rerun cleanly:")
-        print(f"  git checkout {args.bin}")
+        print("This bin file has already been modified. To regenerate from "
+              "the tracked post-append file, re-run with --reset:")
+        print(f"  python3 scripts/append_named_systems.py --reset")
         sys.exit(1)
 
     with open(args.mapping) as f:
@@ -179,9 +234,13 @@ def main():
             print(f"  SKIP {name}: missing xyz or spt")
             continue
         m_g, bp_rp = compute_M_and_color(s.get("ref_v_mag"), s.get("ref_distance_pc"), spt)
+        # ref_xyz_pc is equatorial (ICRS); rotate into the bin's ecliptic
+        # frame before appending. See OBLIQUITY_DEG note at top.
+        xyz_ecl = list(equatorial_to_ecliptic(xyz))
         to_append.append({
             "name": name,
-            "xyz": xyz,
+            "xyz": xyz_ecl,
+            "xyz_equatorial": list(xyz),
             "spt": spt,
             "v_mag": s.get("ref_v_mag"),
             "distance_pc": s.get("ref_distance_pc"),
@@ -228,16 +287,24 @@ def main():
         s = mapping["systems"][r["name"]]
         s["index"] = idx
         s["byte_offset"] = 4 + idx * RECORD_SIZE
-        s["bin_xyz_pc"] = list(r["xyz"])
+        s["bin_xyz_pc"] = list(r["xyz"])  # ecliptic frame (matches bin)
+        s["bin_xyz_pc_equatorial"] = list(r["xyz_equatorial"])
         s["bin_M_abs_g"] = r["M_abs_g"]
         s["bin_BP_RP"] = r["BP_RP"]
         s["match_distance_pc"] = 0.0
         s["confidence"] = "appended"
-        # Preserve diagnostic but mark as obsolete
-        s.setdefault("notes", "")
-        s["notes"] = ("APPENDED to stars-near.bin from SIMBAD reference data; "
-                      "Mamajek 2013 SpT→photometry. " +
-                      (s.get("notes") or "")).strip()
+        # Preserve diagnostic but mark as obsolete. Strip any prior
+        # "APPENDED ..." prefix(es) so re-running with --reset doesn't
+        # accumulate duplicate banners.
+        notes_prefix = ("APPENDED to stars-near.bin from SIMBAD reference data; "
+                        "Mamajek 2013 SpT→photometry")
+        existing = (s.get("notes") or "")
+        while existing.startswith(notes_prefix):
+            sep = existing.find(". ")
+            existing = existing[sep + 2:] if sep != -1 else ""
+        s["notes"] = (
+            f"{notes_prefix}; rotated equatorial→ecliptic. {existing}"
+        ).strip()
         # Drop the old diagnostic — it described the failed crossmatch
         s.pop("nearest_record_index_diagnostic", None)
 
@@ -262,9 +329,10 @@ def main():
     named_doc["$bin_file"] = args.bin
     named_doc["$bin_record_count"] = new_count
     named_doc["$source_photometry"] = (
-        "Positions from SIMBAD (RA/Dec/parallax). Photometry computed from "
-        "V_mag + distance + spectral type via Pecaut & Mamajek 2013 main-sequence "
-        "color table."
+        "Positions from SIMBAD (RA/Dec/parallax), rotated equatorial→ecliptic "
+        f"(obliquity ε={OBLIQUITY_DEG}°) to match the bin's heliocentric "
+        "ecliptic frame. Photometry computed from V_mag + distance + spectral "
+        "type via Pecaut & Mamajek 2013 main-sequence color table."
     )
     named_doc["named_systems"] = []
     for r in to_append:
@@ -273,7 +341,8 @@ def main():
             "name": r["name"],
             "index": idx,
             "byte_offset": 4 + idx * RECORD_SIZE,
-            "xyz_pc": list(r["xyz"]),
+            "xyz_pc": list(r["xyz"]),                       # ecliptic (bin frame)
+            "xyz_pc_equatorial": list(r["xyz_equatorial"]), # ICRS, for reference
             "M_abs_g": r["M_abs_g"],
             "BP_RP": r["BP_RP"],
             "spt": r["spt"],
@@ -297,7 +366,7 @@ def main():
         json.dump(named_doc, f, indent=2, ensure_ascii=False)
     print(f"Named lookup written: {args.named_out}")
 
-    print(f"\nDone. To restore original bin: git checkout {args.bin}")
+    print(f"\nDone. To regenerate from scratch: python3 scripts/append_named_systems.py --reset")
 
 
 if __name__ == "__main__":

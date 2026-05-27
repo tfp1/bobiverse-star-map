@@ -187,7 +187,15 @@
 	{/if}
 	<div class="hud">
 		<h1>Bobiverse Star Map</h1>
-		<p>WASD to fly · drag mouse to look · R/F up/down · Q/E roll</p>
+		<p>Drag to orbit · right-drag pan · wheel zoom · click to select</p>
+		<div class="nav-buttons" role="group" aria-label="Navigation">
+			<button type="button" onclick={() => handle?.recenter()} aria-label="Recenter on Sol">⌂ Sol</button>
+			<button
+				type="button"
+				onclick={() => handle?.frameEcliptic()}
+				aria-label="Top-down view of the ecliptic plane">⊥ Ecliptic</button
+			>
+		</div>
 		{#if stats}
 			<p class="small">
 				{stats.systems} systems{stats.megastructures > 0
@@ -264,7 +272,13 @@
 			</div>
 		</div>
 	{/if}
-	<InfoPanel {selection} {tier} {yearMax} onClose={() => (selection = null)} />
+	<InfoPanel
+		{selection}
+		{tier}
+		{yearMax}
+		onClose={() => (selection = null)}
+		onFocus={(sel) => handle?.focusOn(sel)}
+	/>
 </div>
 
 <style>
@@ -288,6 +302,26 @@
 		left: 16px;
 		pointer-events: none;
 		text-shadow: 0 0 6px #000;
+	}
+	.nav-buttons {
+		margin-top: 6px;
+		display: flex;
+		gap: 4px;
+		pointer-events: auto;
+	}
+	.nav-buttons button {
+		background: rgba(0, 8, 24, 0.55);
+		color: #cfe4ff;
+		border: 1px solid rgba(111, 195, 255, 0.35);
+		border-radius: 3px;
+		padding: 3px 9px;
+		font-size: 0.78rem;
+		cursor: pointer;
+		font-family: inherit;
+	}
+	.nav-buttons button:hover {
+		border-color: rgba(111, 195, 255, 0.7);
+		color: #fff;
 	}
 	.hud h1 {
 		margin: 0;
@@ -453,5 +487,23 @@
 		color: #d8e8d0;
 		border-color: rgba(109, 208, 160, 0.6);
 		background: rgba(10, 24, 18, 0.7);
+	}
+	:global(.skybox-labels) {
+		pointer-events: none;
+	}
+	:global(.skybox-label) {
+		position: absolute;
+		top: 0;
+		left: 0;
+		color: rgba(200, 215, 235, 0.55);
+		font-size: 9px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		white-space: nowrap;
+		text-shadow: 0 0 4px #000;
+		pointer-events: none;
+		will-change: transform;
+		transform: translate(-9999px, -9999px);
 	}
 </style>
