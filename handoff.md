@@ -9,21 +9,26 @@ Read it fully before writing code.
 
 ## Status — as of 2026-05-27
 
-**v0 + Timeline mode shipped.** Live at https://tfp1.github.io/bobiverse-star-map/.
-Issues #11 and #12 closed. Six PRs landed: #17 (scaffold) → #19 (overlay graph) →
+**v0 + Timeline mode + non-spatial rendering shipped.** Live at
+https://tfp1.github.io/bobiverse-star-map/. Issues #11, #12, #14
+closed. Seven PRs landed: #17 (scaffold) → #19 (overlay graph) →
 #20 (render polish) → #21 (Bob pips + picking + info panel) → #22
-(spoiler-tier selector) → #23 (Timeline mode). The reading-order gate from
-§D2 is `#book=N`; Timeline state is `#mode=timeline&year=YYYY` (sharable
-scrubber position). Both gates compose — tier still applies inside Timeline.
+(spoiler-tier selector) → #23 (Timeline mode) → #25 (non-spatial
+ring + megastructures, D6/D7/D9/D10). The reading-order gate from
+§D2 is `#book=N`; Timeline state is `#mode=timeline&year=YYYY`
+(sharable scrubber position). Off-map systems sit on a 120 pc ring
+sphere; megastructures nest beside their host with a tether.
 
 **Open work** (issues, not in this doc — `gh issue list`):
 - #13 — Story mode (POV-guided tour)
-- #14 — Non-spatial rendering design (off_map / wormhole / Sgr A* / megastructure currently silently dropped by the renderer; see #14 status comment for what the v0 code actually does)
+- #24 — Non-spatial: D8 wormhole edges (blocked on `via=wormhole`
+  data flag), off-map sidebar, "fly to off-map" affordance
 
 §§1–7 below remain the source of truth for committed decisions and the
 data model. §8 open questions are partially resolved (Explore + Timeline
-modes done; Story / non-spatial are issue-tracked). §9's "suggested first
-moves" is now historical — v0 is in main.
+modes done; D6/D7/D9/D10 non-spatial rendering shipped; D8 wormhole
+edges and Story mode are issue-tracked). §9's "suggested first moves"
+is now historical — v0 is in main.
 
 ---
 
